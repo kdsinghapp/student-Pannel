@@ -1,0 +1,214 @@
+import axios from "axios";
+
+const API_URL = "https://server-php-8-3.technorizen.com/gradesphere/api";
+const token = localStorage.getItem("userTokenStudent");
+
+export const signInAdmin = async (data) => {
+  try {
+    const res = await axios.post(`${API_URL}/admin/login`, data);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching restaurants:", error);
+    throw error;
+  }
+};
+
+export const getAllClasses = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/admin/classes`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};
+
+export const getClassById = async (id) => {
+  try {
+    const res = await axios.get(`${API_URL}/admin/classes/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};
+
+export const deleteClassById = async (id) => {
+  try {
+    const res = await axios.delete(`${API_URL}/admin/classes/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};
+
+export const updateClassById = async (id, data) => {
+  try {
+    const res = await axios.put(`${API_URL}/admin/classes/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error updating class:", error);
+    throw error;
+  }
+};
+
+
+export const addClasses = async (formData) => {
+  try {
+    const res = await axios.post(`${API_URL}/admin/classes`,formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};
+
+
+// -------------Student -----------------------
+export const getAllStudents = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/admin/student/get-students`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};
+
+export const getStudentById = async (id) => {
+  try {
+    const res = await axios.get(`${API_URL}/admin{{baseUrl}}admin/student/get-student?student_id=${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};
+
+export const deleteStudentById = async (id) => {
+  try {
+    const res = await axios.delete(`${API_URL}/admin/student/delete-student?student_id=${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};
+
+export const updateStudentById = async (id, data) => {
+  try {
+    const res = await axios.put(`${API_URL}/admin/student/update-student`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error updating class:", error);
+    throw error;
+  }
+};
+
+
+export const addStudents = async (formData) => {
+  try {
+    const res = await axios.post(`${API_URL}/admin/classes`,formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};
+
+
+// ----------------------COUNTRY--------------
+
+export const getCountryList = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/admin/countries`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};
+
+
+export const getReligionsList = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/admin/religions`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};

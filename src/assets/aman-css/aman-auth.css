@@ -1,0 +1,241 @@
+/* @import url("./index.css"); */
+
+.sign-in-section {
+    background-color: var(--background-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.left-section {
+    background-image: url("../assets/bg-grad.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    position: fixed;
+    width: 50%;
+    left: 0;
+    top: 0;
+}
+
+.sign-up-title {
+    background-size: contain;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 50px;
+    padding-bottom: 60px;
+    position: relative;
+}
+
+.shimmer-img {
+    position: absolute;
+}
+
+.logo-img {
+    width: 300px;
+    position: relative;
+}
+
+.indicator{
+    width: 10%;
+}
+
+.right-section {
+    min-height: 100vh;
+    overflow-y: auto;
+}
+
+.register-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.setup-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.logo-upload .upload-area {
+    border: 2px dashed #1a73e8;
+    border-radius: 8px;
+    padding: 2rem;
+    cursor: pointer;
+}
+
+.logo-container{
+    margin-top: 30% !;
+    position: relative;
+}
+
+.logo-container p{
+    font-size: 12px;
+}
+
+.plus-icon {
+    width: 40px;
+    height: 40px;
+    background: #1a73e8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0;
+    color: #ffffff;
+    font-size: 30px;
+}
+
+.upload-area small {
+    display: block;
+    color: #666;
+    margin-top: 0.5rem;
+    font-size: 12px;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    height: calc(3rem + 2px) !important;
+}
+
+.term-group {
+    position: relative;
+}
+
+.add-term, .remove-term {
+    width: 55px;
+    height: 50px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.remove-term {
+    background-color: #dc3545;
+}
+
+.terms-section {
+    margin: 1.5rem 0;
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.terms-section a {
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+button[type="submit"] {
+    background: #1a73e8;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+select.form-control {
+    padding-right: 30px;  /* Add more space for the dropdown arrow */
+}
+
+.additional-text{
+    margin-bottom: 1.5rem;
+    font-size: 12px;
+}
+
+.custom-select-wrapper {
+    position: relative;
+}
+
+.custom-select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.custom-select-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #1a73e8;
+    pointer-events: none;
+}
+
+.select-wrapper {
+    position: relative;
+    width: 100%;
+    margin-right: 5px;
+}
+
+.select-wrapper::after {
+    content: '\f107';  /* Font Awesome chevron-down icon */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #000000;  /* Matches your theme blue color */
+    font-size: 16px;
+}
+
+.select-with-icon {
+    width: 100%;
+    height: calc(3rem + 2px);
+    padding: 8px 30px 8px 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: white;
+}
+
+.select-with-icon:focus {
+    outline: none;
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+@media (max-width: 991.98px) {
+    .left-section {
+        display: block;
+        width: 100%;
+        position: relative;
+    }
+    
+    .right-section {
+        padding: 1rem;
+        width: 100%;
+    }
+    
+    .setup-form {
+        max-width: 100%;
+    }
+    
+    .register-title {
+        text-align: center;
+        margin-left: 0;
+    }
+}
+
+.enter-btn{
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
