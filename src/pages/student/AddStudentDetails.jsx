@@ -1,19 +1,19 @@
 import React, { useState,useEffect } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 
-import Headers from "../components/Headers";
-import studentId from "../assets/assets/icon/fi_list.png";
-import studentPh from "../assets/assets/icon/ph_student.png";
-import studentCat from "../assets/assets/icon/category.png";
-import studentClass from "../assets/assets/icon/class.png";
-import studentProg from "../assets/assets/icon/tabler_progress.png";
-import studentStat from "../assets/assets/icon/lets-icons_status.png";
-import studentEdit from "../assets/assets/icon/tabler_edit.png";
-import Sidebar from "../components/Sidebar";
+import Headers from "../../components/Headers";
+// import studentId from "../assets/assets/icon/fi_list.png";
+// import studentPh from "../assets/assets/icon/ph_student.png";
+// import studentCat from "../assets/assets/icon/category.png";
+// import studentClass from "../assets/assets/icon/class.png";
+// import studentProg from "../assets/assets/icon/tabler_progress.png";
+// import studentStat from "../assets/assets/icon/lets-icons_status.png";
+// import studentEdit from "../assets/assets/icon/tabler_edit.png";
+import Sidebar from "../../components/Sidebar";
 import * as bootstrap from "bootstrap";
-import DownloadTemplate from "../components/DownloadTemplate";
+import DownloadTemplate from "../../components/DownloadTemplate";
 import {
-  addStudents,getCountryList,getReligionsList,getAllClasses} from "../utils/authApi";
+  addStudents,getCountryList,getReligionsList,getAllClasses} from "../../utils/authApi";
 import { useNavigate } from "react-router-dom";
 
 
@@ -30,8 +30,8 @@ const AddStudentsUI = () => {
   const [countries, setCountries] = useState([]);
   const [religions, setReligions] = useState([]);
    const [classData, setClassData] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-  const navigate = useNavigate();
+  // const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  // const navigate = useNavigate();
   
   const [sturdentFormData,setStudentFormData] = useState({
     first_name:"",
@@ -45,7 +45,14 @@ const AddStudentsUI = () => {
     gender:"",
     profile_image:"",
     progress:"",
-    category:""
+    category:"",
+    school_code:"",
+    year_group_id:"",
+    academic_class_id:"",
+    school_division:"",
+    sen:"",
+    g_and_t:"",
+    eal:""
   });
   const [academic,setStudentAcademic] = useState({})
  
@@ -139,10 +146,38 @@ const AddStudentsUI = () => {
       [name]: value,
     }));
   }
-  const handleStudentFormSubbmit=(e)=>{
+  const handleStudentFormSubbmit=async (e)=>{
     e.preventDefault();
     console.log("sturdentFormData",sturdentFormData);
-
+     e.preventDefault();
+     // Call API or update state to add the class
+        try {
+          const res = await addStudents(sturdentFormData);
+          console.log("class-list",res)
+          if(!res.status){
+            // setToastData({ message: "Class not added", type: "denger" });
+        // setShowToast(true);
+          }
+          if (res.status) {
+            // setData(res.data);
+            alert("student added successfully");
+          }
+    
+        } catch (error) {
+          console.error("Error add class data:", error);
+          if (error.message) {
+            console.error("Response Error:", error.response.data);
+            alert(
+              `Error: ${error.response.data.message || "Something went wrong"}`
+            );
+          } else if (error.request) {
+            console.error("Network Error:", error.request);
+            alert("Network error. Please check your internet connection.");
+          } else {
+            console.error("Unexpected Error:", error.message);
+            alert("An unexpected error occurred. Please try again.");
+          }
+        }
   }
 
   return (
@@ -308,9 +343,9 @@ const AddStudentsUI = () => {
                              onChange={handleStudentFormChange}
                             className="select2 form-control">
                               <option value="">Please Select Gender *</option>
-                              <option value={1}>Male</option>
-                              <option value={2}>Female</option>
-                              <option value={3}>Others</option>
+                              <option value="Male">Male</option>
+                              <option value="Female">Female</option>
+                              <option value="Others">Others</option>
                             </select>
                           </div>
                           <div className="col-lg-8 col-12 form-group mg-t-30">
@@ -362,8 +397,8 @@ const AddStudentsUI = () => {
                             <input
                               type="text"
                               placeholder="Enter Forename"
-                              name="gender"
-                            value={sturdentFormData.gender}
+                              name="school_code"
+                            value={sturdentFormData.school_code}
                             onChange={handleStudentFormChange}
                               className="form-control"
                             />
@@ -371,8 +406,8 @@ const AddStudentsUI = () => {
                           <div className="col-xl-4 col-lg-6 col-12 form-group">
                             <label>Year Group*</label>
                             <select 
-                            name="gender"
-                            value={sturdentFormData.gender}
+                            name="year_group_id"
+                            value={sturdentFormData.year_group_id}
                             onChange={handleStudentFormChange}
                             className="select2 form-control">
                               <option value="">Year Group*</option>
@@ -384,8 +419,8 @@ const AddStudentsUI = () => {
                           <div className="col-xl-4 col-lg-6 col-12 form-group">
                             <label>Class*</label>
                             <select 
-                            name="gender"
-                            value={sturdentFormData.gender}
+                            name="class_id"
+                            value={sturdentFormData.class_id}
                             onChange={handleStudentFormChange}
                             className="select2 form-control">
                               <option value="">Please Select Class *</option>
@@ -397,64 +432,74 @@ const AddStudentsUI = () => {
                           <div className="col-xl-4 col-lg-6 col-12 form-group">
                             <label>School Division*</label>
                             <select 
-                            name="gender"
-                            value={sturdentFormData.gender}
+                            name="school_division"
+                            value={sturdentFormData.school_division}
                             onChange={handleStudentFormChange}
                             className="select2 form-control">
-                              <option value="">School Division *</option>
+                              <option value="">Pleasec School Division *</option>
+                              <option value="AMORG91731">Indore Division</option>
                             </select>
                           </div>
                           <div className="col-xl-4 col-lg-6 col-12 form-group">
                             <label>SEN*</label>
                             <select 
-                            name="gender"
-                            value={sturdentFormData.gender}
+                            name="sen"
+                            value={sturdentFormData.sen}
                             onChange={handleStudentFormChange}
                             className="select2 form-control">
-                              <option value="">Yes</option>
-                              <option value="">No</option>
+                               <option value="">Pleasec Select SEN</option>
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
                             </select>
                           </div>
                           <div className="col-xl-4 col-lg-6 col-12 form-group">
                             <label>G &amp; T*</label>
                             <select 
-                            name="gender"
-                            value={sturdentFormData.gender}
+                            name="g_and_t"
+                            value={sturdentFormData.g_and_t}
                             onChange={handleStudentFormChange}
                             className="select2 form-control">
-                              <option value="">Yes</option>
-                              <option value="">No</option>
+                              <option value="">Pleasec Select G&T</option>
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
                             </select>
                           </div>
                           <div className="col-xl-4 col-lg-6 col-12 form-group">
                             <label>EAL*</label>
                             <select 
-                            name="gender"
-                            value={sturdentFormData.gender}
+                            name="eal"
+                            value={sturdentFormData.eal}
                             onChange={handleStudentFormChange}
                             className="select2 form-control">
-                              <option value="">Yes</option>
-                              <option value="">No</option>
+                              <option value="">Pleasec Select EAL</option>
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
                             </select>
                           </div>
                           <div className="col-xl-4 col-lg-6 col-12 form-group">
-                            <label>Custom</label>
+                            <label>Academic Class</label>
                             <select 
-                            name="gender"
-                            value={sturdentFormData.gender}
+                            name="academic_class_id"
+                            value={sturdentFormData.academic_class_id}
                             onChange={handleStudentFormChange}
                             className="select2 form-control">
-                              <option value="">Optional</option>
+                              <option value="">Please Select Class *</option>
+                              {classData&&classData.map(clas=>{
+                              return(<option key={clas.id} value={clas.id}>{clas.name}</option>)
+                            })}
                             </select>
+                           
                           </div>
                           <div className="col-xl-4 col-lg-6 col-12 form-group">
-                            <label>Custom</label>
+                            <label>Category</label>
                             <select 
-                            name="gender"
-                            value={sturdentFormData.gender}
+                            name="category"
+                            value={sturdentFormData.category}
                             onChange={handleStudentFormChange}
                             className="select2 form-control">
-                              <option value="">Optional</option>
+                              <option value="">Please Select</option>
+                              <option value="ESL">ESL</option>
+                              <option value="ESL">GEN</option>
                             </select>
                           </div>
                           <div className="col-12 form-group mg-t-8">

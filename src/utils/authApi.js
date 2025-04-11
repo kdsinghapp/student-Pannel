@@ -14,6 +14,7 @@ export const signInAdmin = async (data) => {
 };
 
 export const getAllClasses = async () => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
     const res = await axios.get(`${API_URL}/admin/classes`, {
       headers: {
@@ -30,6 +31,7 @@ export const getAllClasses = async () => {
 };
 
 export const getClassById = async (id) => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
     const res = await axios.get(`${API_URL}/admin/classes/${id}`, {
       headers: {
@@ -46,6 +48,7 @@ export const getClassById = async (id) => {
 };
 
 export const deleteClassById = async (id) => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
     const res = await axios.delete(`${API_URL}/admin/classes/${id}`, {
       headers: {
@@ -62,6 +65,7 @@ export const deleteClassById = async (id) => {
 };
 
 export const updateClassById = async (id, data) => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
     const res = await axios.put(`${API_URL}/admin/classes/${id}`, data, {
       headers: {
@@ -79,6 +83,7 @@ export const updateClassById = async (id, data) => {
 
 
 export const addClasses = async (formData) => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
     const res = await axios.post(`${API_URL}/admin/classes`,formData, {
       headers: {
@@ -97,6 +102,7 @@ export const addClasses = async (formData) => {
 
 // -------------Student -----------------------
 export const getAllStudents = async () => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
     const res = await axios.get(`${API_URL}/admin/student/get-students`, {
       headers: {
@@ -113,6 +119,7 @@ export const getAllStudents = async () => {
 };
 
 export const getStudentById = async (id) => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
     const res = await axios.get(`${API_URL}/admin{{baseUrl}}admin/student/get-student?student_id=${id}`, {
       headers: {
@@ -129,8 +136,9 @@ export const getStudentById = async (id) => {
 };
 
 export const deleteStudentById = async (id) => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.delete(`${API_URL}/admin/student/delete-student?student_id=${id}`, {
+    const res = await axios.get(`${API_URL}/admin/student/delete-student?student_id=${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -145,8 +153,9 @@ export const deleteStudentById = async (id) => {
 };
 
 export const updateStudentById = async (id, data) => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.put(`${API_URL}/admin/student/update-student`, data, {
+    const res = await axios.post(`${API_URL}/admin/student/update-student`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -162,8 +171,9 @@ export const updateStudentById = async (id, data) => {
 
 
 export const addStudents = async (formData) => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.post(`${API_URL}/admin/classes`,formData, {
+    const res = await axios.post(`${API_URL}/admin/student/add-student`,formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -181,6 +191,7 @@ export const addStudents = async (formData) => {
 // ----------------------COUNTRY--------------
 
 export const getCountryList = async () => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
     const res = await axios.get(`${API_URL}/admin/countries`, {
       headers: {
@@ -198,6 +209,7 @@ export const getCountryList = async () => {
 
 
 export const getReligionsList = async () => {
+  const token = localStorage.getItem("userTokenStudent");
   try {
     const res = await axios.get(`${API_URL}/admin/religions`, {
       headers: {

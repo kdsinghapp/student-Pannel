@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 
-import Headers from "../components/Headers";
-import logo from "../assets/img/logo.png";
+import Headers from "../../components/Headers";
+import logo from "../../assets/img/logo.png";
 import { Link } from "react-router-dom";
-import studentId from "../assets/assets/icon/fi_list.png";
-import studentPh from "../assets/assets/icon/ph_student.png";
-import studentCat from "../assets/assets/icon/category.png";
-import studentClass from "../assets/assets/icon/class.png";
-import studentProg from "../assets/assets/icon/tabler_progress.png";
-import studentStat from "../assets/assets/icon/lets-icons_status.png";
-import studentEdit from "../assets/assets/icon/tabler_edit.png";
-import Sidebar from "../components/Sidebar";
+import studentId from "../../assets/assets/icon/fi_list.png";
+import studentPh from "../../assets/assets/icon/ph_student.png";
+import studentCat from "../../assets/assets/icon/category.png";
+import studentClass from "../../assets/assets/icon/class.png";
+import studentProg from "../../assets/assets/icon/tabler_progress.png";
+import studentStat from "../../assets/assets/icon/lets-icons_status.png";
+import studentEdit from "../../assets/assets/icon/tabler_edit.png";
+import Sidebar from "../../components/Sidebar";
 import * as bootstrap from "bootstrap";
-import DownloadTemplate from "../components/DownloadTemplate";
+import DownloadTemplate from "../../components/DownloadTemplate";
 
 const Teachers = () => {
   const initialTeachers = [

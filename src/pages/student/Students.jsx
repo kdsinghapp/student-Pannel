@@ -1,26 +1,32 @@
 import React, { useState,useEffect } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 
-import Headers from "../components/Headers";
-import studentId from "../assets/assets/icon/fi_list.png";
-import studentPh from "../assets/assets/icon/ph_student.png";
-import studentCat from "../assets/assets/icon/category.png";
-import studentClass from "../assets/assets/icon/class.png";
-import studentProg from "../assets/assets/icon/tabler_progress.png";
-import studentStat from "../assets/assets/icon/lets-icons_status.png";
-import studentEdit from "../assets/assets/icon/tabler_edit.png";
-import Sidebar from "../components/Sidebar";
+import Headers from "../../components/Headers";
+import studentId from "../../assets/assets/icon/fi_list.png";
+// import studentId from "";
+import studentPh from "../../assets/assets/icon/ph_student.png";
+import studentCat from "../../assets/assets/icon/category.png";
+import studentClass from "../../assets/assets/icon/class.png";
+import studentProg from "../../assets/assets/icon/tabler_progress.png";
+import studentStat from "../../assets/assets/icon/lets-icons_status.png";
+import studentEdit from "../../assets/assets/icon/tabler_edit.png";
+import Sidebar from "../../components/Sidebar";
 import * as bootstrap from "bootstrap";
-import DownloadTemplate from "../components/DownloadTemplate";
+import DownloadTemplate from "../../components/DownloadTemplate";
 import {
-  getAllStudents,getStudentById,deleteStudentById,updateStudentById,addStudents} from "../utils/authApi";
+  getAllStudents,getStudentById,deleteStudentById,updateStudentById,addStudents} from "../../utils/authApi";
 import { useNavigate } from "react-router-dom";
-
+import Swal from "sweetalert2";
+import EditStudent from "./EditStudent";
+import { Modal } from 'bootstrap';
+import StudentViewModal from "./StudentViewModal";
 
 const Students = () => {
   const [students, setStudents] = useState([]);
-
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [editFormData, setEditFormData] = useState({ name: "" });
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   
   // const sList = [
@@ -128,10 +134,89 @@ const Students = () => {
   };
   const navigateToAddStudents = () => {
     navigate("/add-student-details")
-  }
+  };
+  const handleEditClick = (student) => {
+    // setShowModal(true)
+    console.log("handleEditClick-edit",student)
+    setSelectedItem(student);
+    // setEditFormData({ name: item.name });
+  };
+   const handleUpdate = async (editFormData) => {
+    console.log("handleUpdate-editFormData",editFormData)
+    delete editFormData.profile_image
+
+      if (selectedItem) {
+        try {
+          const res = await updateStudentById(selectedItem.id, editFormData);
+          // setData((prevData) =>
+          //   prevData.map((item) =>
+          //     item.id === selectedItem.id ? { ...item, ...editFormData } : item
+          //   )
+          // );
+          console.log("update-res",res)
+          setSelectedItem();
+          const modal = Modal.getInstance(document.getElementById('editModal'));
+          console.log("bootstrap-modal",modal)
+          modal?.hide();
+          
+          document.getElementById("closeEditModal")?.click();
+          getStudentsData();
+        } catch (error) {
+          console.error("Error updating class:", error);
+          const modal = Modal.getInstance(document.getElementById('editModal'));
+          modal?.hide();
+          document.getElementById("closeEditModal")?.click();
+        }
+      }
+    };
+  
+    const handleDelete = async (id) => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            console.log(id);
+            const res = await deleteStudentById(id);
+            // setData((prevData) => prevData.filter((item) => item.id !== id));
+            Swal.fire("Deleted!", "The student has been deleted.", "success");
+            getStudentsData();
+          } catch (error) {
+            Swal.fire("Error!", "Failed to delete the class.", "error");
+          }
+        }
+      });
+    };
 
   return (
     <>
+       {/* Edit Info Model */}
+       <div
+  className="modal fade"
+  id="editModal"
+  tabIndex="-1"
+  aria-labelledby="editModalLabel"
+  aria-hidden="true"
+>
+  <div className="modal-dialog">
+    <div className="modal-content">
+      <div className="modal-header">
+        <h5 className="modal-title" id="editModalLabel">Edit Student</h5>
+        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+      </div>
+      <div className="modal-body">
+        <EditStudent student={selectedItem} handleUpdate={handleUpdate} con/>
+      </div>
+    </div>
+  </div>
+</div>
+
       <div id="wrapper" className="wrapper bg-ash">
         <Headers />
         <div className="dashboard-page-one">
@@ -202,16 +287,15 @@ const Students = () => {
                             >
                               <i className="fas fa-plus" /> Add New
                             </button>
-                         
                           </div>
             </div>
-            {/* Class Table Area Start Here */}
+            {/* Student Table Area Start Here */}
             <div className="card height-auto">
               <div className="card-body p-0">
                 <div className="table-responsive">
                   <table className="table display data-table">
-                    <thead>
-                      <tr>
+                    <thead style={{ lineHeight: "35px", fontSize:"15px" }}>
+                      <tr >
                         <th onClick={() => sortData("id")}>
                           <img src={studentId} /> Student Id{" "}
                           <i className={getSortIcon("id")} />
@@ -240,12 +324,13 @@ const Students = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {students.map((student) => (
-                        <tr key={student.id}>
+                      {(!students || !students.length)&&(<tr style={{ lineHeight: "35px", fontSize:"15px" }}><td>No Data Found</td></tr>) }
+                      {students&&students.map((student) => (
+                        <tr key={student.id} style={{ lineHeight: "35px", fontSize:"15px" }}>
                           <td>{student.id}</td>
                           <td>{student.first_name }  {student.last_name }</td>
                           <td>{student.category}</td>
-                          <td>{student.class}</td>
+                          <td>{student?.student_class?.name}</td>
                           <td className="progress-indicator">
                             {student.progress}%{" "}
                             <span
@@ -258,17 +343,27 @@ const Students = () => {
                               }`}
                             />
                           </td>
-                          <td>{student.nationality}</td>
+                          <td>{student.country.name}</td>
                           <td className="action-icons">
+                          <a
+                                href="#"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editModal"
+                                onClick={() => handleEditClick(student)}
+                              >
                             <i className="fas fa-edit" />
-                            <i className="fas fa-eye" />
-                            <a
-                              href="javascript:void()"
-                              data-toggle="modal"
-                              data-target="#deleteconfirm"
-                            >
-                              <i className="fas fa-trash" />
                             </a>
+                            <a
+                                href="#"
+                                data-bs-toggle="modal"
+                                data-bs-target="#viewModal"
+                                onClick={() => setSelectedItem(student)}
+                              >
+                                <i className="fas fa-eye" />
+                              </a>
+                              <a href="#" onClick={() => handleDelete(student.id)}>
+                                <i className="fas fa-trash" />
+                              </a>
                           </td>
                         </tr>
                       ))}
@@ -332,6 +427,7 @@ const Students = () => {
           </div>
         </div>
       </div> */}
+       {/* {showModal && <div className="modal-backdrop fade show"></div>} */}
       <DownloadTemplate/>
       <div
         className="modal fade"
@@ -424,6 +520,16 @@ const Students = () => {
             </div>
           </div>
         </div>
+      </div>
+       {/* View Info Model */}
+       <div
+        className="modal fade"
+        id="viewModal"
+        tabIndex="-1"
+        aria-labelledby="viewModalLabel"
+        aria-hidden="true"
+      >
+       <StudentViewModal student={selectedItem} />
       </div>
     </>
   );

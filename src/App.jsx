@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import SignUp from "./pages/SignUp";
 import Classes from "./pages/Classes";
-import Students from "./pages/Students";
+import Students from "./pages/student/Students";
 import Grading from "./pages/Grading";
-import Teachers from "./pages/Teachers";
+import Teachers from "./pages/teachers/Teachers";
 import CurriculamSetup from "./pages/CurriculumSetup";
 import Grade from "./pages/Grade";
 import InternalAssesment from "./pages/InternalAssesment";
@@ -15,7 +15,7 @@ import Settings from "./pages/Settings";
 import WelcomePage from "./pages/WelcomePage";
 import AddExternalAssesment from "./components/ExternalAssesments/AddExternalAssesment";
 import NotFound from "./pages/NotFound";
-import AddStudentDetails from "./pages/AddStudentDetails";
+import AddStudentDetails from "./pages/student/AddStudentDetails";
 
 function App() {
   return (
