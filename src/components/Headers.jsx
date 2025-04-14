@@ -2,20 +2,21 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/img/logo.png";
 import admin from "../assets/img/figure/admin.jpg";
-
+import { useSidebarContext } from "../context/SidebarContext";
 const Headers = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const {toggleSidebar}=useSidebarContext()
   const dropdownRef = useRef(null);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  // const toggleSidebar = () => {
+  //   setIsSidebarOpen(!isSidebarOpen);
+  // };
 
-  const toggleMobileNav = () => {
-    setIsMobileNavOpen(!isMobileNavOpen);
-  };
+  // const toggleMobileNav = () => {
+  //   setIsMobileNavOpen(!isMobileNavOpen);
+  // };
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -63,7 +64,7 @@ const Headers = () => {
         <button
           className="navbar-toggler pulse-animation"
           type="button"
-          onClick={toggleMobileNav}
+          // onClick={toggleMobileNav}
         >
           <i className="far fa-arrow-alt-circle-down" />
         </button>

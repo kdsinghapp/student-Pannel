@@ -16,10 +16,12 @@ import WelcomePage from "./pages/WelcomePage";
 import AddExternalAssesment from "./components/ExternalAssesments/AddExternalAssesment";
 import NotFound from "./pages/NotFound";
 import AddStudentDetails from "./pages/student/AddStudentDetails";
+import { SidebarProvider } from "./context/SidebarContext";
 
 function App() {
   return (
     <Router>
+      <SidebarProvider>
       <Routes>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/" element={<Dashboard />} />
@@ -42,6 +44,7 @@ function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </SidebarProvider>
     </Router>
   );
 }

@@ -4,31 +4,28 @@ import { createContext,  useContext, useState } from "react"
 const SidebarContext = createContext(null);
 
 export function SidebarProvider({children}){
-    const [isLargeOpen,setIsLargeOpen] =useState(true);
-    const [isSmallOpen,setIsSmallOpen] =useState(false);
+    const [isSidebarOpen,setIsSidebarOpen] =useState(true);
+    // const [isSmallOpen,setIsSmallOpen] =useState(false);
     function isScreenSmall(){
         return window.innerWidth<1024
     };
-    function toggle(){
+    function toggleSidebar(){
         console.log("sidebar-toggle-clicked")
         if(isScreenSmall()){
-            setIsSmallOpen(prev=>!prev);
+            setIsSidebarOpen(prev=>!prev);
             // setIsLargeOpen(false)
-        }else{
-            setIsLargeOpen(prev=>!prev);
-            
         }
     }
     function close(){
         if(isScreenSmall()){
-            setIsSmallOpen(false)
+            setIsSidebarOpen(false)
         }else{
             setIsLargeOpen(false)
         }
     }
-    console.log("context-isLargeOpen",isLargeOpen,"isSmallOpen->",isSmallOpen)
+    console.log("context-isLargeOpen","isSidebarOpen->",isSidebarOpen)
     return <SidebarContext.Provider value={{
-        isLargeOpen,isSmallOpen,toggle,close
+        isSidebarOpen,toggleSidebar,close
     }}>
         {children}
     </SidebarContext.Provider>
