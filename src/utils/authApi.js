@@ -158,7 +158,7 @@ export const updateStudentById = async (id, data) => {
     const res = await axios.post(`${API_URL}/admin/student/update-student`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
       },
     });
 
@@ -176,7 +176,7 @@ export const addStudents = async (formData) => {
     const res = await axios.post(`${API_URL}/admin/student/add-student`,formData, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
       },
     });
 

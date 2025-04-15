@@ -141,30 +141,42 @@ const Students = () => {
     setSelectedItem(student);
     // setEditFormData({ name: item.name });
   };
-   const handleUpdate = async (editFormData) => {
-    console.log("handleUpdate-editFormData",editFormData)
-    delete editFormData.profile_image
+   const handleUpdate = async (editFormData,profileImageFile) => {
+    console.log("handleUpdate-editFormData",editFormData,profileImageFile)
+    // delete editFormData.profile_image
 
       if (selectedItem) {
         try {
-          const res = await updateStudentById(selectedItem.id, editFormData);
-          // setData((prevData) =>
-          //   prevData.map((item) =>
-          //     item.id === selectedItem.id ? { ...item, ...editFormData } : item
-          //   )
-          // );
+          
+          const formData = new FormData();
+          // Append all form fields to FormData
+          for (const key in editFormData) {
+            formData.append(key, editFormData[key]);
+          }
+          if (profileImageFile) {
+            formData.set("profile_image", profileImageFile);
+          }else if(!profileImageFile){
+            formData.delete("profile_image");
+          }
+             
+
+
+          const res = await updateStudentById(selectedItem.id, formData);
+         
           console.log("update-res",res)
-          setSelectedItem();
+          
           const modal = Modal.getInstance(document.getElementById('editModal'));
           console.log("bootstrap-modal",modal)
           modal?.hide();
-          
+          modal?.dispose();
           document.getElementById("closeEditModal")?.click();
           getStudentsData();
+          setSelectedItem();
         } catch (error) {
           console.error("Error updating class:", error);
           const modal = Modal.getInstance(document.getElementById('editModal'));
           modal?.hide();
+          modal?.dispose();
           document.getElementById("closeEditModal")?.click();
         }
       }
@@ -208,10 +220,10 @@ const Students = () => {
     <div className="modal-content">
       <div className="modal-header">
         <h5 className="modal-title" id="editModalLabel">Edit Student</h5>
-        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+        <button  id="closeEditModal" type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
       </div>
       <div className="modal-body">
-        <EditStudent student={selectedItem} handleUpdate={handleUpdate} con/>
+        {selectedItem&&<EditStudent student={selectedItem} handleUpdate={handleUpdate} />}
       </div>
     </div>
   </div>

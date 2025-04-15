@@ -19,6 +19,13 @@ function StudentViewModal({student}) {
                 aria-label="Close"
               ></button>
             </div>
+            <div clasName="d-flex mb-2 justify-center" style={{margin:"auto"}}>
+              <div className="m-auto justify-center" >
+                  <img src={student?.profile_image} style={{ width:"10em" ,height:"10em", borderRadius:"50%"}}/>
+                 
+              </div>
+              
+            </div>
             <div className="modal-body">
               <p style={{ fontSize: "14px" }}>Item ID: {student?.id}</p>
               <p style={{ fontSize: "14px" }}>Name: {student?.first_name} {student?.last_name}</p>
