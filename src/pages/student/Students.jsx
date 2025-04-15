@@ -347,9 +347,9 @@ const Students = () => {
                             {student.progress}%{" "}
                             <span
                               className={`progress-circle progress-${
-                                student.progress === 100
+                                student.progress >= 99.9
                                   ? "green"
-                                  : student.progress > 50
+                                  : student.progress >= 50
                                   ? "orange"
                                   : "red"
                               }`}
