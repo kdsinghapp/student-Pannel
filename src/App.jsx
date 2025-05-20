@@ -17,11 +17,14 @@ import AddExternalAssesment from "./components/ExternalAssesments/AddExternalAss
 import NotFound from "./pages/NotFound";
 import AddStudentDetails from "./pages/student/AddStudentDetails";
 import { SidebarProvider } from "./context/SidebarContext";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
     <Router>
       <SidebarProvider>
+      <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/" element={<Dashboard />} />
