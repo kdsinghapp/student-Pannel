@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import shimmer from "../assets/assets/shimmer.png";
 import logoLight from "../assets/assets/logo-light.png";
+import Select from 'react-select';
 const baseUrl = "https://server-php-8-3.technorizen.com/gradesphere/api/";
 // console.log('baseUrl', baseUrl);
 
@@ -32,6 +33,7 @@ export const SignUpUI = () => {
         const allCurriculums = categories.flatMap(
           (cat) => cat.curriculum_category?.curriculums || []
         );
+        console.log("allCurriculums", allCurriculums);
         setCurriculums(allCurriculums); // Full objects with curriculum_terms
       } catch (error) {
         console.error("Error fetching curriculums:", error);
@@ -40,6 +42,30 @@ export const SignUpUI = () => {
 
     fetchCurriculums();
   }, []);
+
+
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCurriculumCategories = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}admin/curriculum/get-curriculums`);
+        const categories = response.data?.data || [];
+
+        // Extract only id and name from curriculum_category
+        const curriculumCategories = categories.map(item => {
+          const { id, name } = item.curriculum_category;
+          return { id, name };
+        });
+        console.log("curriculumCategories", curriculumCategories);
+        setCategories(curriculumCategories); // Update your state here
+      } catch (error) {
+        console.error("Error fetching curriculum categories:", error);
+      }
+    };
+
+    fetchCurriculumCategories();
+  }, []);
+
 
   const [divisions, setDivisions] = useState([]);
 
@@ -86,7 +112,9 @@ export const SignUpUI = () => {
   const [mobile, setMobile] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-
+  const options = [
+    { value: '', label: 'Select Phone Code', isDisabled: true },
+  ]
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -129,11 +157,11 @@ export const SignUpUI = () => {
     termDates.forEach((term, index) => {
       if (term.startDate)
         formData.append(`term_start[${index}]`, term.startDate);
-      console.log(`term_start[${index}]` , term.startDate);
+      console.log(`term_start[${index}]`, term.startDate);
     });
     termDates.forEach((term, index) => {
       if (term.endDate) formData.append(`term_end[${index}]`, term.endDate);
-      console.log(`term_end[${index}]` , term.endDate);
+      console.log(`term_end[${index}]`, term.endDate);
     });
     termDates.forEach((term, index) => {
       if (term.termId)
@@ -293,20 +321,24 @@ export const SignUpUI = () => {
                       id="schoolLogo"
                       required
                       accept="image/*"
-                      hidden=""
+                      hidden
                       onChange={(e) => setSchoolLogo(e.target.files[0])}
                     />
+
                     <label
                       htmlFor="schoolLogo"
-                      className="upload-area d-flex flex-column align-items-center"
+                      className="upload-area d-flex flex-column align-items-center justify-content-center border rounded p-4 text-center cursor-pointer"
+                      style={{ borderStyle: 'dashed', minHeight: '150px' }}
                     >
-                      <div className="plus-icon">+</div>
-                      <span>Add Image</span>
+                      <div className="plus-icon display-4 mb-2">+</div>
+                      <span className="text-muted">Add Image</span>
                     </label>
+
                     <span className="additional-text d-block mt-2">
-                      <b>Select School Logo</b> File Supported JPG, PNG, JPEG
+                      <b>Select School Logo</b> — File types supported: JPG, PNG, JPEG
                     </span>
                   </div>
+
                   {/* Form groups with responsive margins */}
                   <div className="form-group mb-3">
                     <input
@@ -318,32 +350,12 @@ export const SignUpUI = () => {
                       onChange={(e) => setSchoolName(e.target.value)}
                     />
                   </div>
-                  <div className="form-group mb-3 select-wrapper">
-                    <select
-                      name="curriculum"
-                      required
-                      className="form-select select-with-icon"
-                      value={selectedCurriculum}
-                      onChange={(e) => setSelectedCurriculum(e.target.value)}
-                    >
-                      <option value="" disabled selected>
-                        School Curriculum
-                      </option>
-                      {curriculums.map((item) => (
-                        <option
-                          key={item.curriculum_id}
-                          value={item.curriculum_id}
-                        >
-                          {item.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
                   <div className="row mb-3">
                     <div className="col-md-6 mb-3 mb-md-0">
                       <input
                         type="date"
                         required
+                        style={{ fontSize: '14px' }}
                         className="form-control"
                         placeholder="Academic Start"
                         value={academicStart}
@@ -354,6 +366,7 @@ export const SignUpUI = () => {
                       <input
                         type="date"
                         required
+                        style={{ fontSize: '14px' }}
                         className="form-control"
                         placeholder="Academic End"
                         value={academicEnd}
@@ -361,6 +374,47 @@ export const SignUpUI = () => {
                       />
                     </div>
                   </div>
+                  <div className="row mb-3 ">
+                    <div className="col-md-6 mb-3 mb-md-0">
+                      <select
+                        name="curriculum"
+                        required
+                        style={{ fontSize: '14px' }}
+                        className="form-select select-with-icon"
+                        value={selectedCurriculum}
+                        onChange={(e) => setSelectedCurriculum(e.target.value)}
+                      >
+                        <option value="" disabled>
+                          School Curriculum
+                        </option>
+                        {categories.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-md-6">
+                      <select
+                        name="curriculum"
+                        required
+                        style={{ fontSize: '14px' }}
+                        className="form-select select-with-icon"
+                      >
+                        <option value="" disabled selected>
+                          Select Division
+                        </option>
+                        {curriculums.map((curriculum) => (
+                          <option key={curriculum.curriculum_id} value={curriculum.curriculum_id}>
+                            {curriculum.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                  </div>
+
+
                   {/* <div className="school-terms-container">
                     <div className="form-group term-group">
                       <div className="d-flex align-items-center">
@@ -387,6 +441,28 @@ export const SignUpUI = () => {
                       </div>
                     </div>
                   </div> */}
+
+
+
+                  {/* <div className="form-group select-wrapper">
+                    <select
+                      name="division"
+                      required
+                      className="select-with-icon"
+                      value={selectedDivision}
+                      onChange={(e) => setSelectedDivision(e.target.value)}
+                    >
+                      <option value="" disabled selected>
+                        School Division
+                      </option>
+                      {divisions.map((division) => (
+                        <option key={division.id} value={division.id}>
+                          {division.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div> */}
+
                   {termDates.map((term, index) => (
                     <div key={term.termId} className="form-row">
                       <div className="form-group col-md-6">
@@ -423,25 +499,8 @@ export const SignUpUI = () => {
                       </div>
                     </div>
                   ))}
-                  <div className="form-group select-wrapper">
-                    <select
-                      name="division"
-                      required
-                      className="select-with-icon"
-                      value={selectedDivision}
-                      onChange={(e) => setSelectedDivision(e.target.value)}
-                    >
-                      <option value="" disabled selected>
-                        School Division
-                      </option>
-                      {divisions.map((division) => (
-                        <option key={division.id} value={division.id}>
-                          {division.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="form-group select-wrapper">
+
+                  {/* <div className="form-group select-wrapper">
                     <select
                       name="year"
                       required
@@ -458,43 +517,53 @@ export const SignUpUI = () => {
                         </option>
                       ))}
                     </select>
+                  </div> */}
+                  <div className="row mb-3">
+                    <div className="col-md-6 mb-3 mb-md-0">
+                      <input
+                        type="email"
+                        required
+                        className="form-control border"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        style={{ fontSize: '14px' }}
+                        autoComplete="off"
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3 mb-md-0">
+                      <input
+                        type="password"
+                        required
+                        className="form-control border"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <input
-                      type="email"
-                      required
-                      className="form-control border"
-                      placeholder="Email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <input
-                      type="password"
-                      required
-                      className="form-control border"
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </div>
-                  <div className="form-row">
-                    <select
-                      required
-                      className="form-select col-md-6"
-                      value={phoneCode}
-                      onChange={(e) => setPhoneCode(e.target.value)}
-                    >
-                      <option value="" disabled>
-                        Select Phone Code
-                      </option>
-                      {countries.map((country) => (
-                        <option key={country.id} value={country.phone_code}>
-                          {country.name} ({country.phone_code})
+
+                  <div className="row mb-3">
+
+                    <div className="col-md-6 mb-3 mb-md-0 ">
+                      <select
+                        required
+                        className="form-control border"
+                        style={{ fontSize: '14px' }}
+                        value={phoneCode}
+                        onChange={(e) => setPhoneCode(e.target.value)}
+                      >
+                        <option value="" disabled>
+                          Select Phone Code
                         </option>
-                      ))}
-                    </select>
+                        {countries.map((country) => (
+                          <option key={country.id} value={country.phone_code}>
+                            {country.name} ({country.phone_code})
+                          </option>
+                        ))}
+                      </select>
+
+                    </div>
                     <div className="form-group col-md-6">
                       <input
                         type="number"
@@ -554,176 +623,3 @@ export const SignUpUI = () => {
   );
 };
 
-// const Old=()=>{
-//   return (
-//     <section className="sign-up-section min-vh-100">
-//       <div className="container-fluid h-100">
-//         <div className="row h-100">
-//           <div className="col-lg-6 p-0 d-lg-block">
-//             <div className="left-section">
-//               <div className="container">
-//                 <div className="row">
-//                   <div className="col-12">
-//                     <div className="sign-up-title-container">
-//                       <h3 className="text-white mx-2 my-3 sign-up-title">
-//                         Sign Up
-//                       </h3>
-//                       <img src={shimer} alt="shimmer" className="shimmer-img" />
-//                     </div>
-//                     <div className="text-center mt-5 d-flex flex-column justify-content-center align-items-center">
-//                       <img
-//                         src={logo}
-//                         alt="logo"
-//                         className="logo-img img-fluid mb-5"
-//                       />
-//                       <h4 className="text-white mt-2 mb-3">
-//                         Welcome to Schooleo{" "}
-//                       </h4>
-//                       <p className="text-white">
-//                         Login to get started with Schooleo
-//                         <br />
-//                         If not yet registered click on sign up
-//                         <br />
-//                         to get started
-//                       </p>
-//                       {/*  <img src="assets/indicator.png" alt="indicator" class="mt-3 indicator"> */}
-//                     </div>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//           {/* Right Section */}
-//           <div className="col-lg-6 col-12">
-//             <div className="right-section py-4 px-3 px-md-5">
-//               <h1 className="register-title">Register and Setup</h1>
-//               <form className="setup-form mb-5">
-//                 {/* Form groups */}
-//                 <div className="logo-upload mb-4">
-//                   {/* <input
-//                     type="file"
-//                     id="schoolLogo"
-//                     accept="image/*"
-//                     hidden=""
-//                   /> */}
-//                   <label
-//                     htmlFor="schoolLogo"
-//                     className="upload-area d-flex flex-column align-items-center"
-//                   >
-//                     <div className="plus-icon">+</div>
-//                     <span>Add Image</span>
-//                   </label>
-//                   <span className="additional-text d-block mt-2">
-//                     <b>Select School Logo</b> File Supported JPG, PNG, JPEG
-//                   </span>
-//                 </div>
-//                 <div className="form-group mb-3">
-//                   <input
-//                     type="text"
-//                     className="form-control"
-//                     placeholder="School Name"
-//                   />
-//                 </div>
-//                 <div className="form-group mb-3 select-wrapper">
-//                   <select
-//                     name="curriculum"
-//                     className="form-select select-with-icon"
-//                   >
-//                     <option value="" selected="" disabled="">
-//                       School Curriculum
-//                     </option>
-//                     <option value="international-b">International B</option>
-//                   </select>
-//                 </div>
-//                 <div className="row mb-3">
-//                   <div className="col-md-6 mb-3 mb-md-0">
-//                     <input
-//                       type="date"
-//                       className="form-control"
-//                       placeholder="Academic Start"
-//                     />
-//                   </div>
-//                   <div className="col-md-6">
-//                     <input
-//                       type="date"
-//                       className="form-control"
-//                       placeholder="Academic End"
-//                     />
-//                   </div>
-//                 </div>
-//                 <div className="school-terms-container">
-//                   <div className="form-group term-group">
-//                     <div className="d-flex align-items-center">
-//                       <div className="select-wrapper">
-//                         <select name="terms" className="select-with-icon mr-2">
-//                           <option value="" selected="" disabled="">
-//                             School Terms
-//                           </option>
-//                           {/* Add options */}
-//                         </select>
-//                       </div>
-//                       <button
-//                         type="button"
-//                         className="btn btn-primary add-term"
-//                       >
-//                         +
-//                       </button>
-//                     </div>
-//                   </div>
-//                 </div>
-//                 <div className="form-row">
-//                   <div className="form-group col-md-6">
-//                     <input
-//                       type="date"
-//                       className="form-control"
-//                       placeholder="Start Date"
-//                     />
-//                   </div>
-//                   <div className="form-group col-md-6">
-//                     <input
-//                       type="date"
-//                       className="form-control"
-//                       placeholder="End Date"
-//                     />
-//                   </div>
-//                 </div>
-//                 <div className="form-group select-wrapper">
-//                   <select name="division" className="select-with-icon">
-//                     <option value="" selected="" disabled="">
-//                       School Division
-//                     </option>
-//                     {/* Add options */}
-//                   </select>
-//                 </div>
-//                 <div className="form-group select-wrapper">
-//                   <select name="year" className="select-with-icon">
-//                     <option value="" selected="" disabled="">
-//                       Year Group
-//                     </option>
-//                     {/* Add options */}
-//                   </select>
-//                 </div>
-//                 <div className="terms-section">
-//                   <small className="d-block text-center">
-//                     By continuing you are acknowledging that you have read,
-//                     understand and agreed to Mentrix's{" "}
-//                     <a href="#">Terms and Conditions</a> and
-//                     <a href="#">Privacy Policy</a>
-//                   </small>
-//                 </div>
-//                 <div className="d-flex justify-content-center">
-//                   <button
-//                     type="submit"
-//                     className="btn btn-primary w-50 w-md-50 enter-btn"
-//                   >
-//                     Enter
-//                   </button>
-//                 </div>
-//               </form>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
