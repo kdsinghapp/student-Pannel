@@ -20,84 +20,70 @@ export default SignUp;
 
 export const SignUpUI = () => {
   const navigate = useNavigate();
-  const [curriculums, setCurriculums] = useState([]);
 
-  useEffect(() => {
-    const fetchCurriculums = async () => {
-      try {
-        const response = await axios.get(
-          `${baseUrl}admin/curriculum/get-curriculums`
-        );
-        const categories = response.data?.data || [];
-
-        const allCurriculums = categories.flatMap(
-          (cat) => cat.curriculum_category?.curriculums || []
-        );
-        console.log("allCurriculums", allCurriculums);
-        setCurriculums(allCurriculums); // Full objects with curriculum_terms
-      } catch (error) {
-        console.error("Error fetching curriculums:", error);
-      }
-    };
-
-    fetchCurriculums();
-  }, []);
-
-
+  const [data, setData] = useState([]);
   const [categories, setCategories] = useState([]);
-  useEffect(() => {
-    const fetchCurriculumCategories = async () => {
-      try {
-        const response = await axios.get(`${baseUrl}admin/curriculum/get-curriculums`);
-        const categories = response.data?.data || [];
-
-        // Extract only id and name from curriculum_category
-        const curriculumCategories = categories.map(item => {
-          const { id, name } = item.curriculum_category;
-          return { id, name };
-        });
-        console.log("curriculumCategories", curriculumCategories);
-        setCategories(curriculumCategories); // Update your state here
-      } catch (error) {
-        console.error("Error fetching curriculum categories:", error);
-      }
-    };
-
-    fetchCurriculumCategories();
-  }, []);
-
-
-  const [divisions, setDivisions] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [curriculums, setCurriculums] = useState([]);
+  const [selectedCurriculums, setSelectedCurriculums] = useState([]);
+  const [termInputs, setTermInputs] = useState([]);
 
   useEffect(() => {
-    const fetchDivisions = async () => {
-      try {
-        const response = await axios.get(
-          `${baseUrl}admin/school-division/get-school-divisions`
-        );
-        setDivisions(response.data?.data || []);
-      } catch (error) {
-        console.error("Error fetching divisions:", error);
-      }
-    };
+    axios
+      .get('https://server-php-8-3.technorizen.com/gradesphere/api/admin/curriculum/get-curriculums')
+      .then((res) => {
+        const responseData = res.data?.data || [];
+        setData(responseData);
 
-    fetchDivisions();
+        const categoryOptions = responseData.map((item) => ({
+          value: item.curriculum_category.id,
+          label: item.curriculum_category.name,
+          curriculums: item.curriculum_category.curriculums
+        }));
+        setCategories(categoryOptions);
+      })
+      .catch((err) => console.error('Error fetching data:', err));
   }, []);
 
-  const [yearGroups, setYearGroups] = useState([]);
+  const handleCategoryChange = (selected) => {
+    setSelectedCategory(selected);
+    setSelectedCurriculums([]);
+    setTermInputs([]);
+    if (selected) {
+      const options = selected.curriculums.map((curr) => ({
+        value: curr.curriculum_id,
+        label: curr.name,
+        curriculum_terms: curr.curriculum_terms
+      }));
+      setCurriculums(options);
+    } else {
+      setCurriculums([]);
+    }
+  };
 
-  useEffect(() => {
-    const fetchYearGroups = async () => {
-      try {
-        const response = await axios.get(`${baseUrl}admin/year/get-year-group`);
-        setYearGroups(response.data?.data || []);
-      } catch (error) {
-        console.error("Error fetching year groups:", error);
-      }
-    };
+  const handleCurriculumChange = (selectedOptions) => {
+    setSelectedCurriculums(selectedOptions);
 
-    fetchYearGroups();
-  }, []);
+    const termsWithDates = selectedOptions.flatMap((curr) =>
+      curr.curriculum_terms.map((term) => ({
+        term_id: term.curriculum_term_id,
+        term_name: term.name,
+        curriculum_id: curr.value,
+        curriculum_name: curr.label,
+        start_date: '',
+        end_date: ''
+      }))
+    );
+
+    setTermInputs(termsWithDates);
+  };
+
+  const handleDateChange = (index, field, value) => {
+    const updated = [...termInputs];
+    updated[index][field] = value;
+    setTermInputs(updated);
+  };
+
 
   const [schoolLogo, setSchoolLogo] = useState(null);
   const [schoolName, setSchoolName] = useState("");
@@ -215,20 +201,6 @@ export const SignUpUI = () => {
 
   const [termDates, setTermDates] = useState([]);
 
-  useEffect(() => {
-    const selected = curriculums.find(
-      (c) => c.curriculum_id === Number(selectedCurriculum)
-    );
-    if (selected && selected.curriculum_terms) {
-      const dates = selected.curriculum_terms.map((term) => ({
-        termId: term.curriculum_term_id,
-        termName: term.name,
-        startDate: "",
-        endDate: "",
-      }));
-      setTermDates(dates);
-    }
-  }, [selectedCurriculum]);
 
   const handleTermDateChange = (index, field, value) => {
     const updated = [...termDates];
@@ -236,17 +208,7 @@ export const SignUpUI = () => {
     setTermDates(updated);
   };
 
-  // const [schoolTerms, setSchoolTerms] = useState([]);
 
-  // // Update terms when curriculum changes
-  // useEffect(() => {
-  //   const selected = curriculums.find((c) => c.id == selectedCurriculum);
-  //   if (selected && selected.curriculum_terms) {
-  //     setSchoolTerms(selected.curriculum_terms);
-  //   } else {
-  //     setSchoolTerms([]);
-  //   }
-  // }, [selectedCurriculum, curriculums]);
   const [countries, setCountries] = useState([]);
 
   useEffect(() => {
@@ -269,6 +231,7 @@ export const SignUpUI = () => {
         <div className="container-fluid h-100">
           <div className="row h-100">
             {/* Left Section */}
+
             <div className="col-lg-6 p-0 d-lg-block">
               <div className="left-section">
                 <div className="container">
@@ -376,7 +339,7 @@ export const SignUpUI = () => {
                   </div>
                   <div className="row mb-3 ">
                     <div className="col-md-6 mb-3 mb-md-0">
-                      <select
+                      {/* <select
                         name="curriculum"
                         required
                         style={{ fontSize: '14px' }}
@@ -392,132 +355,67 @@ export const SignUpUI = () => {
                             {item.name}
                           </option>
                         ))}
-                      </select>
+                      </select> */}
+                      <Select
+                        style={{ fontSize: '14px' }}
+                        options={categories}
+                        value={selectedCategory}
+                        onChange={handleCategoryChange}
+                        placeholder="Select Curriculum Category"
+                      />
                     </div>
                     <div className="col-md-6">
-                      <select
-                        name="curriculum"
-                        required
-                        style={{ fontSize: '14px' }}
-                        className="form-select select-with-icon"
-                      >
-                        <option value="" disabled selected>
-                          Select Division
-                        </option>
-                        {curriculums.map((curriculum) => (
-                          <option key={curriculum.curriculum_id} value={curriculum.curriculum_id}>
-                            {curriculum.name}
-                          </option>
-                        ))}
-                      </select>
+                      <Select
+                        isMulti
+                        options={curriculums}
+                        value={selectedCurriculums}
+                        onChange={handleCurriculumChange}
+                        placeholder="Select Curriculums"
+                      />
                     </div>
 
                   </div>
 
-
-                  {/* <div className="school-terms-container">
-                    <div className="form-group term-group">
-                      <div className="d-flex align-items-center">
-                        <div className="select-wrapper">
-                          <select
-                            name="terms"
-                            required
-                            className="select-with-icon mr-2"
-                            value={selectedSchoolTerms}
-                            onChange={(e) =>
-                              setSelectedSchoolTerms(e.target.value)
-                            }
-                          >
-                            <option value="" selected="" disabled="">
-                              School Terms
-                            </option>
-                            {schoolTerms.map((item) => (
-                              <option key={item.id} value={item.id}>
-                                {item.terms_name}
-                              </option>
-                            ))}
-                          </select>
+                      {termInputs.length > 0 && (
+                    <div>
+                      <h5>Curriculum Terms & Dates</h5>
+                      {termInputs.map((term, index) => (
+                        <div
+                          key={`${term.term_id}-${index}`}
+                          style={{
+                            border: '1px solid #ddd',
+                            borderRadius: 6,
+                            padding: 10,
+                            marginBottom: 10,
+                            backgroundColor: '#f9f9f9'
+                          }}
+                        >
+                          <strong>
+                            {term.curriculum_name} - {term.term_name}
+                          </strong>
+                          <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                            <div>
+                              <label>Start Date</label>
+                              <input
+                                type="date"
+                                value={term.start_date}
+                                onChange={(e) => handleDateChange(index, 'start_date', e.target.value)}
+                              />
+                            </div>
+                            <div>
+                              <label>End Date</label>
+                              <input
+                                type="date"
+                                value={term.end_date}
+                                onChange={(e) => handleDateChange(index, 'end_date', e.target.value)}
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </div> */}
-
-
-
-                  {/* <div className="form-group select-wrapper">
-                    <select
-                      name="division"
-                      required
-                      className="select-with-icon"
-                      value={selectedDivision}
-                      onChange={(e) => setSelectedDivision(e.target.value)}
-                    >
-                      <option value="" disabled selected>
-                        School Division
-                      </option>
-                      {divisions.map((division) => (
-                        <option key={division.id} value={division.id}>
-                          {division.name}
-                        </option>
                       ))}
-                    </select>
-                  </div> */}
-
-                  {termDates.map((term, index) => (
-                    <div key={term.termId} className="form-row">
-                      <div className="form-group col-md-6">
-                        <label>{term.termName} Start Date</label>
-                        <input
-                          type="date"
-                          required
-                          className="form-control"
-                          value={term.startDate}
-                          onChange={(e) =>
-                            handleTermDateChange(
-                              index,
-                              "startDate",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </div>
-                      <div className="form-group col-md-6">
-                        <label>{term.termName} End Date</label>
-                        <input
-                          type="date"
-                          required
-                          className="form-control"
-                          value={term.endDate}
-                          onChange={(e) =>
-                            handleTermDateChange(
-                              index,
-                              "endDate",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </div>
                     </div>
-                  ))}
+                  )}
 
-                  {/* <div className="form-group select-wrapper">
-                    <select
-                      name="year"
-                      required
-                      className="select-with-icon"
-                      value={selectedYearGroup}
-                      onChange={(e) => setSelectedYearGroup(e.target.value)}
-                    >
-                      <option value="" disabled>
-                        Year Group
-                      </option>
-                      {yearGroups.map((year) => (
-                        <option key={year.id} value={year.id}>
-                          {year.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div> */}
                   <div className="row mb-3">
                     <div className="col-md-6 mb-3 mb-md-0">
                       <input
@@ -537,6 +435,7 @@ export const SignUpUI = () => {
                         required
                         className="form-control border"
                         placeholder="Password"
+                        style={{ fontSize: '14px' }}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
