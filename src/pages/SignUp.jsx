@@ -315,6 +315,7 @@ export const SignUpUI = () => {
                   </div>
                   <div className="row mb-3">
                     <div className="col-md-6 mb-3 mb-md-0">
+                      <h5>Start Date</h5>
                       <input
                         type="date"
                         required
@@ -326,6 +327,7 @@ export const SignUpUI = () => {
                       />
                     </div>
                     <div className="col-md-6">
+                      <h5>End Date</h5>
                       <input
                         type="date"
                         required
@@ -357,12 +359,26 @@ export const SignUpUI = () => {
                         ))}
                       </select> */}
                       <Select
-                        style={{ fontSize: '14px' }}
                         options={categories}
                         value={selectedCategory}
                         onChange={handleCategoryChange}
                         placeholder="Select Curriculum Category"
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            fontSize: '12px',
+                          }),
+                          option: (provided) => ({
+                            ...provided,
+                            fontSize: '12px',
+                          }),
+                          singleValue: (provided) => ({
+                            ...provided,
+                            fontSize: '12px',
+                          }),
+                        }}
                       />
+
                     </div>
                     <div className="col-md-6">
                       <Select
@@ -371,12 +387,26 @@ export const SignUpUI = () => {
                         value={selectedCurriculums}
                         onChange={handleCurriculumChange}
                         placeholder="Select Curriculums"
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            fontSize: '12px',
+                          }),
+                          option: (provided) => ({
+                            ...provided,
+                            fontSize: '12px',
+                          }),
+                          singleValue: (provided) => ({
+                            ...provided,
+                            fontSize: '12px',
+                          }),
+                        }}
                       />
                     </div>
 
                   </div>
 
-                      {termInputs.length > 0 && (
+                  {termInputs.length > 0 && (
                     <div>
                       <h5>Curriculum Terms & Dates</h5>
                       {termInputs.map((term, index) => (
@@ -443,24 +473,37 @@ export const SignUpUI = () => {
                   </div>
 
                   <div className="row mb-3">
-
-                    <div className="col-md-6 mb-3 mb-md-0 ">
-                      <select
-                        required
-                        className="form-control border"
-                        style={{ fontSize: '14px' }}
-                        value={phoneCode}
-                        onChange={(e) => setPhoneCode(e.target.value)}
-                      >
-                        <option value="" disabled>
-                          Select Phone Code
-                        </option>
-                        {countries.map((country) => (
-                          <option key={country.id} value={country.phone_code}>
-                            {country.name} ({country.phone_code})
-                          </option>
-                        ))}
-                      </select>
+                    <div className="col-md-6 mb-3 mb-md-0">
+                      <Select
+                        options={countries.map((country) => ({
+                          value: country.phone_code,
+                          label: `${country.name} (${country.phone_code})`,
+                        }))}
+                        value={
+                          phoneCode
+                            ? {
+                              value: phoneCode,
+                              label: countries.find((c) => c.phone_code === phoneCode)?.name + ` (${phoneCode})`,
+                            }
+                            : null
+                        }
+                        onChange={(selectedOption) => setPhoneCode(selectedOption.value)}
+                        placeholder="Select Phone Code"
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            fontSize: '13px',
+                          }),
+                          option: (provided) => ({
+                            ...provided,
+                            fontSize: '13px',
+                          }),
+                          singleValue: (provided) => ({
+                            ...provided,
+                            fontSize: '13px',
+                          }),
+                        }}
+                      />
 
                     </div>
                     <div className="form-group col-md-6">
@@ -474,6 +517,7 @@ export const SignUpUI = () => {
                       />
                     </div>
                   </div>
+
                   <div className="form-row">
                     <div className="form-group col-md-6">
                       <input
