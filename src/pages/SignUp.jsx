@@ -4,9 +4,8 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import shimmer from "../assets/assets/shimmer.png";
 import logoLight from "../assets/assets/logo-light.png";
-import Select from 'react-select';
+import Select from "react-select";
 const baseUrl = "https://server-php-8-3.technorizen.com/gradesphere/api/";
-// console.log('baseUrl', baseUrl);
 
 const SignUp = () => {
   return (
@@ -20,77 +19,44 @@ export default SignUp;
 
 export const SignUpUI = () => {
   const navigate = useNavigate();
-
-  const [data, setData] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [curriculums, setCurriculums] = useState([]);
-  const [selectedCurriculums, setSelectedCurriculums] = useState([]);
-  const [termInputs, setTermInputs] = useState([]);
+  const [selectedCurriculumId, setSelectedCurriculumId] = useState("");
+  const [selectedDivisions, setSelectedDivisions] = useState([]);
+  const [termDates, setTermDates] = useState({});
 
   useEffect(() => {
-    axios
-      .get('https://server-php-8-3.technorizen.com/gradesphere/api/admin/curriculum/get-curriculums')
-      .then((res) => {
-        const responseData = res.data?.data || [];
-        setData(responseData);
-
-        const categoryOptions = responseData.map((item) => ({
-          value: item.curriculum_category.id,
-          label: item.curriculum_category.name,
-          curriculums: item.curriculum_category.curriculums
-        }));
-        setCategories(categoryOptions);
-      })
-      .catch((err) => console.error('Error fetching data:', err));
+    axios.get(`${baseUrl}admin/curriculum/get-curriculums`).then((response) => {
+      setCurriculums(response.data.data);
+    });
   }, []);
 
-  const handleCategoryChange = (selected) => {
-    setSelectedCategory(selected);
-    setSelectedCurriculums([]);
-    setTermInputs([]);
-    if (selected) {
-      const options = selected.curriculums.map((curr) => ({
-        value: curr.curriculum_id,
-        label: curr.name,
-        curriculum_terms: curr.curriculum_terms
-      }));
-      setCurriculums(options);
-    } else {
-      setCurriculums([]);
-    }
+  const handleDateChange = (divisionId, termId, type, value) => {
+    setTermDates((prev) => ({
+      ...prev,
+      [divisionId]: {
+        ...prev[divisionId],
+        [termId]: {
+          ...((prev[divisionId] && prev[divisionId][termId]) || {}),
+          [type]: value,
+        },
+      },
+    }));
   };
+  const selectedCurriculum = curriculums.find(
+    (c) => c.curriculum_id === Number(selectedCurriculumId)
+  );
+  const divisions = selectedCurriculum?.divisions || [];
 
-  const handleCurriculumChange = (selectedOptions) => {
-    setSelectedCurriculums(selectedOptions);
-
-    const termsWithDates = selectedOptions.flatMap((curr) =>
-      curr.curriculum_terms.map((term) => ({
-        term_id: term.curriculum_term_id,
-        term_name: term.name,
-        curriculum_id: curr.value,
-        curriculum_name: curr.label,
-        start_date: '',
-        end_date: ''
-      }))
-    );
-
-    setTermInputs(termsWithDates);
-  };
-
-  const handleDateChange = (index, field, value) => {
-    const updated = [...termInputs];
-    updated[index][field] = value;
-    setTermInputs(updated);
-  };
-
+  // Options for react-select
+  const divisionOptions = divisions.map((d) => ({
+    value: d.division_id,
+    label: d.name,
+  }));
 
   const [schoolLogo, setSchoolLogo] = useState(null);
   const [schoolName, setSchoolName] = useState("");
   const [academicStart, setAcademicStart] = useState("");
   const [academicEnd, setAcademicEnd] = useState("");
-  const [selectedCurriculum, setSelectedCurriculum] = useState("");
-  const [selectedDivision, setSelectedDivision] = useState("");
   const [selectedYearGroup, setSelectedYearGroup] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -98,108 +64,65 @@ export const SignUpUI = () => {
   const [mobile, setMobile] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const options = [
-    { value: '', label: 'Select Phone Code', isDisabled: true },
-  ]
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
+  const options = [{ value: "", label: "Select Phone Code", isDisabled: true }];
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const formData = new FormData();
 
-    // Add school logo file (example)
-    // if (schoolLogo) {
-    //   formData.append("school_logo", schoolLogo);
-    // }
+  // Append basic fields
+  formData.append("school_logo", schoolLogo); // Must append actual file
+  formData.append("name", schoolName);
+  formData.append("curriculum_id", selectedCurriculumId);
+  formData.append("academic_start", academicStart);
+  formData.append("academic_end", academicEnd);
+  formData.append("email", email);
+  formData.append("password", password);
+  formData.append("phonecode", phoneCode);
+  formData.append("mobile", mobile);
+  formData.append("first_name", firstName);
+  formData.append("last_name", lastName);
 
-    // Add other fields like name, curriculum etc.
-    formData.append("name", schoolName);
-    formData.append("curriculum_id", selectedCurriculum);
-    formData.append("academic_start", academicStart);
-    formData.append("academic_end", academicEnd);
-    formData.append("division_id", selectedDivision);
-    formData.append("year_group_id", selectedYearGroup);
-    formData.append("email", email);
-    formData.append("password", password);
-    formData.append("phonecode", phoneCode);
-    formData.append("mobile", mobile);
-    formData.append("first_name", firstName);
-    formData.append("last_name", lastName);
+  // Append multiple divisions
+  selectedDivisions.forEach((divisionId) => {
+    formData.append("division_id[]", divisionId);
+  });
 
-    console.log("Submitting form with values:");
-    console.log("school_logo:", schoolLogo);
-    console.log("name:", schoolName);
-    console.log("curriculum_id:", selectedCurriculum);
-    console.log("academic_start:", academicStart);
-    console.log("academic_end:", academicEnd);
-    console.log("division_id:", selectedDivision);
-    console.log("year_group_id:", selectedYearGroup);
-    console.log("email:", email);
-    console.log("password:", password);
-    console.log("phonecode:", phoneCode);
-    console.log("mobile:", mobile);
-    console.log("first_name:", firstName);
-    console.log("last_name:", lastName);
-
-    // Append term dates using indexed keys
-    termDates.forEach((term, index) => {
-      if (term.startDate)
-        formData.append(`term_start[${index}]`, term.startDate);
-      console.log(`term_start[${index}]`, term.startDate);
-    });
-    termDates.forEach((term, index) => {
-      if (term.endDate) formData.append(`term_end[${index}]`, term.endDate);
-      console.log(`term_end[${index}]`, term.endDate);
-    });
-    termDates.forEach((term, index) => {
-      if (term.termId)
-        formData.append(`curriculum_term_id[${index}]`, term.termId);
-      console.log(`curriculum_term_id[${index}]`, term.termId);
-    });
-
-    try {
-      const response = await axios.post(
-        `${baseUrl}admin/school/signup-school`,
-        formData
-      );
-      console.log("handleSubmit response:", response);
-      if (response.data?.status === false) {
-        // Show main message
-        if (response.data.message) {
-          toast.error(response.data.message);
-        }
-
-        // Show all detailed validation errors if available
-        if (Array.isArray(response.data.errors)) {
-          response.data.errors.forEach((err) => {
-            toast.error(err);
-          });
-        }
-      }
-
-      if (response.data?.status === true) {
-        toast.success("Submitted successfully!");
-        // Reset form state here
-        setSchoolLogo(null);
-        setSchoolName("");
-        setAcademicStart("");
-        setAcademicEnd("");
-        setSelectedCurriculum("");
-        setSelectedDivision("");
-        setSelectedYearGroup("");
-        setEmail("");
-        setPassword("");
-        setPhoneCode("");
-        setMobile("");
-        setFirstName("");
-        setLastName("");
-        setTermDates([]);
-        navigate("/dashboard");
-      }
-    } catch (error) {
-      console.error("Error handleSubmit:", error);
+  // Flatten and append all term dates
+  let index = 0;
+  for (const divisionId in termDates) {
+    for (const termId in termDates[divisionId]) {
+      const term = termDates[divisionId][termId];
+      formData.append(`term_start[${index}]`, term.start_date);
+      formData.append(`term_end[${index}]`, term.end_date);
+      formData.append(`curriculum_term_id[${index}]`, termId);
+      formData.append(`division_id_term[${index}]`, divisionId); // if required
+      index++;
     }
-  };
+  }
 
-  const [termDates, setTermDates] = useState([]);
+  try {
+    const response = await axios.post(
+      `${baseUrl}admin/school/signup-school`,
+      formData
+    );
+    console.log("Submission response:", response.data);
+
+    if (response.data?.status) {
+      toast.success("Submitted successfully!");
+      navigate("/dashboard");
+    } else {
+      toast.error(response.data.message || "Submission failed.");
+      if (Array.isArray(response.data.errors)) {
+        response.data.errors.forEach((err) => toast.error(err));
+      }
+    }
+  } catch (error) {
+    console.error("Submission error:", error);
+    toast.error("Server error occurred.");
+  }
+};
+
+
 
 
   const handleTermDateChange = (index, field, value) => {
@@ -207,7 +130,6 @@ export const SignUpUI = () => {
     updated[index][field] = value;
     setTermDates(updated);
   };
-
 
   const [countries, setCountries] = useState([]);
 
@@ -291,14 +213,15 @@ export const SignUpUI = () => {
                     <label
                       htmlFor="schoolLogo"
                       className="upload-area d-flex flex-column align-items-center justify-content-center border rounded p-4 text-center cursor-pointer"
-                      style={{ borderStyle: 'dashed', minHeight: '150px' }}
+                      style={{ borderStyle: "dashed", minHeight: "150px" }}
                     >
                       <div className="plus-icon display-4 mb-2">+</div>
                       <span className="text-muted">Add Image</span>
                     </label>
 
                     <span className="additional-text d-block mt-2">
-                      <b>Select School Logo</b> — File types supported: JPG, PNG, JPEG
+                      <b>Select School Logo</b> — File types supported: JPG,
+                      PNG, JPEG
                     </span>
                   </div>
 
@@ -319,7 +242,7 @@ export const SignUpUI = () => {
                       <input
                         type="date"
                         required
-                        style={{ fontSize: '14px' }}
+                        style={{ fontSize: "14px" }}
                         className="form-control"
                         placeholder="Academic Start"
                         value={academicStart}
@@ -331,7 +254,7 @@ export const SignUpUI = () => {
                       <input
                         type="date"
                         required
-                        style={{ fontSize: '14px' }}
+                        style={{ fontSize: "14px" }}
                         className="form-control"
                         placeholder="Academic End"
                         value={academicEnd}
@@ -341,110 +264,108 @@ export const SignUpUI = () => {
                   </div>
                   <div className="row mb-3 ">
                     <div className="col-md-6 mb-3 mb-md-0">
-                      {/* <select
-                        name="curriculum"
-                        required
-                        style={{ fontSize: '14px' }}
-                        className="form-select select-with-icon"
-                        value={selectedCurriculum}
-                        onChange={(e) => setSelectedCurriculum(e.target.value)}
+                      <label className="block font-semibold mb-2">
+                        Select Curriculum
+                      </label>
+                      <select
+                        className="w-full"
+                        value={selectedCurriculumId}
+                        onChange={(e) => {
+                          setSelectedCurriculumId(e.target.value);
+                          setSelectedDivisions([]);
+                          setTermDates({});
+                        }}
                       >
-                        <option value="" disabled>
-                          School Curriculum
-                        </option>
-                        {categories.map((item) => (
-                          <option key={item.id} value={item.id}>
-                            {item.name}
+                        <option value="">-- Select Curriculum --</option>
+                        {curriculums.map((curriculum) => (
+                          <option
+                            key={curriculum.curriculum_id}
+                            value={curriculum.curriculum_id}
+                          >
+                            {curriculum.name}
                           </option>
                         ))}
-                      </select> */}
-                      <Select
-                        options={categories}
-                        value={selectedCategory}
-                        onChange={handleCategoryChange}
-                        placeholder="Select Curriculum Category"
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            fontSize: '12px',
-                          }),
-                          option: (provided) => ({
-                            ...provided,
-                            fontSize: '12px',
-                          }),
-                          singleValue: (provided) => ({
-                            ...provided,
-                            fontSize: '12px',
-                          }),
-                        }}
-                      />
-
+                      </select>
                     </div>
                     <div className="col-md-6">
+                      <label className="block font-semibold mb-2">
+                        Select Divisions
+                      </label>
                       <Select
                         isMulti
-                        options={curriculums}
-                        value={selectedCurriculums}
-                        onChange={handleCurriculumChange}
-                        placeholder="Select Curriculums"
-                        styles={{
-                          control: (provided) => ({
-                            ...provided,
-                            fontSize: '12px',
-                          }),
-                          option: (provided) => ({
-                            ...provided,
-                            fontSize: '12px',
-                          }),
-                          singleValue: (provided) => ({
-                            ...provided,
-                            fontSize: '12px',
-                          }),
-                        }}
+                        name="divisions"
+                        options={divisionOptions}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        onChange={(selected) =>
+                          setSelectedDivisions(
+                            selected.map((option) => option.value)
+                          )
+                        }
+                        value={divisionOptions.filter((opt) =>
+                          selectedDivisions.includes(opt.value)
+                        )}
                       />
                     </div>
-
                   </div>
 
-                  {termInputs.length > 0 && (
-                    <div>
-                      <h5>Curriculum Terms & Dates</h5>
-                      {termInputs.map((term, index) => (
-                        <div
-                          key={`${term.term_id}-${index}`}
-                          style={{
-                            border: '1px solid #ddd',
-                            borderRadius: 6,
-                            padding: 10,
-                            marginBottom: 10,
-                            backgroundColor: '#f9f9f9'
-                          }}
-                        >
-                          <strong>
-                            {term.curriculum_name} - {term.term_name}
-                          </strong>
-                          <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-                            <div>
-                              <label>Start Date</label>
-                              <input
-                                type="date"
-                                value={term.start_date}
-                                onChange={(e) => handleDateChange(index, 'start_date', e.target.value)}
-                              />
-                            </div>
-                            <div>
-                              <label>End Date</label>
-                              <input
-                                type="date"
-                                value={term.end_date}
-                                onChange={(e) => handleDateChange(index, 'end_date', e.target.value)}
-                              />
-                            </div>
+                  {selectedDivisions.map((divisionId) => {
+                    const division = divisions.find(
+                      (d) => d.division_id === divisionId
+                    );
+                    if (!division) return null;
+
+                    return (
+                      <div
+                        key={division.division_id}
+                        className="mb-8 border-t pt-4"
+                      >
+                        <h3 className="text-lg font-semibold mb-2">
+                          {division.name} - Terms
+                        </h3>
+                        {division.terms.map((term) => (
+                          <div
+                            key={term.term_id}
+                            className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4"
+                          >
+                            <div className="font-medium">{term.name}</div>
+                            <input
+                              type="date"
+                              className="border p-2 rounded"
+                              value={
+                                termDates[divisionId]?.[term.term_id]
+                                  ?.start_date || ""
+                              }
+                              onChange={(e) =>
+                                handleDateChange(
+                                  divisionId,
+                                  term.term_id,
+                                  "start_date",
+                                  e.target.value
+                                )
+                              }
+                            />
+                            <input
+                              type="date"
+                              className="border p-2 rounded"
+                              value={
+                                termDates[divisionId]?.[term.term_id]
+                                  ?.end_date || ""
+                              }
+                              onChange={(e) =>
+                                handleDateChange(
+                                  divisionId,
+                                  term.term_id,
+                                  "end_date",
+                                  e.target.value
+                                )
+                              }
+                            />
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    );
+                  })}
 
                   <div className="row mb-3">
                     <div className="col-md-6 mb-3 mb-md-0">
@@ -455,7 +376,7 @@ export const SignUpUI = () => {
                         placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        style={{ fontSize: '14px' }}
+                        style={{ fontSize: "14px" }}
                         autoComplete="off"
                       />
                     </div>
@@ -465,7 +386,7 @@ export const SignUpUI = () => {
                         required
                         className="form-control border"
                         placeholder="Password"
-                        style={{ fontSize: '14px' }}
+                        style={{ fontSize: "14px" }}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
@@ -482,29 +403,33 @@ export const SignUpUI = () => {
                         value={
                           phoneCode
                             ? {
-                              value: phoneCode,
-                              label: countries.find((c) => c.phone_code === phoneCode)?.name + ` (${phoneCode})`,
-                            }
+                                value: phoneCode,
+                                label:
+                                  countries.find(
+                                    (c) => c.phone_code === phoneCode
+                                  )?.name + ` (${phoneCode})`,
+                              }
                             : null
                         }
-                        onChange={(selectedOption) => setPhoneCode(selectedOption.value)}
+                        onChange={(selectedOption) =>
+                          setPhoneCode(selectedOption.value)
+                        }
                         placeholder="Select Phone Code"
                         styles={{
                           control: (provided) => ({
                             ...provided,
-                            fontSize: '13px',
+                            fontSize: "13px",
                           }),
                           option: (provided) => ({
                             ...provided,
-                            fontSize: '13px',
+                            fontSize: "13px",
                           }),
                           singleValue: (provided) => ({
                             ...provided,
-                            fontSize: '13px',
+                            fontSize: "13px",
                           }),
                         }}
                       />
-
                     </div>
                     <div className="form-group col-md-6">
                       <input
@@ -565,4 +490,3 @@ export const SignUpUI = () => {
     </>
   );
 };
-
