@@ -82,23 +82,19 @@ const handleSubmit = async (e) => {
   formData.append("first_name", firstName);
   formData.append("last_name", lastName);
 
-  // Append multiple divisions
-  selectedDivisions.forEach((divisionId) => {
-    formData.append("division_id[]", divisionId);
-  });
+  // Append multiple divisions dynamically
+  selectedDivisions.forEach((divisionId, divisionIndex) => {
+    formData.append(`division_id[${divisionIndex}]`, divisionId);
 
-  // Flatten and append all term dates
-  let index = 0;
-  for (const divisionId in termDates) {
-    for (const termId in termDates[divisionId]) {
-      const term = termDates[divisionId][termId];
-      formData.append(`term_start[${index}]`, term.start_date);
-      formData.append(`term_end[${index}]`, term.end_date);
-      formData.append(`curriculum_term_id[${index}]`, termId);
-      formData.append(`division_id_term[${index}]`, divisionId); // if required
-      index++;
-    }
-  }
+    // Append term dates for each division
+    const terms = termDates[divisionId] || {};
+    Object.keys(terms).forEach((termId, termIndex) => {
+      const term = terms[termId];
+      formData.append(`curriculum_term_id[${divisionIndex}][${termIndex}]`, termId);
+      formData.append(`term_start[${divisionIndex}][${termIndex}]`, term.start_date);
+      formData.append(`term_end[${divisionIndex}][${termIndex}]`, term.end_date);
+    });
+  });
 
   try {
     const response = await axios.post(
