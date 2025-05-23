@@ -147,7 +147,7 @@ export const SignUpUI = () => {
 
     fetchCountries();
   }, []);
-  
+
   const curriculumOptions = curriculums.map((curriculum) => ({
     value: curriculum.curriculum_id,
     label: curriculum.name,
@@ -277,7 +277,11 @@ export const SignUpUI = () => {
                       <Select
                         className="w-full"
                         options={curriculumOptions}
-                        value={curriculumOptions.find(option => option.value === selectedCurriculumId) || null}
+                        value={
+                          curriculumOptions.find(
+                            (option) => option.value === selectedCurriculumId
+                          ) || null
+                        }
                         onChange={(selectedOption) => {
                           setSelectedCurriculumId(selectedOption?.value || "");
                           setSelectedDivisions([]);
@@ -328,38 +332,48 @@ export const SignUpUI = () => {
                             className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4"
                           >
                             <div className="font-medium">{term.name}</div>
-                            <input
-                              type="date"
-                              className="border p-2 rounded"
-                              value={
-                                termDates[divisionId]?.[term.term_id]
-                                  ?.start_date || ""
-                              }
-                              onChange={(e) =>
-                                handleDateChange(
-                                  divisionId,
-                                  term.term_id,
-                                  "start_date",
-                                  e.target.value
-                                )
-                              }
-                            />
-                            <input
-                              type="date"
-                              className="border p-2 rounded"
-                              value={
-                                termDates[divisionId]?.[term.term_id]
-                                  ?.end_date || ""
-                              }
-                              onChange={(e) =>
-                                handleDateChange(
-                                  divisionId,
-                                  term.term_id,
-                                  "end_date",
-                                  e.target.value
-                                )
-                              }
-                            />
+                            <div className="row mb-3">
+                              <div className="col-md-6 mb-3 mb-md-0">
+                                <h5>Start Date</h5>
+                                <input
+                                  type="date"
+                                   className="form-control"
+                                    style={{ fontSize: "14px" }}
+                                  value={
+                                    termDates[divisionId]?.[term.term_id]
+                                      ?.start_date || ""
+                                  }
+                                  onChange={(e) =>
+                                    handleDateChange(
+                                      divisionId,
+                                      term.term_id,
+                                      "start_date",
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </div>
+                              <div className="col-md-6">
+                                <h5>End Date</h5>
+                                <input
+                                  type="date"
+                                  className="form-control"
+                                   style={{ fontSize: "14px" }}
+                                  value={
+                                    termDates[divisionId]?.[term.term_id]
+                                      ?.end_date || ""
+                                  }
+                                  onChange={(e) =>
+                                    handleDateChange(
+                                      divisionId,
+                                      term.term_id,
+                                      "end_date",
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </div>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -370,18 +384,18 @@ export const SignUpUI = () => {
                     <div className="col-md-6 mb-3 mb-md-0">
                       <Select
                         options={countries.map((country) => ({
-                          value: country.phone_code,
-                          label: `${country.name} (${country.phone_code})`,
+                          value: country.phonecode,
+                          label: `${country.name} (${country.phonecode})`,
                         }))}
                         value={
                           phoneCode
                             ? {
-                              value: phoneCode,
-                              label:
-                                countries.find(
-                                  (c) => c.phone_code === phoneCode
-                                )?.name + ` (${phoneCode})`,
-                            }
+                                value: phoneCode,
+                                label:
+                                  countries.find(
+                                    (c) => c.phone_code === phoneCode
+                                  )?.name + ` (${phoneCode})`,
+                              }
                             : null
                         }
                         onChange={(selectedOption) =>
