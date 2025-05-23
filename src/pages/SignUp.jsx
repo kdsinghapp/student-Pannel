@@ -339,8 +339,8 @@ export const SignUpUI = () => {
                                 <h5>Start Date</h5>
                                 <input
                                   type="date"
-                                   className="form-control"
-                                    style={{ fontSize: "14px" }}
+                                  className="form-control"
+                                  style={{ fontSize: "14px" }}
                                   value={
                                     termDates[divisionId]?.[term.term_id]
                                       ?.start_date || ""
@@ -360,7 +360,7 @@ export const SignUpUI = () => {
                                 <input
                                   type="date"
                                   className="form-control"
-                                   style={{ fontSize: "14px" }}
+                                  style={{ fontSize: "14px" }}
                                   value={
                                     termDates[divisionId]?.[term.term_id]
                                       ?.end_date || ""
@@ -392,12 +392,12 @@ export const SignUpUI = () => {
                         value={
                           phoneCode
                             ? {
-                                value: phoneCode,
-                                label:
-                                  countries.find(
-                                    (c) => c.phone_code === phoneCode
-                                  )?.name + ` (${phoneCode})`,
-                              }
+                              value: phoneCode,
+                              label:
+                                countries.find(
+                                  (c) => c.phonecode === phoneCode
+                                )?.name + ` (${phoneCode})`,
+                            }
                             : null
                         }
                         onChange={(selectedOption) =>
@@ -456,19 +456,20 @@ export const SignUpUI = () => {
                       />
                     </div>
                   </div>
+                  <div className="w-full  mb-3">
+                    <input
+                      type="email"
+                      required
+                      className="form-control border"
+                      placeholder="Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      style={{ fontSize: "14px" }}
+                      autoComplete="off"
+                    />
+                  </div>
                   <div className="row mb-3">
-                    <div className="col-md-6 mb-3 mb-md-0">
-                      <input
-                        type="email"
-                        required
-                        className="form-control border"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        style={{ fontSize: "14px" }}
-                        autoComplete="off"
-                      />
-                    </div>
+
                     <div className="col-md-6 mb-3 mb-md-0">
                       <input
                         type="password"
@@ -480,8 +481,6 @@ export const SignUpUI = () => {
                         onChange={(e) => setPassword(e.target.value)}
                       />
                     </div>
-                  </div>
-                  <div className="row mb-3">
                     <div className="col-md-6 mb-3 mb-md-0">
                       <input
                         type="confirm-password"
@@ -494,6 +493,9 @@ export const SignUpUI = () => {
                         autoComplete="off"
                       />
                     </div>
+                  </div>
+                  <div className="row mb-3">
+
                   </div>
                   <div className="terms-section">
                     <small className="d-block text-center">
