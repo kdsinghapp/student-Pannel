@@ -60,6 +60,7 @@ export const SignUpUI = () => {
   const [selectedYearGroup, setSelectedYearGroup] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [phoneCode, setPhoneCode] = useState("");
   const [mobile, setMobile] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -77,6 +78,7 @@ export const SignUpUI = () => {
     formData.append("academic_end", academicEnd);
     formData.append("email", email);
     formData.append("password", password);
+    formData.append("password_confirmation", confirmPassword);
     formData.append("phonecode", phoneCode);
     formData.append("mobile", mobile);
     formData.append("first_name", firstName);
@@ -114,7 +116,7 @@ export const SignUpUI = () => {
 
       if (response.data?.status) {
         toast.success("Submitted successfully!");
-        navigate("/dashboard");
+        navigate("/");
       } else {
         toast.error(response.data.message || "Submission failed.");
         if (Array.isArray(response.data.errors)) {
@@ -482,12 +484,12 @@ export const SignUpUI = () => {
                   <div className="row mb-3">
                     <div className="col-md-6 mb-3 mb-md-0">
                       <input
-                        type="email"
+                        type="confirm-password"
                         required
                         className="form-control border"
                         placeholder="Confirm Password"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         style={{ fontSize: "14px" }}
                         autoComplete="off"
                       />
