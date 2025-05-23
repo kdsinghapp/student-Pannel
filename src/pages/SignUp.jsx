@@ -147,6 +147,11 @@ export const SignUpUI = () => {
 
     fetchCountries();
   }, []);
+  
+  const curriculumOptions = curriculums.map((curriculum) => ({
+    value: curriculum.curriculum_id,
+    label: curriculum.name,
+  }));
 
   return (
     <>
@@ -269,25 +274,17 @@ export const SignUpUI = () => {
                       <label className="block font-semibold mb-2">
                         Select Curriculum
                       </label>
-                      <select
+                      <Select
                         className="w-full"
-                        value={selectedCurriculumId}
-                        onChange={(e) => {
-                          setSelectedCurriculumId(e.target.value);
+                        options={curriculumOptions}
+                        value={curriculumOptions.find(option => option.value === selectedCurriculumId) || null}
+                        onChange={(selectedOption) => {
+                          setSelectedCurriculumId(selectedOption?.value || "");
                           setSelectedDivisions([]);
                           setTermDates({});
                         }}
-                      >
-                        <option value="">-- Select Curriculum --</option>
-                        {curriculums.map((curriculum) => (
-                          <option
-                            key={curriculum.curriculum_id}
-                            value={curriculum.curriculum_id}
-                          >
-                            {curriculum.name}
-                          </option>
-                        ))}
-                      </select>
+                        placeholder="-- Select Curriculum --"
+                      />
                     </div>
                     <div className="col-md-6">
                       <label className="block font-semibold mb-2">
@@ -379,12 +376,12 @@ export const SignUpUI = () => {
                         value={
                           phoneCode
                             ? {
-                                value: phoneCode,
-                                label:
-                                  countries.find(
-                                    (c) => c.phone_code === phoneCode
-                                  )?.name + ` (${phoneCode})`,
-                              }
+                              value: phoneCode,
+                              label:
+                                countries.find(
+                                  (c) => c.phone_code === phoneCode
+                                )?.name + ` (${phoneCode})`,
+                            }
                             : null
                         }
                         onChange={(selectedOption) =>
