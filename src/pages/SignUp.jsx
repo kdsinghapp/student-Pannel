@@ -65,61 +65,67 @@ export const SignUpUI = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const options = [{ value: "", label: "Select Phone Code", isDisabled: true }];
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const formData = new FormData();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
 
-  // Append basic fields
-  formData.append("school_logo", schoolLogo); // Must append actual file
-  formData.append("name", schoolName);
-  formData.append("curriculum_id", selectedCurriculumId);
-  formData.append("academic_start", academicStart);
-  formData.append("academic_end", academicEnd);
-  formData.append("email", email);
-  formData.append("password", password);
-  formData.append("phonecode", phoneCode);
-  formData.append("mobile", mobile);
-  formData.append("first_name", firstName);
-  formData.append("last_name", lastName);
+    // Append basic fields
+    formData.append("school_logo", schoolLogo); // Must append actual file
+    formData.append("name", schoolName);
+    formData.append("curriculum_id", selectedCurriculumId);
+    formData.append("academic_start", academicStart);
+    formData.append("academic_end", academicEnd);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("phonecode", phoneCode);
+    formData.append("mobile", mobile);
+    formData.append("first_name", firstName);
+    formData.append("last_name", lastName);
 
-  // Append multiple divisions dynamically
-  selectedDivisions.forEach((divisionId, divisionIndex) => {
-    formData.append(`division_id[${divisionIndex}]`, divisionId);
+    // Append multiple divisions dynamically
+    selectedDivisions.forEach((divisionId, divisionIndex) => {
+      formData.append(`division_id[${divisionIndex}]`, divisionId);
 
-    // Append term dates for each division
-    const terms = termDates[divisionId] || {};
-    Object.keys(terms).forEach((termId, termIndex) => {
-      const term = terms[termId];
-      formData.append(`curriculum_term_id[${divisionIndex}][${termIndex}]`, termId);
-      formData.append(`term_start[${divisionIndex}][${termIndex}]`, term.start_date);
-      formData.append(`term_end[${divisionIndex}][${termIndex}]`, term.end_date);
+      // Append term dates for each division
+      const terms = termDates[divisionId] || {};
+      Object.keys(terms).forEach((termId, termIndex) => {
+        const term = terms[termId];
+        formData.append(
+          `curriculum_term_id[${divisionIndex}][${termIndex}]`,
+          termId
+        );
+        formData.append(
+          `term_start[${divisionIndex}][${termIndex}]`,
+          term.start_date
+        );
+        formData.append(
+          `term_end[${divisionIndex}][${termIndex}]`,
+          term.end_date
+        );
+      });
     });
-  });
 
-  try {
-    const response = await axios.post(
-      `${baseUrl}admin/school/signup-school`,
-      formData
-    );
-    console.log("Submission response:", response.data);
+    try {
+      const response = await axios.post(
+        `${baseUrl}admin/school/signup-school`,
+        formData
+      );
+      console.log("Submission response:", response.data);
 
-    if (response.data?.status) {
-      toast.success("Submitted successfully!");
-      navigate("/dashboard");
-    } else {
-      toast.error(response.data.message || "Submission failed.");
-      if (Array.isArray(response.data.errors)) {
-        response.data.errors.forEach((err) => toast.error(err));
+      if (response.data?.status) {
+        toast.success("Submitted successfully!");
+        navigate("/dashboard");
+      } else {
+        toast.error(response.data.message || "Submission failed.");
+        if (Array.isArray(response.data.errors)) {
+          response.data.errors.forEach((err) => toast.error(err));
+        }
       }
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error("Server error occurred.");
     }
-  } catch (error) {
-    console.error("Submission error:", error);
-    toast.error("Server error occurred.");
-  }
-};
-
-
-
+  };
 
   const handleTermDateChange = (index, field, value) => {
     const updated = [...termDates];
@@ -365,32 +371,6 @@ const handleSubmit = async (e) => {
 
                   <div className="row mb-3">
                     <div className="col-md-6 mb-3 mb-md-0">
-                      <input
-                        type="email"
-                        required
-                        className="form-control border"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        style={{ fontSize: "14px" }}
-                        autoComplete="off"
-                      />
-                    </div>
-                    <div className="col-md-6 mb-3 mb-md-0">
-                      <input
-                        type="password"
-                        required
-                        className="form-control border"
-                        placeholder="Password"
-                        style={{ fontSize: "14px" }}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="row mb-3">
-                    <div className="col-md-6 mb-3 mb-md-0">
                       <Select
                         options={countries.map((country) => ({
                           value: country.phone_code,
@@ -439,25 +419,66 @@ const handleSubmit = async (e) => {
                     </div>
                   </div>
 
-                  <div className="form-row">
-                    <div className="form-group col-md-6">
+                  <div className="row mb-3">
+                    <div className="col-md-6 mb-3 mb-md-0">
                       <input
                         type="text"
                         required
                         className="form-control border"
                         placeholder="First Name"
                         value={firstName}
+                        style={{ fontSize: "14px" }}
                         onChange={(e) => setFirstName(e.target.value)}
                       />
                     </div>
-                    <div className="form-group col-md-6">
+                    <div className="col-md-6 mb-3 mb-md-0">
                       <input
                         type="text"
                         required
                         className="form-control border"
                         placeholder="Last Name"
                         value={lastName}
+                        style={{ fontSize: "14px" }}
                         onChange={(e) => setLastName(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="row mb-3">
+                    <div className="col-md-6 mb-3 mb-md-0">
+                      <input
+                        type="email"
+                        required
+                        className="form-control border"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        style={{ fontSize: "14px" }}
+                        autoComplete="off"
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3 mb-md-0">
+                      <input
+                        type="password"
+                        required
+                        className="form-control border"
+                        placeholder="Password"
+                        style={{ fontSize: "14px" }}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="row mb-3">
+                    <div className="col-md-6 mb-3 mb-md-0">
+                      <input
+                        type="email"
+                        required
+                        className="form-control border"
+                        placeholder="Confirm Password"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        style={{ fontSize: "14px" }}
+                        autoComplete="off"
                       />
                     </div>
                   </div>
