@@ -65,6 +65,7 @@ export const SignUpUI = () => {
   const [mobile, setMobile] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [schoolLogoPreview, setSchoolLogoPreview] = useState(null);
   const options = [{ value: "", label: "Select Phone Code", isDisabled: true }];
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -216,7 +217,13 @@ export const SignUpUI = () => {
                       required
                       accept="image/*"
                       hidden
-                      onChange={(e) => setSchoolLogo(e.target.files[0])}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setSchoolLogo(file);
+                          setSchoolLogoPreview(URL.createObjectURL(file));
+                        }
+                      }}
                     />
 
                     <label
@@ -224,8 +231,19 @@ export const SignUpUI = () => {
                       className="upload-area d-flex flex-column align-items-center justify-content-center border rounded p-4 text-center cursor-pointer"
                       style={{ borderStyle: "dashed", minHeight: "150px" }}
                     >
-                      <div className="plus-icon display-4 mb-2">+</div>
-                      <span className="text-muted">Add Image</span>
+                      {schoolLogoPreview ? (
+                        <img
+                          src={schoolLogoPreview}
+                          alt="School Logo Preview"
+                          style={{ maxHeight: "120px", objectFit: "contain" }}
+                          className="img-fluid"
+                        />
+                      ) : (
+                        <>
+                          <div className="plus-icon display-4 mb-2">+</div>
+                          <span className="text-muted">Add Image</span>
+                        </>
+                      )}
                     </label>
 
                     <span className="additional-text d-block mt-2">
@@ -392,12 +410,12 @@ export const SignUpUI = () => {
                         value={
                           phoneCode
                             ? {
-                              value: phoneCode,
-                              label:
-                                countries.find(
-                                  (c) => c.phonecode === phoneCode
-                                )?.name + ` (${phoneCode})`,
-                            }
+                                value: phoneCode,
+                                label:
+                                  countries.find(
+                                    (c) => c.phonecode === phoneCode
+                                  )?.name + ` (${phoneCode})`,
+                              }
                             : null
                         }
                         onChange={(selectedOption) =>
@@ -469,7 +487,6 @@ export const SignUpUI = () => {
                     />
                   </div>
                   <div className="row mb-3">
-
                     <div className="col-md-6 mb-3 mb-md-0">
                       <input
                         type="password"
@@ -494,9 +511,7 @@ export const SignUpUI = () => {
                       />
                     </div>
                   </div>
-                  <div className="row mb-3">
-
-                  </div>
+                  <div className="row mb-3"></div>
                   <div className="terms-section">
                     <small className="d-block text-center">
                       By continuing you are acknowledging that you have read,
