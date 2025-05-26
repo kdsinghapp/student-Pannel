@@ -23,6 +23,7 @@ export const SignUpUI = () => {
   const [selectedCurriculumId, setSelectedCurriculumId] = useState("");
   const [selectedDivisions, setSelectedDivisions] = useState([]);
   const [termDates, setTermDates] = useState({});
+  
 
   useEffect(() => {
     axios.get(`${baseUrl}admin/curriculum/get-curriculums`).then((response) => {
