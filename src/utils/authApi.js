@@ -5,13 +5,23 @@ const token = localStorage.getItem("userTokenStudent");
 
 export const signInAdmin = async (data) => {
   try {
-    const res = await axios.post(`${API_URL}/admin/login`, data);
-    return res.data;
+    const res = await axios.post(`${API_URL}/user/login`, data);
+    const responseData = res.data;
+
+    // Save full user object in localStorage (optional)
+    localStorage.setItem("userStudentData", JSON.stringify(responseData));
+
+    // ✅ Save just the user's full name separately
+    const fullName = `${responseData.user.first_name} ${responseData.user.last_name}`;
+    localStorage.setItem("userName", fullName);
+
+    return responseData;
   } catch (error) {
-    console.error("Error fetching restaurants:", error);
+    console.error("Error logging in:", error);
     throw error;
   }
 };
+
 
 export const getAllClasses = async () => {
   const token = localStorage.getItem("userTokenStudent");

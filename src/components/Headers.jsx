@@ -7,8 +7,9 @@ const Headers = () => {
   // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const {toggleSidebar}=useSidebarContext()
+  const { toggleSidebar } = useSidebarContext();
   const dropdownRef = useRef(null);
+  const [userName, setUserName] = useState("");
 
   // const toggleSidebar = () => {
   //   setIsSidebarOpen(!isSidebarOpen);
@@ -42,6 +43,12 @@ const Headers = () => {
     navigate("/signin");
   };
 
+  useEffect(() => {
+    const name = localStorage.getItem("userName");
+    if (name) {
+      setUserName(name);
+    }
+  }, []);
   return (
     <div className="navbar navbar-expand-md header-menu-one bg-light">
       <div className="nav-bar-header-one">
@@ -109,14 +116,14 @@ const Headers = () => {
                 <img src={admin} alt="Admin" />
               </div>
               <div className="admin-title">
-                <h5 className="item-title">John Doe</h5>
+                <h5 className="item-title">{userName || "Admin"}</h5>
                 <span>Admin</span>
               </div>
             </a>
             {isDropdownOpen && (
               <div className="dropdown-menu dropdown-menu-right show">
                 <div className="item-header">
-                  <h6 className="item-title">John Doe</h6>
+                  <h6 className="item-title">{userName || "Admin"}</h6>
                 </div>
                 <div className="item-content">
                   <ul className="settings-list">

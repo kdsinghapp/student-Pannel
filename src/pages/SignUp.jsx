@@ -23,10 +23,12 @@ export const SignUpUI = () => {
   const [selectedCurriculumId, setSelectedCurriculumId] = useState("");
   const [selectedDivisions, setSelectedDivisions] = useState([]);
   const [termDates, setTermDates] = useState({});
-  
+  const [isLoading, setIsLoading] = useState(false);
+
+
 
   useEffect(() => {
-    axios.get(`${baseUrl}admin/curriculum/get-curriculums`).then((response) => {
+    axios.get(`${baseUrl}user/curriculum/get-curriculums`).then((response) => {
       setCurriculums(response.data.data);
     });
   }, []);
@@ -70,10 +72,10 @@ export const SignUpUI = () => {
   const options = [{ value: "", label: "Select Phone Code", isDisabled: true }];
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
+    setIsLoading(true);
 
-    // Append basic fields
-    formData.append("school_logo", schoolLogo); // Must append actual file
+    const formData = new FormData();
+    formData.append("school_logo", schoolLogo);
     formData.append("name", schoolName);
     formData.append("curriculum_id", selectedCurriculumId);
     formData.append("academic_start", academicStart);
@@ -86,11 +88,8 @@ export const SignUpUI = () => {
     formData.append("first_name", firstName);
     formData.append("last_name", lastName);
 
-    // Append multiple divisions dynamically
     selectedDivisions.forEach((divisionId, divisionIndex) => {
       formData.append(`division_id[${divisionIndex}]`, divisionId);
-
-      // Append term dates for each division
       const terms = termDates[divisionId] || {};
       Object.keys(terms).forEach((termId, termIndex) => {
         const term = terms[termId];
@@ -111,10 +110,9 @@ export const SignUpUI = () => {
 
     try {
       const response = await axios.post(
-        `${baseUrl}admin/school/signup-school`,
+        `${baseUrl}user/school/signup-school`,
         formData
       );
-      console.log("Submission response:", response.data);
 
       if (response.data?.status) {
         toast.success("Submitted successfully!");
@@ -128,8 +126,11 @@ export const SignUpUI = () => {
     } catch (error) {
       console.error("Submission error:", error);
       toast.error("Server error occurred.");
+    } finally {
+      setIsLoading(false);
     }
   };
+
 
   const handleTermDateChange = (index, field, value) => {
     const updated = [...termDates];
@@ -142,7 +143,7 @@ export const SignUpUI = () => {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await axios.get(`${baseUrl}admin/country/get-country`);
+        const response = await axios.get(`${baseUrl}user/country/get-country`);
         setCountries(response.data?.data || []);
       } catch (error) {
         console.error("Error fetching countries:", error);
@@ -411,12 +412,12 @@ export const SignUpUI = () => {
                         value={
                           phoneCode
                             ? {
-                                value: phoneCode,
-                                label:
-                                  countries.find(
-                                    (c) => c.phonecode === phoneCode
-                                  )?.name + ` (${phoneCode})`,
-                              }
+                              value: phoneCode,
+                              label:
+                                countries.find(
+                                  (c) => c.phonecode === phoneCode
+                                )?.name + ` (${phoneCode})`,
+                            }
                             : null
                         }
                         onChange={(selectedOption) =>
@@ -522,11 +523,8 @@ export const SignUpUI = () => {
                     </small>
                   </div>
                   <div className="d-flex justify-content-center">
-                    <button
-                      type="submit"
-                      className="btn btn-primary w-50 w-md-50 enter-btn"
-                    >
-                      Enter
+                    <button type="submit" disabled={isLoading}>
+                      {isLoading ? "Submitting..." : "Submit"}
                     </button>
                   </div>
                 </form>
