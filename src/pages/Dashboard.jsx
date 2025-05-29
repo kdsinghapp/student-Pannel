@@ -19,6 +19,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
+  const [selectedYear, setSelectedYear] = useState(null);
+  const [showYearPopup, setShowYearPopup] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("userTokenStudent");
@@ -33,9 +35,8 @@ const Dashboard = () => {
     if (chartInstance.current) {
       chartInstance.current.destroy();
     }
-
+    if (!chartRef.current || !selectedYear) return; // Only run if canvas is rendered and year is selected
     const ctx = chartRef.current.getContext("2d");
-
     chartInstance.current = new Chart(ctx, {
       type: "doughnut",
       data: {
@@ -57,11 +58,12 @@ const Dashboard = () => {
         },
       },
     });
-
     return () => {
-      chartInstance.current.destroy();
+      if (chartInstance.current) {
+        chartInstance.current.destroy();
+      }
     };
-  }, []);
+  }, [selectedYear]);
 
   // State for each counter
   const [totalStudents, setTotalStudents] = useState(0);
@@ -112,16 +114,71 @@ const Dashboard = () => {
       clearInterval(timer4);
     };
   }, [targetStudents, targetReports, targetSubjects, targetStats]);
+  const handleYearSelect = (event) => {
+    const year = event.target.value;
+    setSelectedYear(year);
+    setShowYearPopup(false);
+  };
+  if (showYearPopup) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          backgroundColor: "#f0f4f8",
+          fontFamily: "Segoe UI, sans-serif",
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "#fff",
+            padding: "40px",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            textAlign: "center",
+            minWidth: "300px",
+          }}
+        >
+          <h2 style={{ marginBottom: "20px", fontSize: "24px", color: "#333" }}>
+            Select Academic Year
+          </h2>
+          <select
+            onChange={handleYearSelect}
+            defaultValue=""
+            style={{
+              padding: "10px 16px",
+              fontSize: "16px",
+              borderRadius: "6px",
+              border: "1px solid #ccc",
+              outline: "none",
+              width: "100%",
+              backgroundColor: "#fff",
+              color: "#333",
+              cursor: "pointer",
+            }}
+          >
+            <option value="" disabled>
+              -- Choose Year --
+            </option>
+            <option value="2024-2025">2024-2025</option>
+            <option value="2023-2024">2023-2024</option>
+            <option value="2022-2023">2022-2023</option>
+          </select>
+        </div>
+      </div>
+    );
 
+  }
   return (
     <div id="wrapper" className="wrapper bg-ash">
-      <Headers />
+      <Headers selectedYear={selectedYear} />
       <div className="dashboard-page-one">
+
         <Sidebar />
         <div className="dashboard-content-one">
-          <div className="breadcrumbs-area">
-            <h3>Dashboard</h3>
-          </div>
           <div className="row gutters-20">
             <div className="col-xl-3 col-sm-6 col-12">
               <div className="dashboard-summery-one mg-b-20">

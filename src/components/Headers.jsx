@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/img/logo.png";
 import admin from "../assets/img/figure/admin.jpg";
 import { useSidebarContext } from "../context/SidebarContext";
-const Headers = () => {
+const Headers = ({ selectedYear }) => {
   // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -71,7 +71,7 @@ const Headers = () => {
         <button
           className="navbar-toggler pulse-animation"
           type="button"
-          // onClick={toggleMobileNav}
+        // onClick={toggleMobileNav}
         >
           <i className="far fa-arrow-alt-circle-down" />
         </button>
@@ -84,9 +84,8 @@ const Headers = () => {
         </button>
       </div>
       <div
-        className={`header-main-menu collapse navbar-collapse ${
-          isMobileNavOpen ? "show" : ""
-        }`}
+        className={`header-main-menu collapse navbar-collapse ${isMobileNavOpen ? "show" : ""
+          }`}
         id="mobile-navbar"
       >
         <ul className="navbar-nav">
@@ -105,6 +104,9 @@ const Headers = () => {
             </div>
           </li>
         </ul>
+          <div className="breadcrumbs-area  ">
+                <h3>{selectedYear}</h3>
+              </div>
         <ul className="navbar-nav">
           <li className="navbar-item dropdown header-admin">
             <a
