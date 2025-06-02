@@ -26,7 +26,7 @@ export const signInAdmin = async (data) => {
 export const getAllClasses = async () => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.get(`${API_URL}/admin/classes`, {
+    const res = await axios.get(`${API_URL}/user/classes`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export const getAllClasses = async () => {
 export const getClassById = async (id) => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.get(`${API_URL}/admin/classes/${id}`, {
+    const res = await axios.get(`${API_URL}/user/classes/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export const getClassById = async (id) => {
 export const deleteClassById = async (id) => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.delete(`${API_URL}/admin/classes/${id}`, {
+    const res = await axios.delete(`${API_URL}/user/classes/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -77,7 +77,7 @@ export const deleteClassById = async (id) => {
 export const updateClassById = async (id, data) => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.put(`${API_URL}/admin/classes/${id}`, data, {
+    const res = await axios.put(`${API_URL}/user/classes/${id}`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -95,7 +95,7 @@ export const updateClassById = async (id, data) => {
 export const addClasses = async (formData) => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.post(`${API_URL}/admin/classes`,formData, {
+    const res = await axios.post(`${API_URL}/user/classes`,formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
