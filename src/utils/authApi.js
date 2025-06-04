@@ -26,7 +26,7 @@ export const signInAdmin = async (data) => {
 export const getAllClasses = async () => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.get(`${API_URL}/user/classes`, {
+    const res = await axios.get(`${API_URL}/user/classes?school_curriculum_id=5`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -183,7 +183,7 @@ export const updateStudentById = async (id, data) => {
 export const addStudents = async (formData) => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.post(`${API_URL}/admin/student/add-student`,formData, {
+    const res = await axios.post(`${API_URL}/user/student/add-student`,formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
@@ -203,7 +203,7 @@ export const addStudents = async (formData) => {
 export const getCountryList = async () => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.get(`${API_URL}/admin/countries`, {
+    const res = await axios.get(`${API_URL}/user/countries`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -221,7 +221,7 @@ export const getCountryList = async () => {
 export const getReligionsList = async () => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.get(`${API_URL}/admin/religions`, {
+    const res = await axios.get(`${API_URL}/user/religions`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",

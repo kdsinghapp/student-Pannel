@@ -177,11 +177,11 @@ const Dashboard = () => {
       <div className="dashboard-page-one">
 
         <Sidebar />
-        <div className="dashboard-content-one">
-          <div className="row gutters-20">
+        <div className="dashboard-content-one ">
+          <div className="row gutters-20 ">
             <div className="col-xl-3 col-sm-6 col-12">
               <div className="dashboard-summery-one mg-b-20">
-                <div className="row align-items-center">
+                <div className="row align-items-center ">
                   <div className="col-8">
                     <div className="item-content">
                       <div className="item-title">Total Students</div>

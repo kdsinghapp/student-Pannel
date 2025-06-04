@@ -147,7 +147,7 @@ h6 {
 }
 
 .card-body {
-  padding: 15px 15px 15px;
+  margin: 20px;
   background-color: #ffffff;
   border-radius: 4px;
   -webkit-box-shadow: 0px 10px 20px 0px rgba(229, 229, 229, 0.75);
@@ -531,6 +531,7 @@ h6 {
 .row.gutters-20 {
   padding-left: 5px;
   padding-right: 5px;
+  margin-top: 10px;
 }
 
 .row.gutters-20>[class^="col-"] {
@@ -1911,6 +1912,7 @@ ul {
   -ms-flex-pack: justify;
   justify-content: space-between;
   padding: 0 20px 0 50px;
+  
 }
 
 @media only screen and (min-width: 768px) {
@@ -1980,6 +1982,7 @@ ul {
   color: #111111;
   font-size: 16px;
   height: 50px;
+  margin-top: 10px;
 }
 
 .header-main-menu .navbar-nav .header-search-bar .stylish-input-group .input-group-addon {
