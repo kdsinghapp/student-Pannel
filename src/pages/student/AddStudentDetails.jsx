@@ -28,38 +28,38 @@ export default AddStudentDetails;
 
 
 const AddStudentsUI = () => {
-const userDataString = localStorage.getItem("userData");
-let school = null;
-let groupedCurriculums = {};
-if (userDataString) {
-  const userData = JSON.parse(userDataString);
-  console.log("live Data Fetch Ho Raha Haia", userData);
-  if (
-    userData &&
-    userData.user &&
-    userData.user.school_details &&
-    userData.user.school_details.length > 0
-  ) {
-    school = userData.user.school_details[0];
-    groupedCurriculums = school.grouped_curriculums || {};
+  const userDataString = localStorage.getItem("userData");
+  let school = null;
+  let groupedCurriculums = {};
+  if (userDataString) {
+    const userData = JSON.parse(userDataString);
+    console.log("live Data Fetch Ho Raha Haia", userData);
+    if (
+      userData &&
+      userData.user &&
+      userData.user.school_details &&
+      userData.user.school_details.length > 0
+    ) {
+      school = userData.user.school_details[0];
+      groupedCurriculums = school.grouped_curriculums || {};
+    }
+  } else {
+    console.log("No user data found in localStorage");
   }
-} else {
-  console.log("No user data found in localStorage");
-}
   const [countries, setCountries] = useState([]);
   const [religions, setReligions] = useState([]);
   const [classData, setClassData] = useState([]);
-    const [selectedYear, setSelectedYear] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
   const [selectedDivisionId, setSelectedDivisionId] = useState("");
-   const years = Object.keys(groupedCurriculums);
+  const years = Object.keys(groupedCurriculums);
 
-     const divisions =
+  const divisions =
     selectedYear && groupedCurriculums[selectedYear]
       ? groupedCurriculums[selectedYear].map((item) => ({
-          id: item.curriculum_division.id,
-          name: item.curriculum_division.name,
-          classes: item.curriculum_division.classes,
-        }))
+        id: item.curriculum_division.id,
+        name: item.curriculum_division.name,
+        classes: item.curriculum_division.classes,
+      }))
       : [];
 
   // Get classes for selected division
@@ -274,7 +274,7 @@ if (userDataString) {
           <Sidebar />
           <div className="dashboard-content-one">
             {/* --- DROPDOWNS FOR YEAR, DIVISION, CLASS --- */}
-          
+
             {/* Breadcubs Area Start Here */}
             <div className="breadcrumbs-area d-flex felx-col-2 justify-content-between ">
               <h3>Add Student details</h3>
@@ -350,7 +350,7 @@ if (userDataString) {
                         <form className="new-added-form">
                           <div className="row">
                             {/* Firstname */}
-                              <div className="col-xl-4 col-lg-6 col-12 form-group">
+                            <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>School Code*</label>
                               <input
                                 type="text"
@@ -575,51 +575,51 @@ if (userDataString) {
                       <div className="accordion-body">
                         <form onSubmit={handleSubmit(handleStudentFormSubmit)} className="new-added-form">
                           <div className="row">
-                          
+
                             <div className="col-md-4">
-                <label>Year</label>
-                <select
-                  className="form-control"
-                  value={selectedYear}
-                  onChange={e => {
-                    setSelectedYear(e.target.value);
-                    setSelectedDivisionId(""); // reset division
-                  }}
-                >
-                  <option value="">Select Year</option>
-                  {years.map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-              </div>
+                              <label>Year</label>
+                              <select
+                                className="form-control"
+                                value={selectedYear}
+                                onChange={e => {
+                                  setSelectedYear(e.target.value);
+                                  setSelectedDivisionId(""); // reset division
+                                }}
+                              >
+                                <option value="">Select Year</option>
+                                {years.map(year => (
+                                  <option key={year} value={year}>{year}</option>
+                                ))}
+                              </select>
+                            </div>
 
-                             <div className="col-md-4">
-                <label>Curriculum Division</label>
-                <select
-                  className="form-control"
-                  value={selectedDivisionId}
-                  onChange={e => setSelectedDivisionId(e.target.value)}
-                  disabled={!selectedYear}
-                >
-                  <option value="">Select Division</option>
-                  {divisions.map(div => (
-                    <option key={div.id} value={div.id}>{div.name}</option>
-                  ))}
-                </select>
-              </div>
+                            <div className="col-md-4">
+                              <label>Curriculum Division</label>
+                              <select
+                                className="form-control"
+                                value={selectedDivisionId}
+                                onChange={e => setSelectedDivisionId(e.target.value)}
+                                disabled={!selectedYear}
+                              >
+                                <option value="">Select Division</option>
+                                {divisions.map(div => (
+                                  <option key={div.id} value={div.id}>{div.name}</option>
+                                ))}
+                              </select>
+                            </div>
 
-                              <div className="col-md-4">
-                <label>Class</label>
-                <select
-                  className="form-control"
-                  disabled={!selectedDivisionId}
-                >
-                  <option value="">Select Class</option>
-                  {classes.map(cls => (
-                    <option key={cls.id} value={cls.id}>{cls.name}</option>
-                  ))}
-                </select>
-              </div>
+                            <div className="col-md-4">
+                              <label>Class</label>
+                              <select
+                                className="form-control"
+                                disabled={!selectedDivisionId}
+                              >
+                                <option value="">Select Class</option>
+                                {classes.map(cls => (
+                                  <option key={cls.id} value={cls.id}>{cls.name}</option>
+                                ))}
+                              </select>
+                            </div>
 
 
 
