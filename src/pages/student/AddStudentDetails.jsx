@@ -13,19 +13,23 @@ import Sidebar from "../../components/Sidebar";
 import * as bootstrap from "bootstrap";
 import DownloadTemplate from "../../components/DownloadTemplate";
 import {
-  addStudents, getCountryList, getReligionsList, getAllClasses
+  addStudents,
+  getCountryList,
+  getReligionsList,
+  getAllClasses,
 } from "../../utils/authApi";
 // import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 function AddStudentDetails() {
-  return (<>
-    <AddStudentsUI />
-  </>)
+  return (
+    <>
+      <AddStudentsUI />
+    </>
+  );
 }
 
 export default AddStudentDetails;
-
 
 const AddStudentsUI = () => {
   const userDataString = localStorage.getItem("userData");
@@ -51,21 +55,41 @@ const AddStudentsUI = () => {
   const [classData, setClassData] = useState([]);
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedDivisionId, setSelectedDivisionId] = useState("");
+
+  // Set selectedYear from localStorage or default to first available year
+  useEffect(() => {
+    let yearFromStorage = localStorage.getItem("selectedYear");
+    if (!yearFromStorage && years.length > 0) {
+      yearFromStorage = years[0];
+    }
+    if (yearFromStorage && years.includes(yearFromStorage)) {
+      setSelectedYear(yearFromStorage);
+    } else if (years.length > 0) {
+      setSelectedYear(years[0]);
+    }
+  }, [userDataString]);
+
+  // Reset division when year changes
+  useEffect(() => {
+    setSelectedDivisionId("");
+  }, [selectedYear]);
+
   const years = Object.keys(groupedCurriculums);
 
   const divisions =
     selectedYear && groupedCurriculums[selectedYear]
       ? groupedCurriculums[selectedYear].map((item) => ({
-        id: item.curriculum_division.id,
-        name: item.curriculum_division.name,
-        classes: item.curriculum_division.classes,
-      }))
+          id: item.curriculum_division.id,
+          name: item.curriculum_division.name,
+          classes: item.curriculum_division.classes,
+        }))
       : [];
 
   // Get classes for selected division
   const classes =
     selectedDivisionId && divisions.length
-      ? divisions.find((div) => String(div.id) === String(selectedDivisionId))?.classes || []
+      ? divisions.find((div) => String(div.id) === String(selectedDivisionId))
+          ?.classes || []
       : [];
   // const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   // const navigate = useNavigate();
@@ -101,7 +125,7 @@ const AddStudentsUI = () => {
   const getCountryData = async () => {
     try {
       const res = await getCountryList();
-      console.log("country-list", res)
+      console.log("country-list", res);
       if (res.status) {
         setCountries(res.data);
       }
@@ -124,7 +148,7 @@ const AddStudentsUI = () => {
   const getReligionData = async () => {
     try {
       const res = await getReligionsList();
-      console.log("religion-list", res)
+      console.log("religion-list", res);
       if (res.status) {
         setReligions(res.data);
       }
@@ -148,7 +172,7 @@ const AddStudentsUI = () => {
   const getClassData = async () => {
     try {
       const res = await getAllClasses();
-      console.log("class-list", res)
+      console.log("class-list", res);
       if (res.status) {
         setClassData(res.data);
       }
@@ -174,7 +198,6 @@ const AddStudentsUI = () => {
     getReligionData();
     getClassData();
   }, []);
-
 
   // const navigateToAddStudents = () => {
   //   navigate("/add-student-details")
@@ -231,8 +254,7 @@ const AddStudentsUI = () => {
       for (const key in data) {
         if (key === "profile_image") {
           formData.append("profile_image", data.profile_image[0]); // Get first file from FileList
-        }
-        else {
+        } else {
           formData.append(key, data[key]);
         }
       }
@@ -262,8 +284,6 @@ const AddStudentsUI = () => {
       }
     }
   };
-
-
 
   // Dropdowns for Year, Division, and Class
   return (
@@ -308,15 +328,12 @@ const AddStudentsUI = () => {
                 <button
                   className="btn btn-purple modal-trigger"
                   style={{ color: "white", background: "#501b8d" }}
-                // onClick={navigateToAddStudents}
+                  // onClick={navigateToAddStudents}
                 >
                   <i className="fas fa-plus" /> Add New
                 </button>
-
               </div>
-              <div>
-
-              </div>
+              <div></div>
             </div>
             {/* Breadcubs Area End Here */}
 
@@ -356,9 +373,15 @@ const AddStudentsUI = () => {
                                 type="text"
                                 placeholder="Enter School Code"
                                 className="form-control"
-                                {...register("school_code", { required: "School Code is required" })}
+                                {...register("school_code", {
+                                  required: "School Code is required",
+                                })}
                               />
-                              {errors.school_code && <span className="text-danger">{errors.school_code.message}</span>}
+                              {errors.school_code && (
+                                <span className="text-danger">
+                                  {errors.school_code.message}
+                                </span>
+                              )}
                             </div>
                             <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>Firstname *</label>
@@ -369,13 +392,16 @@ const AddStudentsUI = () => {
                                   required: "Firstname is required",
                                   minLength: {
                                     value: 3,
-                                    message: "FirstName must be at least 3 characters",
+                                    message:
+                                      "FirstName must be at least 3 characters",
                                   },
                                 })}
                                 className="form-control"
                               />
                               {errors.first_name && (
-                                <p className="text-danger">{errors.first_name.message}</p>
+                                <p className="text-danger">
+                                  {errors.first_name.message}
+                                </p>
                               )}
                             </div>
 
@@ -389,13 +415,16 @@ const AddStudentsUI = () => {
                                   required: "Surname is required",
                                   minLength: {
                                     value: 3,
-                                    message: "Surname must be at least 3 characters",
+                                    message:
+                                      "Surname must be at least 3 characters",
                                   },
                                 })}
                                 className="form-control"
                               />
                               {errors.last_name && (
-                                <p className="text-danger">{errors.last_name.message}</p>
+                                <p className="text-danger">
+                                  {errors.last_name.message}
+                                </p>
                               )}
                             </div>
 
@@ -412,7 +441,9 @@ const AddStudentsUI = () => {
                               />
                               <i className="far fa-calendar-alt" />
                               {errors.date_of_birth && (
-                                <p className="text-danger">{errors.date_of_birth.message}</p>
+                                <p className="text-danger">
+                                  {errors.date_of_birth.message}
+                                </p>
                               )}
                             </div>
 
@@ -434,7 +465,9 @@ const AddStudentsUI = () => {
                                   ))}
                               </select>
                               {errors.country_id && (
-                                <p className="text-danger">{errors.country_id.message}</p>
+                                <p className="text-danger">
+                                  {errors.country_id.message}
+                                </p>
                               )}
                             </div>
 
@@ -456,7 +489,9 @@ const AddStudentsUI = () => {
                                   ))}
                               </select>
                               {errors.country_of_birth_id && (
-                                <p className="text-danger">{errors.country_of_birth_id.message}</p>
+                                <p className="text-danger">
+                                  {errors.country_of_birth_id.message}
+                                </p>
                               )}
                             </div>
 
@@ -478,7 +513,9 @@ const AddStudentsUI = () => {
                                   ))}
                               </select>
                               {errors.religion_id && (
-                                <p className="text-danger">{errors.religion_id.message}</p>
+                                <p className="text-danger">
+                                  {errors.religion_id.message}
+                                </p>
                               )}
                             </div>
 
@@ -497,7 +534,9 @@ const AddStudentsUI = () => {
                                 <option value="Others">Others</option>
                               </select>
                               {errors.gender && (
-                                <p className="text-danger">{errors.gender.message}</p>
+                                <p className="text-danger">
+                                  {errors.gender.message}
+                                </p>
                               )}
                             </div>
 
@@ -511,12 +550,13 @@ const AddStudentsUI = () => {
                                 accept="image/*"
                                 {...register("profile_image", {
                                   required: "Photo is required",
-
                                 })}
                                 className="form-control-file"
                               />
                               {errors.profile_image && (
-                                <p className="text-danger">{errors.profile_image.message}</p>
+                                <p className="text-danger">
+                                  {errors.profile_image.message}
+                                </p>
                               )}
                             </div>
                             <div className="col-lg-8 col-12 form-group mg-t-30">
@@ -532,7 +572,9 @@ const AddStudentsUI = () => {
                                 className="form-control-file"
                               />
                               {errors.student_photo && (
-                                <p className="text-danger">{errors.student_photo.message}</p>
+                                <p className="text-danger">
+                                  {errors.student_photo.message}
+                                </p>
                               )}
                             </div>
 
@@ -573,108 +615,148 @@ const AddStudentsUI = () => {
                       data-bs-parent="#customAccordion"
                     >
                       <div className="accordion-body">
-                        <form onSubmit={handleSubmit(handleStudentFormSubmit)} className="new-added-form">
+                        <form
+                          onSubmit={handleSubmit(handleStudentFormSubmit)}
+                          className="new-added-form"
+                        >
                           <div className="row">
-
-                            <div className="col-md-4">
+                            {/* Year Dropdown */}
+                            {/* <div className="col-md-4">
                               <label>Year</label>
                               <select
                                 className="form-control"
                                 value={selectedYear}
-                                onChange={e => {
+                                onChange={(e) => {
                                   setSelectedYear(e.target.value);
-                                  setSelectedDivisionId(""); // reset division
+                                  setSelectedDivisionId(""); // Reset division when year changes
                                 }}
                               >
                                 <option value="">Select Year</option>
-                                {years.map(year => (
-                                  <option key={year} value={year}>{year}</option>
+                                {years.map((year) => (
+                                  <option key={year} value={year}>
+                                    {year}
+                                  </option>
                                 ))}
                               </select>
-                            </div>
-
+                            </div> */}
+                            {/* Curriculum Division Dropdown */}
                             <div className="col-md-4">
                               <label>Curriculum Division</label>
                               <select
                                 className="form-control"
                                 value={selectedDivisionId}
-                                onChange={e => setSelectedDivisionId(e.target.value)}
+                                onChange={(e) => setSelectedDivisionId(e.target.value)}
                                 disabled={!selectedYear}
                               >
                                 <option value="">Select Division</option>
-                                {divisions.map(div => (
-                                  <option key={div.id} value={div.id}>{div.name}</option>
+                                {divisions.map((div) => (
+                                  <option key={div.id} value={div.id}>
+                                    {div.name}
+                                  </option>
                                 ))}
                               </select>
                             </div>
-
+                            {/* Class Dropdown */}
                             <div className="col-md-4">
                               <label>Class</label>
                               <select
                                 className="form-control"
+                                {...register("class_id", { required: "Class is required" })}
                                 disabled={!selectedDivisionId}
                               >
                                 <option value="">Select Class</option>
-                                {classes.map(cls => (
-                                  <option key={cls.id} value={cls.id}>{cls.name}</option>
+                                {classes.map((cls) => (
+                                  <option key={cls.id} value={cls.id}>
+                                    {cls.name}
+                                  </option>
                                 ))}
                               </select>
+                              {errors.class_id && (
+                                <span className="text-danger">{errors.class_id.message}</span>
+                              )}
                             </div>
-
-
 
                             <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>SEN*</label>
                               <select
                                 className="select2 form-control"
-                                {...register("sen", { required: "SEN is required" })}
+                                {...register("sen", {
+                                  required: "SEN is required",
+                                })}
                               >
                                 <option value="">Please Select SEN</option>
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                               </select>
-                              {errors.sen && <span className="text-danger">{errors.sen.message}</span>}
+                              {errors.sen && (
+                                <span className="text-danger">
+                                  {errors.sen.message}
+                                </span>
+                              )}
                             </div>
 
                             <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>G & T*</label>
                               <select
                                 className="select2 form-control"
-                                {...register("g_and_t", { required: "G & T is required" })}
+                                {...register("g_and_t", {
+                                  required: "G & T is required",
+                                })}
                               >
                                 <option value="">Please Select G&T</option>
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                               </select>
-                              {errors.g_and_t && <span className="text-danger">{errors.g_and_t.message}</span>}
+                              {errors.g_and_t && (
+                                <span className="text-danger">
+                                  {errors.g_and_t.message}
+                                </span>
+                              )}
                             </div>
 
                             <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>EAL*</label>
                               <select
                                 className="select2 form-control"
-                                {...register("eal", { required: "EAL is required" })}
+                                {...register("eal", {
+                                  required: "EAL is required",
+                                })}
                               >
                                 <option value="">Please Select EAL</option>
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                               </select>
-                              {errors.eal && <span className="text-danger">{errors.eal.message}</span>}
+                              {errors.eal && (
+                                <span className="text-danger">
+                                  {errors.eal.message}
+                                </span>
+                              )}
                             </div>
 
                             <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>Academic Class</label>
-                              <select className="select2 form-control" {...register("academic_class_id")}>
-                                <option value="">Please Select Academic Class</option>
-                                {classData && classData.map(clas => (
-                                  <option key={clas.id} value={clas.id}>{clas.name}</option>
-                                ))}
+                              <select
+                                className="select2 form-control"
+                                {...register("academic_class_id")}
+                              >
+                                <option value="">
+                                  Please Select Academic Class
+                                </option>
+                                {classData &&
+                                  classData.map((clas) => (
+                                    <option key={clas.id} value={clas.id}>
+                                      {clas.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
 
                             <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>Category</label>
-                              <select className="select2 form-control" {...register("category")}>
+                              <select
+                                className="select2 form-control"
+                                {...register("category")}
+                              >
                                 <option value="">Please Select</option>
                                 <option value="ESL">ESL</option>
                                 <option value="GEN">GEN</option>
@@ -682,7 +764,10 @@ const AddStudentsUI = () => {
                             </div>
 
                             <div className="col-12 form-group mg-t-8">
-                              <button type="submit" className="btn-fill-lg btn-gradient-blue1 btn-hover-bluedark">
+                              <button
+                                type="submit"
+                                className="btn-fill-lg btn-gradient-blue1 btn-hover-bluedark"
+                              >
                                 Submit
                               </button>
                             </div>
@@ -696,7 +781,6 @@ const AddStudentsUI = () => {
             </div>
             {/* Class Table Area End Here */}
           </div>
-
         </div>
         {/* Page Area End Here */}
       </div>
@@ -747,7 +831,7 @@ const AddStudentsUI = () => {
                 <button
                   type="button"
                   className="btn btn-success"
-                // onClick="openModal()"
+                  // onClick="openModal()"
                 >
                   Upload
                 </button>
