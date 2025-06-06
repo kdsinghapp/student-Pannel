@@ -439,7 +439,6 @@ const AddStudentsUI = () => {
                                 })}
                                 className="form-control air-datepicker"
                               />
-                              <i className="far fa-calendar-alt" />
                               {errors.date_of_birth && (
                                 <p className="text-danger">
                                   {errors.date_of_birth.message}
