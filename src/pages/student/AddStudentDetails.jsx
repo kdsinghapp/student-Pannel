@@ -274,50 +274,7 @@ if (userDataString) {
           <Sidebar />
           <div className="dashboard-content-one">
             {/* --- DROPDOWNS FOR YEAR, DIVISION, CLASS --- */}
-            <div className="row mb-4">
-              <div className="col-md-4">
-                <label>Year</label>
-                <select
-                  className="form-control"
-                  value={selectedYear}
-                  onChange={e => {
-                    setSelectedYear(e.target.value);
-                    setSelectedDivisionId(""); // reset division
-                  }}
-                >
-                  <option value="">Select Year</option>
-                  {years.map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-4">
-                <label>Curriculum Division</label>
-                <select
-                  className="form-control"
-                  value={selectedDivisionId}
-                  onChange={e => setSelectedDivisionId(e.target.value)}
-                  disabled={!selectedYear}
-                >
-                  <option value="">Select Division</option>
-                  {divisions.map(div => (
-                    <option key={div.id} value={div.id}>{div.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-4">
-                <label>Class</label>
-                <select
-                  className="form-control"
-                  disabled={!selectedDivisionId}
-                >
-                  <option value="">Select Class</option>
-                  {classes.map(cls => (
-                    <option key={cls.id} value={cls.id}>{cls.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
+          
             {/* Breadcubs Area Start Here */}
             <div className="breadcrumbs-area d-flex felx-col-2 justify-content-between ">
               <h3>Add Student details</h3>
