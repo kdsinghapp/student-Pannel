@@ -640,7 +640,7 @@ const AddStudentsUI = () => {
                               </select>
                             </div> */}
                             {/* Curriculum Division Dropdown */}
-                            <div className="col-md-4">
+                             <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>Curriculum Division</label>
                               <select
                                 className="form-control"
@@ -657,7 +657,7 @@ const AddStudentsUI = () => {
                               </select>
                             </div>
                             {/* Class Dropdown */}
-                            <div className="col-md-4">
+                              <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>Class</label>
                               <select
                                 className="form-control"
