@@ -8,12 +8,13 @@ export const signInAdmin = async (data) => {
     const res = await axios.post(`${API_URL}/user/login`, data);
     const responseData = res.data;
 
-    // Save full user object in localStorage (optional)
-    localStorage.setItem("userStudentData", JSON.stringify(responseData));
+   if (responseData?.user) {
+      localStorage.setItem("userStudentData", JSON.stringify(responseData));
+            console.log("userStudentData stored");
 
-    // ✅ Save just the user's full name separately
-    const fullName = `${responseData.user.first_name} ${responseData.user.last_name}`;
-    localStorage.setItem("userName", fullName);
+      const fullName = `${responseData.user.first_name} ${responseData.user.last_name}`;
+      localStorage.setItem("userName", fullName);
+    }
 
     return responseData;
   } catch (error) {

@@ -146,6 +146,7 @@ const WelcomePage = () => {
       if (res.status) {
         localStorage.setItem("userTokenStudent", res.token);
         localStorage.setItem("userStudentData", JSON.stringify(res.admin));
+        localStorage.setItem("userData", JSON.stringify(res));
 
         navigate("/");
       } else {
