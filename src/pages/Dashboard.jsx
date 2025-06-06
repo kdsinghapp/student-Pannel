@@ -22,6 +22,27 @@ const Dashboard = () => {
   const [selectedYear, setSelectedYear] = useState(null);
   const [showYearPopup, setShowYearPopup] = useState(true);
 
+  // Parse userData from localStorage and extract groupedCurriculums
+  const userDataString = localStorage.getItem("userData");
+  let groupedCurriculums = {};
+  if (userDataString) {
+    try {
+      const userData = JSON.parse(userDataString);
+      if (
+        userData &&
+        userData.user &&
+        userData.user.school_details &&
+        userData.user.school_details.length > 0
+      ) {
+        const school = userData.user.school_details[0];
+        groupedCurriculums = school.grouped_curriculums || {};
+      }
+    } catch (e) {
+      console.error("Error parsing userData from localStorage", e);
+    }
+  }
+  const yearOptions = Object.keys(groupedCurriculums);
+
   useEffect(() => {
     const token = localStorage.getItem("userTokenStudent");
     const userData = localStorage.getItem("userStudentData");
@@ -118,6 +139,7 @@ const Dashboard = () => {
     const year = event.target.value;
     setSelectedYear(year);
     setShowYearPopup(false);
+    localStorage.setItem("selectedYear", year); // Save selected year to localStorage
   };
   if (showYearPopup) {
     return (
@@ -163,8 +185,9 @@ const Dashboard = () => {
             <option value="" disabled>
               -- Choose Year --
             </option>
-            <option value="2025">2025</option>
-            <option value="2024">2026</option>
+            {yearOptions.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
           </select>
         </div>
       </div>
