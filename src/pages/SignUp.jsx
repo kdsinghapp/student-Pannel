@@ -237,7 +237,17 @@ export const SignUpUI = () => {
             {/* Right Section */}
             <div className="col-lg-6 col-12">
               <div className="right-section py-4 px-3 px-md-5">
-                <h1 className="register-title">Register and Setup</h1>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                  <h1 className="register-title mb-0">Register and Setup</h1>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => navigate("/")}
+                  >
+                    Sign In
+                  </button>
+                </div>
+
                 <form className="setup-form mb-5" onSubmit={handleSubmit}>
                   {/* Form groups */}
                   <div className="logo-upload mb-4">
@@ -541,8 +551,8 @@ export const SignUpUI = () => {
                       />
                     </div>
                   </div>
-                  <div className="row mb-3"></div>
-                  <div className="terms-section">
+
+                  <div className="terms-section mt-4 ">
                     <small className="d-block text-center">
                       By continuing you are acknowledging that you have read,
                       understand and agreed to Mentrix's{" "}
@@ -551,10 +561,12 @@ export const SignUpUI = () => {
                     </small>
                   </div>
                   <div className="d-flex justify-content-center">
-                    <button type="submit" disabled={isLoading}>
+                    <button type="submit" disabled={isLoading} className="btn btn-primary me-2">
                       {isLoading ? "Submitting..." : "Submit"}
                     </button>
+
                   </div>
+
                 </form>
               </div>
             </div>
