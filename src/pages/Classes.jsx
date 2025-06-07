@@ -13,7 +13,7 @@ import {
   deleteClassById,
   getAllClasses,
   updateClassById,
-  addClasses
+  addClasses,
 } from "../utils/authApi";
 import Swal from "sweetalert2";
 import img1 from "../assets/assets/icon/circle-round.png";
@@ -27,34 +27,57 @@ const Classes = () => {
   const [className, setClassName] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [toastData, setToastData] = useState({ message: "", type: "success" });
+  const [yearGroups, setYearGroups] = useState([]);
+  const [selectedYearGroup, setSelectedYearGroup] = useState("");
+
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  const curriculum =
+    userData?.user?.school_details?.[0]?.curriculums?.[0]?.curriculum_division
+      ?.curriculum_id;
+  const school = userData?.user?.school_details?.[0]?.curriculums?.[0]?.id;
+
+  console.log("Curriculum ID:", curriculum);
+  console.log("School ID:", school);
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
 
-  const addClass = async(e) => {
+  const addClass = async (e) => {
     e.preventDefault();
-    
-    const newClassData = {
-      name: className
+    if (!selectedYearGroup) {
+      alert("Please select a Year Group!");
+      return;
     }
     if (className.trim() === "") {
       alert("Class name cannot be empty!");
       return;
     }
-  console.log("New Class:", newClassData);
-    // Call API or update state to add the class
+    // Find the selected year group object for curriculum_class
+    const yearGroupObj = yearGroups.find(
+      (g) => g === selectedYearGroup || g.name === selectedYearGroup
+    );
+    // You need to send both name_array and name (for some APIs)
+    const newClassData = {
+      // name: className,
+      name: [className],
+      school_curriculum_id: school,
+      curriculum_class_id: curriculum, // always send curriculum_class_id: 1
+    };
+    console.log("New Class Payload:", newClassData);
     try {
       const res = await addClasses(newClassData);
-      console.log("class-list",res)
-      if(!res.status){
-        setToastData({ message: "Class not added", type: "denger" });
-    setShowToast(true);
+      console.log("class-list", res);
+      if (!res.status) {
+        setToastData({
+          message: res.message || "Class not added",
+          type: "denger",
+        });
+        setShowToast(true);
       }
       if (res.status) {
         // setData(res.data);
         getClassData();
       }
-
     } catch (error) {
       console.error("Error add class data:", error);
       if (error.message) {
@@ -77,7 +100,7 @@ const Classes = () => {
   const getClassData = async () => {
     try {
       const res = await getAllClasses();
-      console.log("class-list",res)
+      console.log("class-list", res);
       if (res.status) {
         setData(res.data);
       }
@@ -97,6 +120,28 @@ const Classes = () => {
       }
     }
   };
+
+  // Fetch year groups (class hierarchy) for dropdown
+  useEffect(() => {
+    const fetchYearGroups = async () => {
+      try {
+        const res = await fetch(
+          `https://server-php-8-3.technorizen.com/gradesphere/api/user/classes/get-class-hierarchy?school_curriculum_id=${school}`
+        );
+        const result = await res.json();
+        if (result.status && result.data && result.data.length > 0) {
+          // Flatten all curriculum_division names (e.g., KG, etc.)
+          const groups = result.data
+            .map((item) => item.curriculum_division?.name)
+            .filter(Boolean);
+          setYearGroups(groups);
+        }
+      } catch (err) {
+        // handle error
+      }
+    };
+    fetchYearGroups();
+  }, []);
 
   useEffect(() => {
     getClassData();
@@ -180,7 +225,7 @@ const Classes = () => {
     <>
       <div id="wrapper" className="wrapper bg-ash">
         <Headers />
-      
+
         <div className="dashboard-page-one">
           <Sidebar />
           <div className="dashboard-content-one">
@@ -497,8 +542,15 @@ const Classes = () => {
                       color: "#646464",
                       border: "1px solid lightgrey",
                     }}
+                    value={selectedYearGroup}
+                    onChange={(e) => setSelectedYearGroup(e.target.value)}
                   >
-                    <option>FSI</option>
+                    <option value="">Select Year Group</option>
+                    {yearGroups.map((group, idx) => (
+                      <option key={group + idx} value={group}>
+                        {group}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="form-group">
@@ -543,7 +595,7 @@ const Classes = () => {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={(e)=>addClass(e)}
+                  onClick={(e) => addClass(e)}
                 >
                   Confirm
                 </button>
@@ -556,7 +608,7 @@ const Classes = () => {
       {showModal && <div className="modal-backdrop fade show"></div>}
       <DownloadTemplate />
       <AddNewFile />
-      <AddNewClass />
+      {/* <AddNewClass /> */}
       {showToast && (
         <Notification
           message={toastData.message}
