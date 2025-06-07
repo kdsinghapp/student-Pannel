@@ -34,16 +34,44 @@ export const SignUpUI = () => {
   }, []);
 
   const handleDateChange = (divisionId, termId, type, value) => {
-    setTermDates((prev) => ({
-      ...prev,
-      [divisionId]: {
-        ...prev[divisionId],
-        [termId]: {
-          ...((prev[divisionId] && prev[divisionId][termId]) || {}),
-          [type]: value,
+    setTermDates((prev) => {
+      const updated = {
+        ...prev,
+        [divisionId]: {
+          ...prev[divisionId],
+          [termId]: {
+            ...((prev[divisionId] && prev[divisionId][termId]) || {}),
+            [type]: value,
+          },
         },
-      },
-    }));
+      };
+
+      // If editing Division 1, propagate the same term's date to all other divisions for the same term index
+      const firstDivisionId = selectedDivisions[0];
+      if (divisionId === firstDivisionId && selectedDivisions.length > 1) {
+        // Find the term index in Division 1
+        const firstDivision = divisions.find((d) => d.division_id === firstDivisionId);
+        const termIndex = firstDivision?.terms.findIndex((t) => t.term_id === termId);
+        if (termIndex !== undefined && termIndex !== -1) {
+          // For each other division, set the same term's date
+          for (let i = 1; i < selectedDivisions.length; i++) {
+            const otherDivisionId = selectedDivisions[i];
+            const otherDivision = divisions.find((d) => d.division_id === otherDivisionId);
+            const otherTermId = otherDivision?.terms[termIndex]?.term_id;
+            if (otherDivisionId && otherTermId) {
+              updated[otherDivisionId] = {
+                ...prev[otherDivisionId],
+                [otherTermId]: {
+                  ...((prev[otherDivisionId] && prev[otherDivisionId][otherTermId]) || {}),
+                  [type]: value,
+                },
+              };
+            }
+          }
+        }
+      }
+      return updated;
+    });
   };
   const selectedCurriculum = curriculums.find(
     (c) => c.curriculum_id === Number(selectedCurriculumId)
