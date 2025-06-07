@@ -141,59 +141,59 @@ const Dashboard = () => {
     setShowYearPopup(false);
     localStorage.setItem("selectedYear", year); // Save selected year to localStorage
   };
-  if (showYearPopup) {
-    return (
-      <div
-        style={{
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          backgroundColor: "#f0f4f8",
-          fontFamily: "Segoe UI, sans-serif",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#fff",
-            padding: "40px",
-            borderRadius: "12px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-            textAlign: "center",
-            minWidth: "300px",
-          }}
-        >
-          <h2 style={{ marginBottom: "20px", fontSize: "24px", color: "#333" }}>
-            Select Academic Year
-          </h2>
-          <select
-            onChange={handleYearSelect}
-            defaultValue=""
-            style={{
-              padding: "10px 16px",
-              fontSize: "16px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-              outline: "none",
-              width: "100%",
-              backgroundColor: "#fff",
-              color: "#333",
-              cursor: "pointer",
-            }}
-          >
-            <option value="" disabled>
-              -- Choose Year --
-            </option>
-            {yearOptions.map((year) => (
-              <option key={year} value={year}>{year}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-    );
+  // if (showYearPopup) {
+  //   return (
+  //     <div
+  //       style={{
+  //         height: "100vh",
+  //         display: "flex",
+  //         justifyContent: "center",
+  //         alignItems: "center",
+  //         flexDirection: "column",
+  //         backgroundColor: "#f0f4f8",
+  //         fontFamily: "Segoe UI, sans-serif",
+  //       }}
+  //     >
+  //       <div
+  //         style={{
+  //           backgroundColor: "#fff",
+  //           padding: "40px",
+  //           borderRadius: "12px",
+  //           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+  //           textAlign: "center",
+  //           minWidth: "300px",
+  //         }}
+  //       >
+  //         <h2 style={{ marginBottom: "20px", fontSize: "24px", color: "#333" }}>
+  //           Select Academic Year
+  //         </h2>
+  //         <select
+  //           onChange={handleYearSelect}
+  //           defaultValue=""
+  //           style={{
+  //             padding: "10px 16px",
+  //             fontSize: "16px",
+  //             borderRadius: "6px",
+  //             border: "1px solid #ccc",
+  //             outline: "none",
+  //             width: "100%",
+  //             backgroundColor: "#fff",
+  //             color: "#333",
+  //             cursor: "pointer",
+  //           }}
+  //         >
+  //           <option value="" disabled>
+  //             -- Choose Year --
+  //           </option>
+  //           {yearOptions.map((year) => (
+  //             <option key={year} value={year}>{year}</option>
+  //           ))}
+  //         </select>
+  //       </div>
+  //     </div>
+  //   );
 
-  }
+  // }
   return (
     <div id="wrapper" className="wrapper bg-ash">
       <Headers selectedYear={selectedYear} />
