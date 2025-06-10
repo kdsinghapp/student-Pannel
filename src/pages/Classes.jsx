@@ -29,6 +29,11 @@ const Classes = () => {
   const [toastData, setToastData] = useState({ message: "", type: "success" });
   const [yearGroups, setYearGroups] = useState([]);
   const [selectedYearGroup, setSelectedYearGroup] = useState("");
+  const [yearGroupHierarchy, setYearGroupHierarchy] = useState([]); // Store full hierarchy
+  const [selectedDivision, setSelectedDivision] = useState("");
+  const [divisionClasses, setDivisionClasses] = useState([]);
+  const [sectionNames, setSectionNames] = useState([""]);
+  const [selectedClassObj, setSelectedClassObj] = useState(null);
 
   const userData = JSON.parse(localStorage.getItem("userData"));
   const curriculum =
@@ -44,24 +49,22 @@ const Classes = () => {
 
   const addClass = async (e) => {
     e.preventDefault();
-    if (!selectedYearGroup) {
+    if (!selectedDivision) {
       alert("Please select a Year Group!");
       return;
     }
-    if (className.trim() === "") {
-      alert("Class name cannot be empty!");
+    if (!selectedClassObj) {
+      alert("Please select a Class!");
       return;
     }
-    // Find the selected year group object for curriculum_class
-    const yearGroupObj = yearGroups.find(
-      (g) => g === selectedYearGroup || g.name === selectedYearGroup
-    );
-    // You need to send both name_array and name (for some APIs)
+    if (sectionNames.some((name) => name.trim() === "")) {
+      alert("Section name cannot be empty!");
+      return;
+    }
     const newClassData = {
-      // name: className,
-      name: [className],
+      name: sectionNames,
       school_curriculum_id: school,
-      curriculum_class_id: curriculum, // always send curriculum_class_id: 1
+      curriculum_class_id: selectedClassObj.id,
     };
     console.log("New Class Payload:", newClassData);
     try {
@@ -130,11 +133,7 @@ const Classes = () => {
         );
         const result = await res.json();
         if (result.status && result.data && result.data.length > 0) {
-          // Flatten all curriculum_division names (e.g., KG, etc.)
-          const groups = result.data
-            .map((item) => item.curriculum_division?.name)
-            .filter(Boolean);
-          setYearGroups(groups);
+          setYearGroupHierarchy(result.data); // Store full hierarchy
         }
       } catch (err) {
         // handle error
@@ -142,6 +141,35 @@ const Classes = () => {
     };
     fetchYearGroups();
   }, []);
+
+  // Update classes dropdown when division changes
+  useEffect(() => {
+    if (!selectedDivision) {
+      setDivisionClasses([]);
+      setSelectedClassObj(null);
+      return;
+    }
+    // Find the selected division object
+    const divisionObj = yearGroupHierarchy.find(
+      (item) => item.curriculum_division?.name === selectedDivision
+    );
+    if (divisionObj && divisionObj.curriculum_division?.classes) {
+      setDivisionClasses(divisionObj.curriculum_division.classes);
+    } else {
+      setDivisionClasses([]);
+    }
+    setSelectedClassObj(null);
+  }, [selectedDivision, yearGroupHierarchy]);
+
+  // Update selectedClassObj when class changes
+  useEffect(() => {
+    if (!selectedYearGroup) {
+      setSelectedClassObj(null);
+      return;
+    }
+    const classObj = divisionClasses.find((cls) => cls.name === selectedYearGroup);
+    setSelectedClassObj(classObj || null);
+  }, [selectedYearGroup, divisionClasses]);
 
   useEffect(() => {
     getClassData();
@@ -219,6 +247,16 @@ const Classes = () => {
         }
       }
     });
+  };
+
+  const handleSectionNameChange = (idx, value) => {
+    setSectionNames((prev) => prev.map((s, i) => (i === idx ? value : s)));
+  };
+  const handleAddSection = () => {
+    setSectionNames((prev) => [...prev, ""]);
+  };
+  const handleRemoveSection = (idx) => {
+    setSectionNames((prev) => prev.filter((_, i) => i !== idx));
   };
 
   return (
@@ -533,22 +571,21 @@ const Classes = () => {
               <div className="modal-body">
                 <div className="form-group">
                   <label style={{ fontSize: "16px", color: "#646464" }}>
-                    Year Group
+                    Year Group (Division)
                   </label>
                   <select
                     className="form-control"
-                    style={{
-                      fontSize: "16px",
-                      color: "#646464",
-                      border: "1px solid lightgrey",
+                    style={{ fontSize: "16px", color: "#646464", border: "1px solid lightgrey" }}
+                    value={selectedDivision}
+                    onChange={(e) => {
+                      setSelectedDivision(e.target.value);
+                      setSelectedYearGroup(""); // Reset class selection
                     }}
-                    value={selectedYearGroup}
-                    onChange={(e) => setSelectedYearGroup(e.target.value)}
                   >
                     <option value="">Select Year Group</option>
-                    {yearGroups.map((group, idx) => (
-                      <option key={group + idx} value={group}>
-                        {group}
+                    {yearGroupHierarchy.map((item, idx) => (
+                      <option key={item.curriculum_division?.id || idx} value={item.curriculum_division?.name}>
+                        {item.curriculum_division?.name}
                       </option>
                     ))}
                   </select>
@@ -557,31 +594,59 @@ const Classes = () => {
                   <label style={{ fontSize: "16px", color: "#646464" }}>
                     Class Name
                   </label>
-                  <div
-                    className="input-group mb-2"
-                    style={{
-                      fontSize: "16px",
-                      color: "#646464",
-                      border: "1px solid lightgrey",
-                    }}
+                  <select
+                    className="form-control"
+                    style={{ fontSize: "16px", color: "#646464", border: "1px solid lightgrey" }}
+                    value={selectedYearGroup}
+                    onChange={(e) => setSelectedYearGroup(e.target.value)}
+                    disabled={!selectedDivision}
                   >
-                    <input
-                      type="text"
-                      name="name"
-                      className="form-control mr-3"
-                      value={className}
-                      onChange={(e) => setClassName(e.target.value)}
-                    />
-                    <div className="input-group-append">
-                      <button
-                        className="btn add-class text-dark ml-2"
-                        type="button"
-                        style={{ background: "lightgrey" }}
-                      >
-                        +
-                      </button>
+                    <option value="">Select Class</option>
+                    {divisionClasses.map((cls) => (
+                      <option key={cls.id} value={cls.name}>
+                        {cls.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label style={{ fontSize: "16px", color: "#646464" }}>
+                    Section Name
+                  </label>
+                  {sectionNames.map((section, idx) => (
+                    <div key={idx} className="input-group mb-2">
+                      <input
+                        type="text"
+                        name={`section-${idx}`}
+                        className="form-control mr-3"
+                        value={section}
+                        onChange={(e) => handleSectionNameChange(idx, e.target.value)}
+                        placeholder="Enter Section Name"
+                        disabled={!selectedYearGroup}
+                      />
+                      <div className="input-group-append">
+                        {sectionNames.length > 1 && (
+                          <button
+                            className="btn btn-danger ml-2"
+                            type="button"
+                            onClick={() => handleRemoveSection(idx)}
+                          >
+                            -
+                          </button>
+                        )}
+                        {idx === sectionNames.length - 1 && (
+                          <button
+                            className="btn btn-success ml-2"
+                            type="button"
+                            onClick={handleAddSection}
+                            disabled={!selectedYearGroup}
+                          >
+                            +
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
               <div className="modal-footer d-flex justify-content-between">
