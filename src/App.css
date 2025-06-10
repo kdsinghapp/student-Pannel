@@ -2361,6 +2361,7 @@ ul {
 .header-main-menu .navbar-nav .header-admin .navbar-nav-link {
   display: flex;
   align-items: center;
+  text-decoration: none;
 }
 
 @media only screen and (max-width: 767px) {
