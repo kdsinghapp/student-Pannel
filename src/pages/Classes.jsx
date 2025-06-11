@@ -571,7 +571,7 @@ const Classes = () => {
               <div className="modal-body">
                 <div className="form-group">
                   <label style={{ fontSize: "16px", color: "#646464" }}>
-                    Year Group (Division)
+                    Division
                   </label>
                   <select
                     className="form-control"
@@ -582,7 +582,7 @@ const Classes = () => {
                       setSelectedYearGroup(""); // Reset class selection
                     }}
                   >
-                    <option value="">Select Year Group</option>
+                    <option value="">Select Division</option>
                     {yearGroupHierarchy.map((item, idx) => (
                       <option key={item.curriculum_division?.id || idx} value={item.curriculum_division?.name}>
                         {item.curriculum_division?.name}
@@ -592,7 +592,7 @@ const Classes = () => {
                 </div>
                 <div className="form-group">
                   <label style={{ fontSize: "16px", color: "#646464" }}>
-                    Class Name
+                   Year Group
                   </label>
                   <select
                     className="form-control"
@@ -601,7 +601,7 @@ const Classes = () => {
                     onChange={(e) => setSelectedYearGroup(e.target.value)}
                     disabled={!selectedDivision}
                   >
-                    <option value="">Select Class</option>
+                    <option value="">Select  Year Group</option>
                     {divisionClasses.map((cls) => (
                       <option key={cls.id} value={cls.name}>
                         {cls.name}
@@ -611,7 +611,7 @@ const Classes = () => {
                 </div>
                 <div className="form-group">
                   <label style={{ fontSize: "16px", color: "#646464" }}>
-                    Section Name
+                    Class
                   </label>
                   {sectionNames.map((section, idx) => (
                     <div key={idx} className="input-group mb-2">
@@ -621,7 +621,7 @@ const Classes = () => {
                         className="form-control mr-3"
                         value={section}
                         onChange={(e) => handleSectionNameChange(idx, e.target.value)}
-                        placeholder="Enter Section Name"
+                        placeholder="Enter Class Name"
                         disabled={!selectedYearGroup}
                       />
                       <div className="input-group-append">
