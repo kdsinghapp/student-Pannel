@@ -15,13 +15,14 @@ const Notification = ({ message, type = "success", duration = 3000, onClose }) =
       style={{ zIndex: 9999 }}
     >
       <div
-        className={`toast align-items-center text-white bg-${type} border-0 show`}
+        className={`toast align-items-center text-white border-0 show`}
         role="alert"
         aria-live="assertive"
         aria-atomic="true"
+        style={{ background: type === 'error' ? '#ffcccc' : 'red' }}
       >
         <div className="d-flex">
-          <div className="toast-body" style={{color:"black", fontSize:"2em"}}>{message}</div>
+          <div className="toast-body" style={{color:"white", fontSize:"2em"}}>{message}</div>
           <button
             type="button"
             className="btn-close btn-close-white me-2 m-auto"
