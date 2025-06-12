@@ -295,8 +295,8 @@ const AddStudentsUI = () => {
           <div className="dashboard-content-one">
             {/* --- DROPDOWNS FOR YEAR, DIVISION, CLASS --- */}
 
-            {/* Breadcubs Area Start Here */}
-            <div className="breadcrumbs-area d-flex felx-col-2 justify-content-between ">
+            {/* Breadcrumbs Area Start Here */}
+            <div className="breadcrumbs-area d-flex  justify-content-between ">
               <h3>Add Student details</h3>
               <div>
                 <button
@@ -333,7 +333,7 @@ const AddStudentsUI = () => {
                   <i className="fas fa-plus" /> Add New
                 </button>
               </div>
-              <div></div>
+          
             </div>
             {/* Breadcubs Area End Here */}
 
@@ -367,22 +367,7 @@ const AddStudentsUI = () => {
                         <form className="new-added-form">
                           <div className="row">
                             {/* Firstname */}
-                            <div className="col-xl-4 col-lg-6 col-12 form-group">
-                              <label>School Code*</label>
-                              <input
-                                type="text"
-                                placeholder="Enter School Code"
-                                className="form-control"
-                                {...register("school_code", {
-                                  required: "School Code is required",
-                                })}
-                              />
-                              {errors.school_code && (
-                                <span className="text-danger">
-                                  {errors.school_code.message}
-                                </span>
-                              )}
-                            </div>
+                           
                             <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>Firstname *</label>
                               <input
@@ -640,6 +625,22 @@ const AddStudentsUI = () => {
                             </div> */}
                             {/* Curriculum Division Dropdown */}
                              <div className="col-xl-4 col-lg-6 col-12 form-group">
+                              <label>School Code*</label>
+                              <input
+                                type="text"
+                                placeholder="Enter School Code"
+                                className="form-control"
+                                {...register("school_code", {
+                                  required: "School Code is required",
+                                })}
+                              />
+                              {errors.school_code && (
+                                <span className="text-danger">
+                                  {errors.school_code.message}
+                                </span>
+                              )}
+                            </div>
+                             <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>Curriculum Division</label>
                               <select
                                 className="form-control"
@@ -657,13 +658,13 @@ const AddStudentsUI = () => {
                             </div>
                             {/* Class Dropdown */}
                               <div className="col-xl-4 col-lg-6 col-12 form-group">
-                              <label>Class</label>
+                              <label>Year Group</label>
                               <select
                                 className="form-control"
                                 {...register("class_id", { required: "Class is required" })}
                                 disabled={!selectedDivisionId}
                               >
-                                <option value="">Select Class</option>
+                                <option value="">Select Year Group</option>
                                 {classes.map((cls) => (
                                   <option key={cls.id} value={cls.id}>
                                     {cls.name}
@@ -674,7 +675,23 @@ const AddStudentsUI = () => {
                                 <span className="text-danger">{errors.class_id.message}</span>
                               )}
                             </div>
-
+     <div className="col-xl-4 col-lg-6 col-12 form-group">
+                              <label> Class</label>
+                              <select
+                                className="select2 form-control"
+                                {...register("academic_class_id")}
+                              >
+                                <option value="">
+                                  Please Select Academic Class
+                                </option>
+                                {classData &&
+                                  classData.map((clas) => (
+                                    <option key={clas.id} value={clas.id}>
+                                      {clas.name}
+                                    </option>
+                                  ))}
+                              </select>
+                            </div>
                             <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>SEN*</label>
                               <select
@@ -732,23 +749,7 @@ const AddStudentsUI = () => {
                               )}
                             </div>
 
-                            <div className="col-xl-4 col-lg-6 col-12 form-group">
-                              <label>Academic Class</label>
-                              <select
-                                className="select2 form-control"
-                                {...register("academic_class_id")}
-                              >
-                                <option value="">
-                                  Please Select Academic Class
-                                </option>
-                                {classData &&
-                                  classData.map((clas) => (
-                                    <option key={clas.id} value={clas.id}>
-                                      {clas.name}
-                                    </option>
-                                  ))}
-                              </select>
-                            </div>
+                       
 
                             <div className="col-xl-4 col-lg-6 col-12 form-group">
                               <label>Category</label>
