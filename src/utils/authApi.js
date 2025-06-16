@@ -115,7 +115,7 @@ export const addClasses = async (formData) => {
 export const getAllStudents = async () => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.get(`${API_URL}/admin/student/get-students`, {
+    const res = await axios.get(`${API_URL}/user/student/get-students?limit=1000&page=1&school_curriculum_id[0]=5&school_curriculum_id[1]=6`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",

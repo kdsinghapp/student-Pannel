@@ -20,51 +20,22 @@ const AddStudentsUI = () => {
   const [countries, setCountries] = useState([]);
   const [religions, setReligions] = useState([]);
   const [classData, setClassData] = useState([]);
-  const [selectedYear, setSelectedYear] = useState("");
-  const [selectedDivisionId, setSelectedDivisionId] = useState("");
 
-  // Get user/school/curriculum info
+  // Class hierarchy states
+  const [classHierarchy, setClassHierarchy] = useState([]);
+  const [selectedDivisionId, setSelectedDivisionId] = useState("");
+  const [selectedYearGroupId, setSelectedYearGroupId] = useState("");
+  const [selectedClassId, setSelectedClassId] = useState("");
+
+  // Get user/school info
   const userDataString = localStorage.getItem("userData");
-  let school = null;
-  let groupedCurriculums = {};
+  let schoolCurriculumId = null;
   if (userDataString) {
     const userData = JSON.parse(userDataString);
-    if (
-      userData &&
-      userData.user &&
-      userData.user.school_details &&
-      userData.user.school_details.length > 0
-    ) {
-      school = userData.user.school_details[0];
-      groupedCurriculums = school.grouped_curriculums || {};
-    }
+    schoolCurriculumId = userData?.user?.school_details?.[0]?.curriculums?.[0]?.id;
   }
 
-  // Years and divisions
-  const years = Object.keys(groupedCurriculums);
-  const divisions =
-    selectedYear && groupedCurriculums[selectedYear]
-      ? groupedCurriculums[selectedYear].map((item) => ({
-          id: item.curriculum_division.id,
-          name: item.curriculum_division.name,
-          classes: item.curriculum_division.classes,
-        }))
-      : [];
-  const classes =
-    selectedDivisionId && divisions.length
-      ? divisions.find((div) => String(div.id) === String(selectedDivisionId))
-          ?.classes || []
-      : [];
-
-  // Form handling
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm({ mode: "onBlur" });
-
-  // Fetch dropdown data
+  // Fetch dropdown data and class hierarchy
   useEffect(() => {
     (async () => {
       try {
@@ -76,38 +47,76 @@ const AddStudentsUI = () => {
         if (countryRes.status) setCountries(countryRes.data);
         if (religionRes.status) setReligions(religionRes.data);
         if (classRes.status) setClassData(classRes.data);
+        // Fetch class hierarchy
+        if (schoolCurriculumId) {
+          const res = await fetch(
+            `https://server-php-8-3.technorizen.com/gradesphere/api/user/classes/get-class-hierarchy?school_curriculum_id=${schoolCurriculumId}`
+          );
+          const result = await res.json();
+          if (result.status && result.data) setClassHierarchy(result.data);
+        }
       } catch (error) {
         alert("Error loading dropdown data");
       }
     })();
-  }, []);
+  }, [schoolCurriculumId]);
 
-  // Set selectedYear from localStorage or default
+  // Reset year group and class when division changes
   useEffect(() => {
-    let yearFromStorage = localStorage.getItem("selectedYear");
-    if (!yearFromStorage && years.length > 0) yearFromStorage = years[0];
-    if (yearFromStorage && years.includes(yearFromStorage))
-      setSelectedYear(yearFromStorage);
-    else if (years.length > 0) setSelectedYear(years[0]);
-  }, [userDataString]);
+    setSelectedYearGroupId("");
+    setSelectedClassId("");
+  }, [selectedDivisionId]);
 
-  // Reset division when year changes
+  // Reset class when year group changes
   useEffect(() => {
-    setSelectedDivisionId("");
-  }, [selectedYear]);
+    setSelectedClassId("");
+  }, [selectedYearGroupId]);
+
+  // Form handling
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({ mode: "onBlur" });
 
   // Form submit handler
   const handleStudentFormSubmit = async (data) => {
     try {
       const formData = new FormData();
-      for (const key in data) {
-        if (key === "profile_image") {
-          formData.append("profile_image", data.profile_image[0]);
-        } else {
-          formData.append(key, data[key]);
-        }
-      }
+      // Append all fields as per required payload
+      formData.append("first_name", data.first_name);
+      formData.append("last_name", data.last_name);
+      formData.append("school_class_id", selectedClassId);
+      formData.append("country_id", data.country_id);
+      formData.append("country_of_birth_id", data.country_of_birth_id);
+      formData.append("date_of_birth", data.date_of_birth);
+      formData.append("religion_id", data.religion_id);
+      formData.append("status", data.status || "");
+      formData.append("gender", data.gender);
+      formData.append("progress", data.progress || "");
+      formData.append("category", data.category);
+      formData.append("school_code", data.school_code);
+      formData.append("year_group_id", selectedYearGroupId);
+      formData.append("academic_class_id", data.academic_class_id || "");
+      formData.append("sen", data.sen);
+      formData.append("g_and_t", data.g_and_t);
+      formData.append("eal", data.eal);
       formData.append("school_division_id", selectedDivisionId);
+      if (data.profile_image && data.profile_image.length > 0) {
+        formData.append("profile_image", data.profile_image[0]);
+      }
+      if (data.profile_image_2 && data.profile_image_2.length > 0) {
+        formData.append("profile_image_2", data.profile_image_2[0]);
+      }
+
+      // Debug: log the payload
+      const payload = {};
+      formData.forEach((value, key) => {
+        payload[key] = value;
+      });
+      console.log("Student Add Payload:", payload);
+
       const res = await addStudents(formData);
       if (res.status) {
         alert("Student added successfully");
@@ -120,6 +129,24 @@ const AddStudentsUI = () => {
     }
   };
 
+  // Helper: get year groups for selected division
+  const yearGroups = React.useMemo(() => {
+    if (!selectedDivisionId) return [];
+    const div = classHierarchy.find(
+      (item) => String(item.curriculum_division?.id) === String(selectedDivisionId)
+    );
+    return div?.curriculum_division?.classes || [];
+  }, [selectedDivisionId, classHierarchy]);
+
+  // Helper: get classes for selected year group
+  const classes = React.useMemo(() => {
+    if (!selectedYearGroupId) return [];
+    const yearGroup = yearGroups.find(
+      (cls) => String(cls.id) === String(selectedYearGroupId)
+    );
+    return yearGroup?.school_classes || [];
+  }, [selectedYearGroupId, yearGroups]);
+
   // UI
   return (
     <div id="wrapper" className="wrapper bg-ash">
@@ -131,32 +158,6 @@ const AddStudentsUI = () => {
           <div className="breadcrumbs-area d-flex  justify-content-between ">
             <h3>Add Student details</h3>
             <div>
-              {/* <button
-                className="btn btn-purple modal-trigger"
-                onClick={() => {
-                  const modalElement = document.getElementById("download");
-                  if (modalElement) {
-                    const modal = new bootstrap.Modal(modalElement);
-                    modal.show();
-                  }
-                }}
-                style={{ color: "white", background: "#501b8d" }}
-              >
-                <i className="fas fa-download" /> Template
-              </button>
-              <button
-                className="btn btn-purple modal-trigger"
-                onClick={() => {
-                  const modalElement = document.getElementById("upload");
-                  if (modalElement) {
-                    const modal = new bootstrap.Modal(modalElement);
-                    modal.show();
-                  }
-                }}
-                style={{ color: "white", background: "#501b8d" }}
-              >
-                <i className="fas fa-upload" /> Upload
-              </button> */}
               <button
                 className="btn btn-purple modal-trigger"
                 style={{ color: "white", background: "#501b8d" }}
@@ -364,22 +365,26 @@ const AddStudentsUI = () => {
                           </div>
                           <div className="col-lg-8 col-12 form-group mg-t-30">
                             <label className="text-dark-medium">
-                              Upload Student Photo (150px X 150px)
+                              Upload Student Photo 2 (150px X 150px)
                             </label>
                             <input
                               type="file"
                               accept="image/*"
-                              {...register("student_photo", {
-                                required: "Photo is required",
+                              {...register("profile_image_2", {
+                                required: "Photo 2 is required",
                               })}
                               className="form-control-file"
                             />
-                            {errors.student_photo && (
+                            {errors.profile_image_2 && (
                               <p className="text-danger">
-                                {errors.student_photo.message}
+                                {errors.profile_image_2.message}
                               </p>
                             )}
                           </div>
+                          {/* Hidden/visible fields for progress, status, academic_class_id */}
+                          <input type="hidden" {...register("progress")} value={10} />
+                          <input type="hidden" {...register("status")} value="" />
+                          <input type="hidden" {...register("academic_class_id")} value={selectedClassId} />
                         </div>
                       </form>
                     </div>
@@ -431,43 +436,60 @@ const AddStudentsUI = () => {
                           </div>
                           {/* Curriculum Division */}
                           <div className="col-xl-4 col-lg-6 col-12 form-group">
-                            <label>Curriculum Division</label>
+                            <label>Curriculum Division*</label>
                             <select
                               className="form-control"
                               value={selectedDivisionId}
-                              onChange={(e) => setSelectedDivisionId(e.target.value)}
-                              disabled={!selectedYear}
+                              onChange={e => setSelectedDivisionId(e.target.value)}
+                              required
                             >
                               <option value="">Select Division</option>
-                              {divisions.map((div) => (
-                                <option key={div.id} value={div.id}>
-                                  {div.name}
+                              {classHierarchy.map((item) => (
+                                <option key={item.curriculum_division?.id} value={item.curriculum_division?.id}>
+                                  {item.curriculum_division?.name}
                                 </option>
                               ))}
                             </select>
                           </div>
                           {/* Year Group */}
                           <div className="col-xl-4 col-lg-6 col-12 form-group">
-                            <label>Year Group</label>
+                            <label>Year Group*</label>
                             <select
                               className="form-control"
-                              {...register("school_class_id", { required: "Class is required" })}
+                              value={selectedYearGroupId}
+                              onChange={e => setSelectedYearGroupId(e.target.value)}
                               disabled={!selectedDivisionId}
+                              required
                             >
                               <option value="">Select Year Group</option>
+                              {yearGroups.map((cls) => (
+                                <option key={cls.id} value={cls.id}>
+                                  {cls.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {/* Class */}
+                          <div className="col-xl-4 col-lg-6 col-12 form-group">
+                            <label>Class*</label>
+                            <select
+                              className="form-control"
+                              value={selectedClassId}
+                              onChange={e => setSelectedClassId(e.target.value)}
+                              disabled={!selectedYearGroupId}
+                              required
+                            >
+                              <option value="">Select Class</option>
                               {classes.map((cls) => (
                                 <option key={cls.id} value={cls.id}>
                                   {cls.name}
                                 </option>
                               ))}
                             </select>
-                            {errors.school_class_id && (
-                              <span className="text-danger">{errors.school_class_id.message}</span>
-                            )}
                           </div>
                           {/* Academic Class */}
-                          <div className="col-xl-4 col-lg-6 col-12 form-group">
-                            <label>Class</label>
+                          {/* <div className="col-xl-4 col-lg-6 col-12 form-group">
+                            <label>Academic Class</label>
                             <select
                               className="select2 form-control"
                               {...register("academic_school_class_id")}
@@ -482,7 +504,7 @@ const AddStudentsUI = () => {
                                   </option>
                                 ))}
                             </select>
-                          </div>
+                          </div> */}
                           {/* SEN */}
                           <div className="col-xl-4 col-lg-6 col-12 form-group">
                             <label>SEN*</label>
