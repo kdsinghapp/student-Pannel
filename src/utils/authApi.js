@@ -149,7 +149,7 @@ export const getStudentById = async (id) => {
 export const deleteStudentById = async (id) => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.get(`${API_URL}/admin/student/delete-student?student_id=${id}`, {
+    const res = await axios.get(`${API_URL}/user/student/delete-student?student_id=${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -166,7 +166,7 @@ export const deleteStudentById = async (id) => {
 export const updateStudentById = async (id, data) => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.post(`${API_URL}/admin/student/update-student`, data, {
+    const res = await axios.post(`${API_URL}/user/student/update-student`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",

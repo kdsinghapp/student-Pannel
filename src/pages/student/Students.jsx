@@ -28,57 +28,6 @@ const Students = () => {
   const [editFormData, setEditFormData] = useState({ name: "" });
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
-  
-  // const sList = [
-  //   {
-  //     id: 1010,
-  //     name: "George Martin",
-  //     category: "ESL",
-  //     class: "Class 10A",
-  //     progress: 10,
-  //     nationality: "Indian",
-  //   },
-  //   {
-  //     id: 1011,
-  //     name: "Ankur Warikoo",
-  //     category: "ESL",
-  //     class: "Class 10A",
-  //     progress: 100,
-  //     nationality: "Indian",
-  //   },
-  //   {
-  //     id: 1012,
-  //     name: "Rahul Rawat",
-  //     category: "ESL",
-  //     class: "Class 10A",
-  //     progress: 50,
-  //     nationality: "Indian",
-  //   },
-  //   {
-  //     id: 1013,
-  //     name: "Jay Shah",
-  //     category: "ESL",
-  //     class: "Class 10A",
-  //     progress: 10,
-  //     nationality: "Indian",
-  //   },
-  //   {
-  //     id: 1014,
-  //     name: "George Martin",
-  //     category: "ESL",
-  //     class: "Class 10A",
-  //     progress: 10,
-  //     nationality: "Indian",
-  //   },
-  //   {
-  //     id: 1015,
-  //     name: "George Martin",
-  //     category: "ESL",
-  //     class: "Class 10A",
-  //     progress: 10,
-  //     nationality: "Indian",
-  //   },
-  // ]
 
    const getStudentsData = async () => {
       try {
@@ -147,21 +96,44 @@ const Students = () => {
 
       if (selectedItem) {
         try {
-          
           const formData = new FormData();
-          // Append all form fields to FormData
-          for (const key in editFormData) {
-            formData.append(key, editFormData[key]);
-          }
+          // Append all required fields for update
+          formData.append("first_name", editFormData.first_name);
+          formData.append("last_name", editFormData.last_name);
+          formData.append("school_class_id", editFormData.school_class_id);
+          formData.append("country_id", editFormData.country_id);
+          formData.append("country_of_birth_id", editFormData.country_of_birth_id);
+          formData.append("date_of_birth", editFormData.date_of_birth);
+          formData.append("religion_id", editFormData.religion_id);
+          formData.append("status", editFormData.status || "");
+          formData.append("gender", editFormData.gender);
+          formData.append("progress", editFormData.progress);
+          formData.append("category", editFormData.category);
+          formData.append("school_code", editFormData.school_code);
+          formData.append("year_group_id", editFormData.year_group_id);
+          formData.append("academic_class_id", editFormData.academic_class_id);
+          formData.append("sen", editFormData.sen);
+          formData.append("g_and_t", editFormData.g_and_t);
+          formData.append("eal", editFormData.eal);
+          formData.append("school_division_id", editFormData.school_division_id);
+          formData.append("student_id", selectedItem.student_id);
           if (profileImageFile) {
             formData.set("profile_image", profileImageFile);
-          }else if(!profileImageFile){
+          } else if (!profileImageFile) {
             formData.delete("profile_image");
           }
-             
+          if (editFormData.profile_image_2) {
+            formData.set("profile_image_2", editFormData.profile_image_2);
+          }
 
+          // Debug: log the payload
+          const payload = {};
+          formData.forEach((value, key) => {
+            payload[key] = value;
+          });
+          console.log("Student Update Payload:", payload);
 
-          const res = await updateStudentById(selectedItem.id, formData);
+          const res = await updateStudentById(selectedItem.student_id, formData);
          
           console.log("update-res",res)
           
@@ -338,11 +310,11 @@ const Students = () => {
                     <tbody>
                       {(!students || !students.length)&&(<tr style={{ lineHeight: "35px", fontSize:"15px" }}><td>No Data Found</td></tr>) }
                       {students&&students.map((student) => (
-                        <tr key={student.id} style={{ lineHeight: "35px", fontSize:"15px" }}>
-                          <td>{student.id}</td>
+                        <tr key={student.student_id} style={{ lineHeight: "35px", fontSize:"15px" }}>
+                          <td>{student.student_id}</td>
                           <td>{student.first_name }  {student.last_name }</td>
                           <td>{student.category}</td>
-                          <td>{student?.student_class?.name}</td>
+                          <td>{student?.academic_info?.class_name}</td>
                           <td className="progress-indicator">
                             {student.progress}%{" "}
                             <span
@@ -373,7 +345,7 @@ const Students = () => {
                               >
                                 <i className="fas fa-eye" />
                               </a>
-                              <a href="#" onClick={() => handleDelete(student.id)}>
+                              <a href="#" onClick={() => { console.log('Delete user id:', student.student_id); handleDelete(student.student_id); }}>
                                 <i className="fas fa-trash" />
                               </a>
                           </td>
