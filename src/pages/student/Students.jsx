@@ -116,11 +116,11 @@ const Students = () => {
           formData.append("g_and_t", editFormData.g_and_t);
           formData.append("eal", editFormData.eal);
           formData.append("school_division_id", editFormData.school_division_id);
-          formData.append("student_id", selectedItem.student_id || selectedItem.id);
-
-          // Handle profile images
+          formData.append("student_id", selectedItem.student_id);
           if (profileImageFile) {
             formData.set("profile_image", profileImageFile);
+          } else if (!profileImageFile) {
+            formData.delete("profile_image");
           }
           if (editFormData.profile_image_2) {
             formData.set("profile_image_2", editFormData.profile_image_2);
@@ -361,57 +361,7 @@ const Students = () => {
         </div>
         {/* Page Area End Here */}
       </div>
-      {/* <div
-        className="modal fade"
-        id="download"
-        tabIndex={-1}
-        role="dialog"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog" role="document">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">Download Template</h5>
-              <button
-                type="button"
-                className="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">×</span>
-              </button>
-            </div>
-            <div className="modal-body text-center">
-              <div className="upload-box">
-                <label style={{ cursor: "pointer" }}>
-                  <input type="file" style={{ display: "none" }} />
-                  <img src="assets/upload.png" alt="Upload Icon" />
-                  <p>This is the template to quickly add students</p>
-                  <span>CSV</span>
-                </label>
-              </div>
-            </div>
-            <div className="modal-footer d-flex justify-content-between">
-              <div className="help-center">
-                <img src="assets/help.png" alt="Help Icon" /> Help Center
-              </div>
-              <div>
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  data-dismiss="modal"
-                >
-                  Cancel
-                </button>
-                <button type="button" className="btn btn-success">
-                  Download
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> */}
-       {/* {showModal && <div className="modal-backdrop fade show"></div>} */}
+  
       <DownloadTemplate/>
       <div
         className="modal fade"
