@@ -234,15 +234,6 @@ const AddStudentsUI = () => {
           {/* Breadcrumbs and actions */}
           <div className="breadcrumbs-area d-flex  justify-content-between ">
             <h3>{editMode ? "Edit Student details" : "Add Student details"}</h3>
-            <div>
-              <button
-                className="btn btn-purple modal-trigger"
-                style={{ color: "white", background: "#501b8d" }}
-                onClick={handleEditButtonClick}
-              >
-                <i className="fas fa-edit" /> Edit Demo
-              </button>
-            </div>
           </div>
           {/* Accordion for forms */}
           <div className="card height-auto">
