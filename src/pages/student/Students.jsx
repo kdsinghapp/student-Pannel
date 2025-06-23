@@ -116,11 +116,11 @@ const Students = () => {
           formData.append("g_and_t", editFormData.g_and_t);
           formData.append("eal", editFormData.eal);
           formData.append("school_division_id", editFormData.school_division_id);
-          formData.append("student_id", selectedItem.student_id);
+          formData.append("student_id", selectedItem.student_id || selectedItem.id);
+
+          // Handle profile images
           if (profileImageFile) {
             formData.set("profile_image", profileImageFile);
-          } else if (!profileImageFile) {
-            formData.delete("profile_image");
           }
           if (editFormData.profile_image_2) {
             formData.set("profile_image_2", editFormData.profile_image_2);

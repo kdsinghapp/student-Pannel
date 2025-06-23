@@ -13,20 +13,29 @@ function EditStudent({ student, handleUpdate }) {
   const [classData, setClassData] = useState([]);
   const [profileImageFile, setProfileImageFile] = useState(null); // only set when changed
 
+  // Add all required fields for update
   const [editFormData, setEditFormData] = useState({
     first_name: "",
     last_name: "",
-    class_id: "",
+    school_class_id: "",
     country_id: "",
     country_of_birth_id: "",
     date_of_birth: "",
     religion_id: "",
     status: "",
     gender: "",
-    profile_image: "",
     progress: "",
     category: "",
+    school_code: "",
+    year_group_id: "",
+    academic_class_id: "",
+    sen: "",
+    g_and_t: "",
+    eal: "",
+    school_division_id: "",
     student_id: "",
+    profile_image: "",
+    profile_image_2: "",
   });
 
   const [previewImage, setPreviewImage] = useState(editFormData?.profile_image);
@@ -102,11 +111,31 @@ function EditStudent({ student, handleUpdate }) {
   };
   useEffect(() => {
     console.log("student", student, editFormData);
-    if (student && student.id) {
+    // Map student fields to API fields
+    if (student && (student.student_id || student.id)) {
       setEditFormData((prev) => ({
         ...prev,
-        ...student,
-        student_id: student.id,
+        first_name: student.first_name || "",
+        last_name: student.last_name || "",
+        school_class_id: student.school_class_id || student.class_id || "",
+        country_id: student.country_id || "",
+        country_of_birth_id: student.country_of_birth_id || "",
+        date_of_birth: student.date_of_birth || "",
+        religion_id: student.religion_id || "",
+        status: student.status || "",
+        gender: student.gender || "",
+        progress: student.progress || "",
+        category: student.category || "",
+        school_code: student.school_code || "",
+        year_group_id: student.year_group_id || "",
+        academic_class_id: student.academic_class_id || "",
+        sen: student.sen || "",
+        g_and_t: student.g_and_t || "",
+        eal: student.eal || "",
+        school_division_id: student.school_division_id || "",
+        student_id: student.student_id || student.id || "",
+        profile_image: student.profile_image || student.profile_image_url || "",
+        profile_image_2: student.profile_image_2 || "",
       }));
     } else {
       // Clean up if needed
@@ -209,10 +238,21 @@ function EditStudent({ student, handleUpdate }) {
             />
           </div>
           <div className="modal-body">
+            <label style={{ fontSize: "14px" }}>School Code:</label>
+            <input
+              style={{ fontSize: "14px" }}
+              type="text"
+              className="form-control"
+              name="school_code"
+              value={editFormData?.school_code}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="modal-body">
             <label style={{ fontSize: "14px" }}>Class:</label>
             <select
-              name="class_id"
-              value={editFormData.class_id}
+              name="school_class_id"
+              value={editFormData.school_class_id}
               onChange={handleInputChange}
               className="select2 form-control"
             >
@@ -226,6 +266,39 @@ function EditStudent({ student, handleUpdate }) {
                   );
                 })}
             </select>
+          </div>
+          <div className="modal-body">
+            <label style={{ fontSize: "14px" }}>Academic Class:</label>
+            <input
+              style={{ fontSize: "14px" }}
+              type="text"
+              className="form-control"
+              name="academic_class_id"
+              value={editFormData?.academic_class_id}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="modal-body">
+            <label style={{ fontSize: "14px" }}>Year Group ID:</label>
+            <input
+              style={{ fontSize: "14px" }}
+              type="text"
+              className="form-control"
+              name="year_group_id"
+              value={editFormData?.year_group_id}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="modal-body">
+            <label style={{ fontSize: "14px" }}>School Division ID:</label>
+            <input
+              style={{ fontSize: "14px" }}
+              type="text"
+              className="form-control"
+              name="school_division_id"
+              value={editFormData?.school_division_id}
+              onChange={handleInputChange}
+            />
           </div>
           <div className="modal-body">
             <label style={{ fontSize: "14px" }}>Nationality:</label>
@@ -249,12 +322,12 @@ function EditStudent({ student, handleUpdate }) {
           <div className="modal-body">
             <label style={{ fontSize: "14px" }}>Birth Country:</label>
             <select
-              name="country_id"
+              name="country_of_birth_id"
               value={editFormData.country_of_birth_id}
               onChange={handleInputChange}
               className="select2 form-control"
             >
-              <option value="">Nationality *</option>
+              <option value="">Birth Country *</option>
               {countries &&
                 countries.map((contry) => {
                   return (
@@ -321,10 +394,10 @@ function EditStudent({ student, handleUpdate }) {
             </select>
           </div>
           <div className="modal-body">
-            <label style={{ fontSize: "14px" }}>progress:</label>
+            <label style={{ fontSize: "14px" }}>Progress:</label>
             <input
               style={{ fontSize: "14px" }}
-              type="text"
+              type="number"
               className="form-control"
               name="progress"
               value={editFormData?.progress}
@@ -332,7 +405,7 @@ function EditStudent({ student, handleUpdate }) {
             />
           </div>
           <div className="modal-body">
-            <label style={{ fontSize: "14px" }}>category:</label>
+            <label style={{ fontSize: "14px" }}>Category:</label>
             <select
               name="category"
               value={editFormData?.category}
@@ -341,7 +414,46 @@ function EditStudent({ student, handleUpdate }) {
             >
               <option value="">Please Select</option>
               <option value="ESL">ESL</option>
-              <option value="ESL">GEN</option>
+              <option value="GEN">GEN</option>
+            </select>
+          </div>
+          <div className="modal-body">
+            <label style={{ fontSize: "14px" }}>SEN:</label>
+            <select
+              name="sen"
+              value={editFormData?.sen}
+              onChange={handleInputChange}
+              className="select2 form-control"
+            >
+              <option value="">Please Select SEN</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div className="modal-body">
+            <label style={{ fontSize: "14px" }}>G & T:</label>
+            <select
+              name="g_and_t"
+              value={editFormData?.g_and_t}
+              onChange={handleInputChange}
+              className="select2 form-control"
+            >
+              <option value="">Please Select G&T</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div className="modal-body">
+            <label style={{ fontSize: "14px" }}>EAL:</label>
+            <select
+              name="eal"
+              value={editFormData?.eal}
+              onChange={handleInputChange}
+              className="select2 form-control"
+            >
+              <option value="">Please Select EAL</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
             </select>
           </div>
           <div className="modal-footer">
@@ -497,8 +609,13 @@ const EditStudentUI = ({
           </div>
 
           <div className="modal-body">
+            <label>School Code:</label>
+            <input className="form-control" {...register("school_code")} />
+          </div>
+
+          <div className="modal-body">
             <label>Class:</label>
-            <select className="form-control" {...register("class_id")}>
+            <select className="form-control" {...register("school_class_id")}>
               <option value="">Class *</option>
               {classData?.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -506,6 +623,21 @@ const EditStudentUI = ({
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="modal-body">
+            <label>Academic Class:</label>
+            <input className="form-control" {...register("academic_class_id")} />
+          </div>
+
+          <div className="modal-body">
+            <label>Year Group ID:</label>
+            <input className="form-control" {...register("year_group_id")} />
+          </div>
+
+          <div className="modal-body">
+            <label>School Division ID:</label>
+            <input className="form-control" {...register("school_division_id")} />
           </div>
 
           <div className="modal-body">
@@ -522,10 +654,7 @@ const EditStudentUI = ({
 
           <div className="modal-body">
             <label>Birth Country:</label>
-            <select
-              className="form-control"
-              {...register("country_of_birth_id")}
-            >
+            <select className="form-control" {...register("country_of_birth_id")}>
               <option value="">Select Country</option>
               {countries?.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -582,6 +711,33 @@ const EditStudentUI = ({
               <option value="">Please Select</option>
               <option value="ESL">ESL</option>
               <option value="GEN">GEN</option>
+            </select>
+          </div>
+
+          <div className="modal-body">
+            <label>SEN:</label>
+            <select className="form-control" {...register("sen")}>
+              <option value="">Please Select SEN</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+
+          <div className="modal-body">
+            <label>G & T:</label>
+            <select className="form-control" {...register("g_and_t")}>
+              <option value="">Please Select G&T</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+
+          <div className="modal-body">
+            <label>EAL:</label>
+            <select className="form-control" {...register("eal")}>
+              <option value="">Please Select EAL</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
             </select>
           </div>
 

@@ -9,6 +9,7 @@ import {
   getCountryList,
   getReligionsList,
   getAllClasses,
+  updateStudentById,
 } from "../../utils/authApi";
 import { useForm } from "react-hook-form";
 
@@ -26,6 +27,10 @@ const AddStudentsUI = () => {
   const [selectedDivisionId, setSelectedDivisionId] = useState("");
   const [selectedYearGroupId, setSelectedYearGroupId] = useState("");
   const [selectedClassId, setSelectedClassId] = useState("");
+
+  // Edit mode state
+  const [editMode, setEditMode] = useState(false);
+  const [editStudentData, setEditStudentData] = useState(null);
 
   // Get user/school info
   const userDataString = localStorage.getItem("userData");
@@ -129,6 +134,50 @@ const AddStudentsUI = () => {
     }
   };
 
+  // Edit form submit handler
+  const handleEditStudentFormSubmit = async (data) => {
+    try {
+      const formData = new FormData();
+      formData.append("first_name", data.first_name);
+      formData.append("last_name", data.last_name);
+      formData.append("school_class_id", selectedClassId);
+      formData.append("country_id", data.country_id);
+      formData.append("country_of_birth_id", data.country_of_birth_id);
+      formData.append("date_of_birth", data.date_of_birth);
+      formData.append("religion_id", data.religion_id);
+      formData.append("status", data.status || "");
+      formData.append("gender", data.gender);
+      formData.append("progress", data.progress || "");
+      formData.append("category", data.category);
+      formData.append("school_code", data.school_code);
+      formData.append("year_group_id", selectedYearGroupId);
+      formData.append("academic_class_id", data.academic_class_id || "");
+      formData.append("sen", data.sen);
+      formData.append("g_and_t", data.g_and_t);
+      formData.append("eal", data.eal);
+      formData.append("school_division_id", selectedDivisionId);
+      formData.append("student_id", data.student_id); // required for update
+      if (data.profile_image && data.profile_image.length > 0) {
+        formData.append("profile_image", data.profile_image[0]);
+      }
+      if (data.profile_image_2 && data.profile_image_2.length > 0) {
+        formData.append("profile_image_2", data.profile_image_2[0]);
+      }
+
+      const res = await updateStudentById(data.student_id, formData);
+      if (res.status) {
+        alert("Student updated successfully");
+        setEditMode(false);
+        setEditStudentData(null);
+        reset();
+      } else {
+        alert("Student not updated");
+      }
+    } catch (error) {
+      alert("Error updating student");
+    }
+  };
+
   // Helper: get year groups for selected division
   const yearGroups = React.useMemo(() => {
     if (!selectedDivisionId) return [];
@@ -147,6 +196,34 @@ const AddStudentsUI = () => {
     return yearGroup?.school_classes || [];
   }, [selectedYearGroupId, yearGroups]);
 
+  // For demonstration: simulate edit with dummy data
+  const handleEditButtonClick = () => {
+    // Replace this with actual student data selection logic
+    setEditMode(true);
+    setEditStudentData({
+      student_id: "1",
+      first_name: "rakesh",
+      last_name: "dongre",
+      school_class_id: "1",
+      country_id: "1",
+      country_of_birth_id: "1",
+      date_of_birth: "2025-12-12",
+      religion_id: "1",
+      status: "",
+      gender: "Male",
+      progress: "10",
+      category: "ESL",
+      school_code: "01234511",
+      year_group_id: "1",
+      academic_class_id: "1",
+      sen: "Yes",
+      g_and_t: "Yes",
+      eal: "Yes",
+      school_division_id: "1",
+      // profile_image, profile_image_2 can be left empty for demo
+    });
+  };
+
   // UI
   return (
     <div id="wrapper" className="wrapper bg-ash">
@@ -156,13 +233,14 @@ const AddStudentsUI = () => {
         <div className="dashboard-content-one">
           {/* Breadcrumbs and actions */}
           <div className="breadcrumbs-area d-flex  justify-content-between ">
-            <h3>Add Student details</h3>
+            <h3>{editMode ? "Edit Student details" : "Add Student details"}</h3>
             <div>
               <button
                 className="btn btn-purple modal-trigger"
                 style={{ color: "white", background: "#501b8d" }}
+                onClick={handleEditButtonClick}
               >
-                <i className="fas fa-plus" /> Add New
+                <i className="fas fa-edit" /> Edit Demo
               </button>
             </div>
           </div>
@@ -192,6 +270,7 @@ const AddStudentsUI = () => {
                     data-bs-parent="#customAccordion"
                   >
                     <div className="accordion-body">
+                      {/* Use the same form for add/edit, but change submit handler and default values */}
                       <form className="new-added-form">
                         <div className="row">
                           {/* Firstname */}
@@ -209,6 +288,7 @@ const AddStudentsUI = () => {
                                 },
                               })}
                               className="form-control"
+                              defaultValue={editStudentData?.first_name}
                             />
                             {errors.first_name && (
                               <p className="text-danger">
@@ -231,6 +311,7 @@ const AddStudentsUI = () => {
                                 },
                               })}
                               className="form-control"
+                              defaultValue={editStudentData?.last_name}
                             />
                             {errors.last_name && (
                               <p className="text-danger">
@@ -248,6 +329,7 @@ const AddStudentsUI = () => {
                                 required: "Date of Birth is required",
                               })}
                               className="form-control air-datepicker"
+                              defaultValue={editStudentData?.date_of_birth}
                             />
                             {errors.date_of_birth && (
                               <p className="text-danger">
@@ -263,6 +345,7 @@ const AddStudentsUI = () => {
                                 required: "Nationality is required",
                               })}
                               className="select2 form-control"
+                              defaultValue={editStudentData?.country_id}
                             >
                               <option value="">Select Nationality</option>
                               {countries &&
@@ -286,6 +369,7 @@ const AddStudentsUI = () => {
                                 required: "Birth Country is required",
                               })}
                               className="select2 form-control"
+                              defaultValue={editStudentData?.country_of_birth_id}
                             >
                               <option value="">Select Birth Country</option>
                               {countries &&
@@ -309,6 +393,7 @@ const AddStudentsUI = () => {
                                 required: "Religion is required",
                               })}
                               className="select2 form-control"
+                              defaultValue={editStudentData?.religion_id}
                             >
                               <option value="">Select Religion</option>
                               {religions &&
@@ -332,6 +417,7 @@ const AddStudentsUI = () => {
                                 required: "Gender is required",
                               })}
                               className="select2 form-control"
+                              defaultValue={editStudentData?.gender}
                             >
                               <option value="">Select Gender</option>
                               <option value="Male">Male</option>
@@ -413,7 +499,11 @@ const AddStudentsUI = () => {
                   >
                     <div className="accordion-body">
                       <form
-                        onSubmit={handleSubmit(handleStudentFormSubmit)}
+                        onSubmit={
+                          editMode
+                            ? handleSubmit(handleEditStudentFormSubmit)
+                            : handleSubmit(handleStudentFormSubmit)
+                        }
                         className="new-added-form"
                       >
                         <div className="row">
@@ -427,6 +517,7 @@ const AddStudentsUI = () => {
                               {...register("school_code", {
                                 required: "School Code is required",
                               })}
+                              defaultValue={editStudentData?.school_code}
                             />
                             {errors.school_code && (
                               <span className="text-danger">
@@ -442,6 +533,7 @@ const AddStudentsUI = () => {
                               value={selectedDivisionId}
                               onChange={e => setSelectedDivisionId(e.target.value)}
                               required
+                              defaultValue={editStudentData?.school_division_id}
                             >
                               <option value="">Select Division</option>
                               {classHierarchy.map((item) => (
@@ -513,6 +605,7 @@ const AddStudentsUI = () => {
                               {...register("sen", {
                                 required: "SEN is required",
                               })}
+                              defaultValue={editStudentData?.sen}
                             >
                               <option value="">Please Select SEN</option>
                               <option value="Yes">Yes</option>
@@ -532,6 +625,7 @@ const AddStudentsUI = () => {
                               {...register("g_and_t", {
                                 required: "G & T is required",
                               })}
+                              defaultValue={editStudentData?.g_and_t}
                             >
                               <option value="">Please Select G&T</option>
                               <option value="Yes">Yes</option>
@@ -551,6 +645,7 @@ const AddStudentsUI = () => {
                               {...register("eal", {
                                 required: "EAL is required",
                               })}
+                              defaultValue={editStudentData?.eal}
                             >
                               <option value="">Please Select EAL</option>
                               <option value="Yes">Yes</option>
@@ -568,6 +663,7 @@ const AddStudentsUI = () => {
                             <select
                               className="select2 form-control"
                               {...register("category")}
+                              defaultValue={editStudentData?.category}
                             >
                               <option value="">Please Select</option>
                               <option value="ESL">ESL</option>
@@ -580,7 +676,7 @@ const AddStudentsUI = () => {
                               type="submit"
                               className="btn-fill-lg btn-gradient-blue1 btn-hover-bluedark"
                             >
-                              Submit
+                              {editMode ? "Update" : "Submit"}
                             </button>
                           </div>
                         </div>
