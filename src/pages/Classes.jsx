@@ -481,9 +481,14 @@ const Classes = () => {
                   </table>
                 </div>
                 {/* Pagination Controls */}
-                {data.length > itemsPerPage && (
-                  <nav aria-label="Class table pagination" className="mt-4">
-                     <ul className="pagination justify-content-center">
+
+              </div>
+
+            </div>
+            {/* Pagination Controls */}
+            {data.length > itemsPerPage && (
+              <nav aria-label="Class table pagination" className="mt-4">
+                <ul className="pagination justify-content-center">
                   <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
                     <button className="page-link" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
                       Previous
@@ -500,10 +505,8 @@ const Classes = () => {
                     </button>
                   </li>
                 </ul>
-                  </nav>
-                )}
-              </div>
-            </div>
+              </nav>
+            )}
           </div>
         </div>
       </div>
@@ -648,7 +651,7 @@ const Classes = () => {
                 </div>
                 <div className="form-group">
                   <label style={{ fontSize: "16px", color: "#646464" }}>
-                   Year Group
+                    Year Group
                   </label>
                   <select
                     className="form-control"
