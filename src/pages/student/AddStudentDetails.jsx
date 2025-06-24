@@ -12,6 +12,7 @@ import {
   updateStudentById,
 } from "../../utils/authApi";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 const AddStudentDetails = () => <AddStudentsUI />;
 export default AddStudentDetails;
@@ -84,6 +85,7 @@ const AddStudentsUI = () => {
     formState: { errors },
     reset,
   } = useForm({ mode: "onBlur" });
+  const navigate = useNavigate();
 
   // Form submit handler
   const handleStudentFormSubmit = async (data) => {
@@ -126,6 +128,7 @@ const AddStudentsUI = () => {
       if (res.status) {
         alert("Student added successfully");
         reset();
+        navigate("/students");
       } else {
         alert("Student not added");
       }
@@ -170,6 +173,7 @@ const AddStudentsUI = () => {
         setEditMode(false);
         setEditStudentData(null);
         reset();
+        navigate("/students");
       } else {
         alert("Student not updated");
       }
