@@ -34,6 +34,7 @@ const Classes = () => {
   const [divisionClasses, setDivisionClasses] = useState([]);
   const [sectionNames, setSectionNames] = useState([""]);
   const [selectedClassObj, setSelectedClassObj] = useState(null);
+  const [loading, setLoading] = useState(false); // Loading state
 
   const userData = JSON.parse(localStorage.getItem("userData"));
   const curriculum =
@@ -101,6 +102,7 @@ const Classes = () => {
   };
 
   const getClassData = async () => {
+    setLoading(true);
     try {
       const res = await getAllClasses();
       console.log("class-list", res);
@@ -121,6 +123,8 @@ const Classes = () => {
         console.error("Unexpected Error:", error.message);
         alert("An unexpected error occurred. Please try again.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -356,7 +360,25 @@ const Classes = () => {
             {/* Class Table Area Start Here */}
             <div className="card height-auto">
               <div className="card-body p-0">
-                <div className="table-responsive">
+                {loading && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      minHeight: '300px',
+                    }}
+                  >
+                    <div
+                      className="spinner-border text-primary"
+                      role="status"
+                      style={{ width: '4rem', height: '4rem' }}
+                    >
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+                <div className="table-responsive" style={{ display: loading ? 'none' : 'block' }}>
                   <table className="table display data-table">
                     <thead>
                       <tr>
