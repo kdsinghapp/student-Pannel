@@ -35,6 +35,8 @@ const Classes = () => {
   const [sectionNames, setSectionNames] = useState([""]);
   const [selectedClassObj, setSelectedClassObj] = useState(null);
   const [loading, setLoading] = useState(false); // Loading state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Adjust as needed
 
   const userData = JSON.parse(localStorage.getItem("userData"));
   const curriculum =
@@ -263,6 +265,16 @@ const Classes = () => {
     setSectionNames((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  // Calculate paginated data
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <>
       <div id="wrapper" className="wrapper bg-ash">
@@ -411,8 +423,8 @@ const Classes = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.length > 0 ? (
-                        data.map((item, index) => (
+                      {currentData.length > 0 ? (
+                        currentData.map((item, index) => (
                           <tr key={index} style={{ lineHeight: "35px" }}>
                             <td
                               style={{
@@ -468,6 +480,28 @@ const Classes = () => {
                     </tbody>
                   </table>
                 </div>
+                {/* Pagination Controls */}
+                {data.length > itemsPerPage && (
+                  <nav aria-label="Class table pagination" className="mt-4">
+                     <ul className="pagination justify-content-center">
+                  <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
+                    <button className="page-link" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                      Previous
+                    </button>
+                  </li>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
+                      <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
+                    </li>
+                  ))}
+                  <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
+                    <button className="page-link" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                      Next
+                    </button>
+                  </li>
+                </ul>
+                  </nav>
+                )}
               </div>
             </div>
           </div>

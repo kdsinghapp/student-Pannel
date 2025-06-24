@@ -29,6 +29,8 @@ const Students = () => {
   const [editFormData, setEditFormData] = useState({ name: "" });
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // You can adjust this as needed
   const navigate = useNavigate();
 
   const getStudentsData = async () => {
@@ -183,6 +185,16 @@ const Students = () => {
     });
   };
 
+  // Calculate paginated students
+  const indexOfLastStudent = currentPage * itemsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - itemsPerPage;
+  const currentStudents = students.slice(indexOfFirstStudent, indexOfLastStudent);
+  const totalPages = Math.ceil(students.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <>
       {/* Edit Info Model */}
@@ -334,7 +346,7 @@ const Students = () => {
                     </thead>
                     <tbody>
                       {(!students || !students.length) && (<tr style={{ lineHeight: "35px", fontSize: "15px" }}><td>No Data Found</td></tr>)}
-                      {students && students.map((student) => (
+                      {currentStudents && currentStudents.map((student) => (
                         <tr key={student.student_id} style={{ lineHeight: "35px", fontSize: "15px" }}>
                           <td>{student.student_id}</td>
                           <td>{student.first_name}  {student.last_name}</td>
@@ -381,6 +393,28 @@ const Students = () => {
               </div>
             </div>
             {/* Class Table Area End Here */}
+            {/* Pagination Controls */}
+            {students.length > itemsPerPage && (
+              <nav aria-label="Student table pagination" className="mt-3">
+                <ul className="pagination justify-content-center">
+                  <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
+                    <button className="page-link" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                      Previous
+                    </button>
+                  </li>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
+                      <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
+                    </li>
+                  ))}
+                  <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
+                    <button className="page-link" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            )}
           </div>
         </div>
         {/* Page Area End Here */}
