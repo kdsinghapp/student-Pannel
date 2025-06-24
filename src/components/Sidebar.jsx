@@ -7,11 +7,10 @@ const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("userTokenStudent");
-    localStorage.removeItem("userStudentData");
-    navigate("/signin");
-  };
+ const handleLogout = () => {
+  localStorage.clear(); 
+  navigate("/signin");
+};
 
   return (
     <>

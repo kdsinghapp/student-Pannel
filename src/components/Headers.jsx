@@ -37,11 +37,10 @@ const Headers = ({ selectedYear }) => {
 
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("userTokenStudent");
-    localStorage.removeItem("userStudentData");
-    navigate("/signin");
-  };
+const handleLogout = () => {
+  localStorage.clear(); 
+  navigate("/signin");
+};
 
   useEffect(() => {
     const name = localStorage.getItem("userName");
