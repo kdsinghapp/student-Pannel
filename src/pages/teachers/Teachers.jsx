@@ -14,85 +14,67 @@ import studentEdit from "../../assets/assets/icon/tabler_edit.png";
 import Sidebar from "../../components/Sidebar";
 import * as bootstrap from "bootstrap";
 import DownloadTemplate from "../../components/DownloadTemplate";
+import EditTeacher from "./EditTeacher";
+import TeacherViewModal from "./TeacherViewModal";
+import { useNavigate } from "react-router-dom";
+
+const mockTeachers = [
+  {
+    id: 1,
+    forename: "John",
+    surname: "Doe",
+    email: "john.doe@example.com",
+    department: "Mathematics",
+    subject: "Math",
+    year_group: "Year 1",
+    class: "A",
+    role: "Teacher",
+    photo_url: "https://randomuser.me/api/portraits/men/1.jpg"
+  },
+  {
+    id: 2,
+    forename: "Jane",
+    surname: "Smith",
+    email: "jane.smith@example.com",
+    department: "Science",
+    subject: "Physics",
+    year_group: "Year 2",
+    class: "B",
+    role: "Head of Department",
+    photo_url: "https://randomuser.me/api/portraits/women/2.jpg"
+  }
+];
 
 const Teachers = () => {
-  const initialTeachers = [
-    {
-      id: 1010,
-      name: "George Martin",
-      department: "Maths",
-      subject: "Math",
-      email: "arjun@gmail.com",
-      yearGroup: "Year 10",
-    },
-    {
-      id: 1011,
-      name: "Ankur Warikoo",
-      department: "Physics",
-      subject: "Science",
-      email: "teacher@gmail.com",
-      yearGroup: "Year 10",
-    },
-    {
-      id: 1012,
-      name: "Rahul Rawat",
-      department: "Math",
-      subject: "Math",
-      email: "new@gmail.com",
-      yearGroup: "Year 10",
-    },
-    {
-      id: 1013,
-      name: "Jay Shah",
-      department: "Science",
-      subject: "Chemistry",
-      email: "123@gmail.com",
-      yearGroup: "Year 10",
-    },
-    {
-      id: 1014,
-      name: "George Martin",
-      department: "History",
-      subject: "History",
-      email: "teacher@gmail.com",
-      yearGroup: "Year 10",
-    },
-    {
-      id: 1015,
-      name: "George Martin",
-      department: "Math",
-      subject: "Math",
-      email: "mailto@gmail.com",
-      yearGroup: "Year 10",
-    },
-  ];
+  const [teachers, setTeachers] = useState(mockTeachers);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
-  const [teachers, setTeachers] = useState(initialTeachers);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-
-  const getSortIcon = (key) => {
-    if (sortConfig.key === key) {
-      return sortConfig.direction === "asc"
-        ? "fas fa-sort-up"
-        : "fas fa-sort-down";
-    }
-    return "fas fa-sort";
+  const handleEditClick = (teacher) => {
+    setSelectedTeacher(teacher);
+    setEditModalOpen(true);
   };
 
-  const sortTable = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
+  const handleViewClick = (teacher) => {
+    setSelectedTeacher(teacher);
+    setViewModalOpen(true);
+  };
+  const navigate = useNavigate();
+  const navigateToAddStudents = () => {
+    navigate("/add-teacher")
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this teacher?")) {
+      setTeachers(teachers.filter(t => t.id !== id));
     }
+  };
 
-    const sortedData = [...teachers].sort((a, b) => {
-      if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
-      if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    setSortConfig({ key, direction });
-    setTeachers(sortedData);
+  const handleUpdate = (updatedData) => {
+    setTeachers(teachers.map(t => t.id === selectedTeacher.id ? { ...t, ...updatedData } : t));
+    setEditModalOpen(false);
+    setSelectedTeacher(null);
   };
 
   return (
@@ -106,11 +88,9 @@ const Teachers = () => {
           <Sidebar />
           {/* Sidebar Area End Here */}
           <div className="dashboard-content-one">
-            {/* Breadcubs Area Start Here */}
-            <div className="breadcrumbs-area">
+            <div className="breadcrumbs-area d-flex justify-content-between">
               <h3>Teacher Lists</h3>
             </div>
-            {/* Breadcubs Area End Here */}
             <div className="filter-bar">
               <div className="filter-group form-group">
                 <button className="btn btn-light">
@@ -131,118 +111,41 @@ const Teachers = () => {
                 </span>
               </div>
               <div>
-              <button
-  className="btn btn-purple modal-trigger"
-  onClick={() => {
-    const modalElement = document.getElementById("download");
-    if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-  }}
->
-  <i className="fas fa-download" /> Template
-</button>
-
                 <button
-                  className="btn btn-purple modal-trigger mb-0"
-                  data-toggle="modal"
-                  data-target="#upload"
+                  className="btn btn-purple modal-trigger"
+                  onClick={() => {
+                    const modalElement = document.getElementById("download");
+                    if (modalElement) {
+                      const modal = new bootstrap.Modal(modalElement);
+                      modal.show();
+                    }
+                  }}
+                  style={{ color: "white", background: "#501b8d" }}
+                >
+                  <i className="fas fa-download" /> Template
+                </button>
+                <button
+                  className="btn btn-purple modal-trigger"
+                  onClick={() => {
+                    const modalElement = document.getElementById("upload");
+                    if (modalElement) {
+                      const modal = new bootstrap.Modal(modalElement);
+                      modal.show();
+                    }
+                  }}
+                  style={{ color: "white", background: "#501b8d" }}
                 >
                   <i className="fas fa-upload" /> Upload
                 </button>
-                <a
-                  href="add-teacher-details.html"
-                  className="btn btn-purple text-white"
+                <button
+                  className="btn btn-purple modal-trigger"
+                  style={{ color: "white", background: "#501b8d" }}
+                  onClick={navigateToAddStudents}
                 >
                   <i className="fas fa-plus" /> Add New
-                </a>
+                </button>
               </div>
             </div>
-            {/* Class Table Area Start Here */}
-            <div className="card height-auto">
-              <div className="card-body p-0">
-                <div className="table-responsive">
-                  <table className="table display data-table">
-                    <thead>
-                      <tr>
-                        <th
-                          onClick={() => sortTable("id")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <img src={studentId} alt="ID" /> Teacher Id{" "}
-                          <i className={getSortIcon("id")} />
-                        </th>
-                        <th
-                          onClick={() => sortTable("name")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <img src={studentPh} alt="Name" /> Teacher Name{" "}
-                          <i className={getSortIcon("name")} />
-                        </th>
-                        <th
-                          onClick={() => sortTable("department")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <img src={studentCat} alt="Department" /> Department{" "}
-                          <i className={getSortIcon("department")} />
-                        </th>
-                        <th
-                          onClick={() => sortTable("subject")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <img src={studentClass} alt="Subject" /> Subject{" "}
-                          <i className={getSortIcon("subject")} />
-                        </th>
-                        <th
-                          onClick={() => sortTable("email")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <img src={studentProg} alt="Email" /> Email{" "}
-                          <i className={getSortIcon("email")} />
-                        </th>
-                        <th
-                          onClick={() => sortTable("yearGroup")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <img src={studentStat} alt="Year Group" /> Year Group{" "}
-                          <i className={getSortIcon("yearGroup")} />
-                        </th>
-                        <th>
-                          <img src={studentEdit} alt="Action" /> Action
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {teachers.map((teacher) => (
-                        <tr key={teacher.id}>
-                          <td>{teacher.id}</td>
-                          <td>{teacher.name}</td>
-                          <td>{teacher.department}</td>
-                          <td>{teacher.subject}</td>
-                          <td>{teacher.email}</td>
-                          <td>{teacher.yearGroup}</td>
-                          <td className="action-icons">
-                            <i className="fas fa-edit" />
-                            <a href="teacher-list-with-profile.html">
-                              <i className="fas fa-eye" />
-                            </a>
-                            <a
-                              href="javascript:void(0);"
-                              data-toggle="modal"
-                              data-target="#deleteconfirm"
-                            >
-                              <i className="fas fa-trash" />
-                            </a>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            {/* Class Table Area End Here */}
           </div>
         </div>
         {/* Page Area End Here */}
@@ -298,7 +201,7 @@ const Teachers = () => {
         </div>
       </div> */}
 
-      <DownloadTemplate/>
+      <DownloadTemplate />
       <div
         className="modal fade"
         id="upload"
@@ -391,6 +294,25 @@ const Teachers = () => {
           </div>
         </div>
       </div>
+      {/* Edit Modal */}
+      <div className="modal fade" id="editModal" tabIndex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="editModalLabel">Edit Teacher</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              {selectedTeacher && <EditTeacher teacher={selectedTeacher} handleUpdate={handleUpdate} />}
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* View Modal */}
+      <div className="modal fade" id="viewModal" tabIndex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+        {selectedTeacher && <TeacherViewModal teacher={selectedTeacher} />}
+      </div>
+
     </>
   );
 };

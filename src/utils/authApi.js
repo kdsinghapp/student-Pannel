@@ -234,3 +234,20 @@ export const getReligionsList = async () => {
     throw error;
   }
 };
+
+export const getTeachers = async()=> {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.get(`${API_URL}user/teacher/get-teachers?limit=10&page=1`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};

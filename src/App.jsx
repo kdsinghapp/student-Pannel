@@ -19,6 +19,7 @@ import AddStudentDetails from "./pages/student/AddStudentDetails";
 import { SidebarProvider } from "./context/SidebarContext";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AddTeacherDetails from "./pages/teachers/AddTeacherDetails";
 
 function ProtectedRoute({ children }) {
   const location = useLocation();
@@ -50,6 +51,7 @@ function App() {
                 <Route path="/students" element={<Students />} />
                 <Route path="/grading-setup" element={<Grading />} />
                 <Route path="/teachers" element={<Teachers />} />
+                <Route path="/add-teacher" element={<AddTeacherDetails />} />
                 <Route path="/curriculam-setup" element={<CurriculamSetup />} />
                 <Route path="/grade" element={<Grade />} />
                 <Route path="/internal-assessment" element={<InternalAssesment />} />
