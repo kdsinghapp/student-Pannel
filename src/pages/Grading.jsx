@@ -134,6 +134,14 @@ const Grading = () => {
                           )}
                        
                         </div>
+                          <div className="mb-3">
+                        <label className="form-label">Description</label>
+                        <input
+                          type="text"
+                          className="form-control mt-3"
+                          placeholder="e.g., Excellent, Needs Improvement"
+                        />
+                      </div>
                         
                         </div> 
                         
