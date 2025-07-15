@@ -7,7 +7,6 @@ import Students from "./pages/student/Students";
 import Grading from "./pages/Grading";
 import Teachers from "./pages/teachers/Teachers";
 import CurriculamSetup from "./pages/CurriculumSetup";
-import Grade from "./pages/Grade";
 import InternalAssesment from "./pages/InternalAssesment";
 import ExternalAssesment from "./pages/ExternalAssesment";
 import Reports from "./pages/Reports";
@@ -53,7 +52,6 @@ function App() {
                 <Route path="/teachers" element={<Teachers />} />
                 <Route path="/add-teacher" element={<AddTeacherDetails />} />
                 <Route path="/curriculam-setup" element={<CurriculamSetup />} />
-                <Route path="/grade" element={<Grade />} />
                 <Route path="/internal-assessment" element={<InternalAssesment />} />
                 <Route path="/external-assessment" element={<ExternalAssesment />} />
                 <Route

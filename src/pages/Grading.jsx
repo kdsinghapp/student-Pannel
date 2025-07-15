@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import * as bootstrap from "bootstrap";
 import { Link } from "react-router-dom";
@@ -8,6 +8,26 @@ import Sidebar from "../components/Sidebar";
 import DownloadTemplate from "../components/DownloadTemplate";
 
 const Grading = () => {
+  // State for multiple grade values
+  const [gradeValues, setGradeValues] = useState([
+    { value: '', min: '', max: '', color: '#ffffff' }
+  ]);
+
+  // Handler to update a grade value
+  const handleGradeValueChange = (idx, field, val) => {
+    setGradeValues(prev => prev.map((g, i) => i === idx ? { ...g, [field]: val } : g));
+  };
+
+  // Handler to add a new grade value input set
+  const handleAddGradeValue = () => {
+    setGradeValues(prev => [...prev, { value: '', min: '', max: '', color: '#ffffff' }]);
+  };
+
+  // Handler to remove a grade value input set
+  const handleRemoveGradeValue = (idx) => {
+    setGradeValues(prev => prev.filter((_, i) => i !== idx));
+  };
+
   return (
     <>
       <div id="wrapper" className="wrapper bg-ash">
@@ -20,18 +40,18 @@ const Grading = () => {
             <div className="breadcrumbs-area d-flex justify-content-between">
               <h3>Grading Setup</h3>
               <div>
-              <button
-  className="btn btn-purple modal-trigger"
-  onClick={() => {
-    const modalElement = document.getElementById("download");
-    if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-  }}
->
-  <i className="fas fa-download" /> Template
-</button>
+                <button
+                  className="btn btn-purple modal-trigger"
+                  onClick={() => {
+                    const modalElement = document.getElementById("download");
+                    if (modalElement) {
+                      const modal = new bootstrap.Modal(modalElement);
+                      modal.show();
+                    }
+                  }}
+                >
+                  <i className="fas fa-download" /> Template
+                </button>
                 <button
                   className="btn btn-purple modal-trigger mb-0"
                   data-toggle="modal"
@@ -58,81 +78,74 @@ const Grading = () => {
                           className="form-control"
                           placeholder="Input Grading"
                         />
-                        <div className="tag mt-2">
-                          Attitude to Learning <i className="fas fa-times" />
-                        </div>
+                       
                       </div>
-                      <div className="mb-3 d-flex">
-                        <div className="mr-1">
-                          <label className="form-label">Grade Value *</label>
-                          <input
-                            type="text"
-                            className="form-control mr-2"
-                            placeholder="Value"
-                          />
-                        </div>
-                        <div>
-                          <label className="form-label">Main(%)</label>
-                          <div className="d-flex">
+                      {/* Dynamic Grade Value Inputs */}
+                      {gradeValues.map((grade, idx) => (
+                       <div> <div className="mb-3 d-flex align-items-end" key={idx}>
+                          <div className="mr-1">
+                            <label className="form-label">Grade Value *</label>
                             <input
-                              type="number"
+                              type="text"
                               className="form-control mr-2"
-                              placeholder="Min (%)"
-                            />
-                            <input
-                              type="number"
-                              className="form-control mr-2"
-                              placeholder="Max (%)"
+                              placeholder="Value"
+                              value={grade.value}
+                              onChange={e => handleGradeValueChange(idx, 'value', e.target.value)}
                             />
                           </div>
-                        </div>
-                        <div className="position-relative">
-                          <label className="form-label">Color</label>
-                          <div
-                            className="color-picker-container"
-                            onclick="document.getElementById('colorInput').click();"
-                            id="colorBox"
-                          >
-                            <img
-                              src="img/mdi_color.png"
-                              alt="Color Palette"
-                              id="colorIcon"
+                          <div>
+                            <label className="form-label">Main(%)</label>
+                            <div className="d-flex">
+                              <input
+                                type="number"
+                                className="form-control mr-2"
+                                placeholder="Min (%)"
+                                value={grade.min}
+                                onChange={e => handleGradeValueChange(idx, 'min', e.target.value)}
+                              />
+                              <input
+                                type="number"
+                                className="form-control mr-2"
+                                placeholder="Max (%)"
+                                value={grade.max}
+                                onChange={e => handleGradeValueChange(idx, 'max', e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          <div className="position-relative ml-2">
+                            <label className="form-label">Color</label>
+                            <input
+                              type="color"
+                              className="color-picker form-control p-0"
+                              style={{ width: 40, height: 40, border: 'none', background: 'none' }}
+                              value={grade.color}
+                              onChange={e => handleGradeValueChange(idx, 'color', e.target.value)}
                             />
                           </div>
-                          <input
-                            type="color"
-                            id="colorInput"
-                            className="color-picker"
-                            onchange="changeColor(this)"
-                          />
-                          <input
-                            type="hidden"
-                            id="colorCode"
-                            className="color-code form-control mt-2 text-center"
-                            placeholder="#FFFFFF"
-                            defaultValue=""
-                            readOnly=""
-                          />
-                          {/*<input type="text" id="colorCode" class="color-code form-control mt-2 text-center" placeholder="#FFFFFF" value="" readonly>*/}
-                          {/*<img src="img/mdi_color.png" class="position-absolute"/>*/}
+                          {gradeValues.length > 1 && (
+                            <button
+                              type="button"
+                              className="btn btn-danger btn-sm ml-2 mb-2"
+                              onClick={() => handleRemoveGradeValue(idx)}
+                              title="Remove"
+                            >
+                              &times;
+                            </button>
+                          )}
+                       
                         </div>
-                      </div>
-                      <div className="mb-3">
-                        <span className="tag text-success bg-succ">
-                          Good - 50% <i className="fas fa-times" />
-                        </span>
-                        <span className="tag text-danger bg-dang">
-                          Poor - 10% <i className="fas fa-times" />
-                        </span>
-                      </div>
-                      <div className="mb-3">
-                        <label className="form-label">Description</label>
-                        <input
-                          type="text"
-                          className="form-control mt-3"
-                          placeholder="e.g., Excellent, Needs Improvement"
-                        />
-                      </div>
+                        
+                        </div> 
+                        
+                      ))}
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary w-20 mt-2 mb-3 p-3 br10"
+                        onClick={handleAddGradeValue}
+                      >
+                        Add Grade Value
+                      </button>
+                    
                       <div className="mb-3">
                         <label className="form-label">
                           Weightage (Optional)
@@ -149,22 +162,6 @@ const Grading = () => {
                           Add Grade Value
                         </button>
                       </div>
-                      <div className="mb-3">
-                        <label className="form-label">Optional1</label>
-                        <input
-                          type="text"
-                          className="form-control mt-3"
-                          placeholder="Optional1"
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label className="form-label">Optional2</label>
-                        <input
-                          type="text"
-                          className="form-control mt-3"
-                          placeholder="Optional2"
-                        />
-                      </div>
                     </div>
                     <div className="col-md-6">
                       <label className="form-label">Progress Category *</label>
@@ -173,9 +170,6 @@ const Grading = () => {
                         className="form-control"
                         placeholder="e.g., 'Above Expected'"
                       />
-                      <div className="tag mt-2">
-                        Attitude to Learning <i className="fas fa-times" />
-                      </div>
                       <div className="mt-3 d-flex">
                         <div className="mr-2">
                           <label className="form-label">
@@ -227,21 +221,8 @@ const Grading = () => {
                           />
                         </div>
                       </div>
-                      <div className="mt-2">
-                        <span className="tag text-success bg-succ">
-                          Good - 50% <i className="fas fa-times" />
-                        </span>
-                        <span className="tag text-danger bg-dang">
-                          Poor - 10% <i className="fas fa-times" />
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        className="btn btn-outline-primary w-100 mt-3 mb-3 p-3 br10"
-                      >
-                        Add Grade Value
-                      </button>
-                      <div className="mt-2">
+                    
+                      <div className="mt-3">
                         <label className="form-label">Description</label>
                         <input
                           type="text"
@@ -249,7 +230,7 @@ const Grading = () => {
                           placeholder="Description"
                         />
                       </div>
-                      <div className="mt-2">
+                      <div className="mt-3">
                         <label className="form-label">Grade Description</label>
                         <input
                           type="text"
@@ -257,7 +238,14 @@ const Grading = () => {
                           placeholder="Grade Description"
                         />
                       </div>
+                        <button
+                        type="button"
+                        className="btn btn-outline-primary w-100 mt-3 mb-3 p-3 br10"
+                      >
+                        Add Grade Value
+                      </button>
                     </div>
+                    
                   </div>
                   <div className="col-md-12 mt-5 text-center">
                     <button
@@ -326,7 +314,7 @@ const Grading = () => {
         </div>
       </div> */}
 
-      <DownloadTemplate/>
+      <DownloadTemplate />
       <div
         className="modal fade"
         id="upload"
