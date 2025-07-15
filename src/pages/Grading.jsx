@@ -7,11 +7,14 @@ import Headers from "../components/Headers";
 import Sidebar from "../components/Sidebar";
 import DownloadTemplate from "../components/DownloadTemplate";
 
+
 const Grading = () => {
   // State for multiple grade values
   const [gradeValues, setGradeValues] = useState([
     { value: '', min: '', max: '', color: '#ffffff' }
   ]);
+  // State for progress color
+  const [progressColor, setProgressColor] = useState('#ffffff');
 
   // Handler to update a grade value
   const handleGradeValueChange = (idx, field, val) => {
@@ -82,69 +85,90 @@ const Grading = () => {
                       </div>
                       {/* Dynamic Grade Value Inputs */}
                       {gradeValues.map((grade, idx) => (
-                       <div> <div className="mb-3 d-flex align-items-end" key={idx}>
-                          <div className="mr-1">
-                            <label className="form-label">Grade Value *</label>
-                            <input
-                              type="text"
-                              className="form-control mr-2"
-                              placeholder="Value"
-                              value={grade.value}
-                              onChange={e => handleGradeValueChange(idx, 'value', e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <label className="form-label">Main(%)</label>
-                            <div className="d-flex">
+                        <div key={idx}>
+                          <div className="mb-3 d-flex align-items-end">
+                            <div className="mr-1">
+                              <label className="form-label">Grade Value *</label>
                               <input
-                                type="number"
+                                type="text"
                                 className="form-control mr-2"
-                                placeholder="Min (%)"
-                                value={grade.min}
-                                onChange={e => handleGradeValueChange(idx, 'min', e.target.value)}
-                              />
-                              <input
-                                type="number"
-                                className="form-control mr-2"
-                                placeholder="Max (%)"
-                                value={grade.max}
-                                onChange={e => handleGradeValueChange(idx, 'max', e.target.value)}
+                                placeholder="Value"
+                                value={grade.value}
+                                onChange={e => handleGradeValueChange(idx, 'value', e.target.value)}
                               />
                             </div>
+                            <div>
+                              <label className="form-label">Main(%)</label>
+                              <div className="d-flex">
+                                <input
+                                  type="number"
+                                  className="form-control mr-2"
+                                  placeholder="Min (%)"
+                                  value={grade.min}
+                                  onChange={e => handleGradeValueChange(idx, 'min', e.target.value)}
+                                />
+                                <input
+                                  type="number"
+                                  className="form-control mr-2"
+                                  placeholder="Max (%)"
+                                  value={grade.max}
+                                  onChange={e => handleGradeValueChange(idx, 'max', e.target.value)}
+                                />
+                              </div>
+                            </div>
+                            <div className="position-relative ml-2">
+                              <label className="form-label">Color</label>
+                              <div className="d-flex align-items-center">
+                                <input
+                                  type="color"
+                                  className="color-picker form-control p-0"
+                                  style={{ width: 40, height: 40, border: 'none', background: 'none' }}
+                                  value={grade.color}
+                                  onChange={e => handleGradeValueChange(idx, 'color', e.target.value)}
+                                />
+                                <input
+                                  type="text"
+                                  className="form-control ml-2"
+                                  style={{ width: 90 }}
+                                  value={grade.color}
+                                  onChange={e => handleGradeValueChange(idx, 'color', e.target.value)}
+                                  maxLength={7}
+                                  placeholder="#FFFFFF"
+                                />
+                                {/* Direct color swatch */}
+                                <div
+                                  style={{
+                                    width: 32,
+                                    height: 32,
+                                    backgroundColor: grade.color,
+                                    border: '1px solid #ccc',
+                                    borderRadius: 4,
+                                    marginLeft: 8
+                                  }}
+                                  title={grade.color}
+                                />
+                              </div>
+                            </div>
+                            {gradeValues.length > 1 && (
+                              <button
+                                type="button"
+                                className="btn btn-danger btn-sm ml-2 mb-2"
+                                onClick={() => handleRemoveGradeValue(idx)}
+                                title="Remove"
+                              >
+                                &times;
+                              </button>
+                            )}
                           </div>
-                          <div className="position-relative ml-2">
-                            <label className="form-label">Color</label>
+                          <div className="mb-3">
+                            <label className="form-label">Description</label>
                             <input
-                              type="color"
-                              className="color-picker form-control p-0"
-                              style={{ width: 40, height: 40, border: 'none', background: 'none' }}
-                              value={grade.color}
-                              onChange={e => handleGradeValueChange(idx, 'color', e.target.value)}
+                              type="text"
+                              className="form-control mt-3"
+                              placeholder="e.g., Excellent, Needs Improvement"
                             />
                           </div>
-                          {gradeValues.length > 1 && (
-                            <button
-                              type="button"
-                              className="btn btn-danger btn-sm ml-2 mb-2"
-                              onClick={() => handleRemoveGradeValue(idx)}
-                              title="Remove"
-                            >
-                              &times;
-                            </button>
-                          )}
-                       
                         </div>
-                          <div className="mb-3">
-                        <label className="form-label">Description</label>
-                        <input
-                          type="text"
-                          className="form-control mt-3"
-                          placeholder="e.g., Excellent, Needs Improvement"
-                        />
-                      </div>
-                        
-                        </div> 
-                        
                       ))}
                       <button
                         type="button"
@@ -167,7 +191,7 @@ const Grading = () => {
                           type="button"
                           className="btn btn-outline-primary w-100 mt-3 mb-3 p-3 br10"
                         >
-                          Add Grade Value
+                          Add Grade Category
                         </button>
                       </div>
                     </div>
@@ -178,7 +202,7 @@ const Grading = () => {
                         className="form-control"
                         placeholder="e.g., 'Above Expected'"
                       />
-                      <div className="mt-3 d-flex">
+                      <div className="mt-3 d-flex align-items-end">
                         <div className="mr-2">
                           <label className="form-label">
                             Minimum Progress (%)
@@ -199,34 +223,26 @@ const Grading = () => {
                             placeholder="Max Progress (%)"
                           />
                         </div>
-                        <div>
+                        <div className="ml-2">
                           <label className="form-label">Color</label>
-                          {/*<input type="color" class="" style="height:45px">*/}
-                          <div
-                            className="color-picker-container"
-                            onclick="document.getElementById('colorInput1').click();"
-                            id="colorBox1"
-                          >
-                            <img
-                              src="img/mdi_color.png"
-                              alt="Color Palette"
-                              id="colorIcon1"
+                          <div className="d-flex align-items-center">
+                            <input
+                              type="color"
+                              className="color-picker form-control p-0"
+                              style={{ width: 40, height: 40, border: 'none', background: 'none' }}
+                              value={progressColor}
+                              onChange={e => setProgressColor(e.target.value)}
+                            />
+                            <input
+                              type="text"
+                              className="form-control ml-2"
+                              style={{ width: 90 }}
+                              value={progressColor}
+                              onChange={e => setProgressColor(e.target.value)}
+                              maxLength={7}
+                              placeholder="#FFFFFF"
                             />
                           </div>
-                          <input
-                            type="color"
-                            id="colorInput1"
-                            className="color-picker"
-                            onchange="changeColor1(this)"
-                          />
-                          <input
-                            type="hidden"
-                            id="colorCode1"
-                            className="color-code form-control mt-2 text-center"
-                            placeholder="#FFFFFF"
-                            defaultValue=""
-                            readOnly=""
-                          />
                         </div>
                       </div>
                     
