@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import * as bootstrap from "bootstrap";
@@ -17,11 +18,25 @@ const initialGradeCategory = () => ({
   weightage: ''
 });
 
+
+const initialProgressRange = () => ({
+  min: '',
+  max: '',
+  color: '#ffffff',
+  description: ''
+});
+
+const initialProgressCategory = () => ({
+  progressCategory: '',
+  progressRanges: [initialProgressRange()],
+  gradeDescription: ''
+});
+
 const Grading = () => {
   // State for multiple grade categories
   const [gradeCategories, setGradeCategories] = useState([initialGradeCategory()]);
-  // State for progress color
-  const [progressColor, setProgressColor] = useState('#ffffff');
+  // State for multiple progress categories (each with multiple progress ranges)
+  const [progressCategories, setProgressCategories] = useState([initialProgressCategory()]);
 
   // Handler to update a grade value in a specific category
   const handleGradeValueChange = (catIdx, idx, field, val) => {
@@ -68,7 +83,64 @@ const Grading = () => {
     ));
   };
 
-  // Handler to clone (add) a new grade category
+
+
+  // Handler to update a field in a specific progress category (for category-level fields)
+  const handleProgressCategoryChange = (idx, field, val) => {
+    setProgressCategories(prev => prev.map((cat, i) =>
+      i === idx ? { ...cat, [field]: val } : cat
+    ));
+  };
+
+  // Handler to update a field in a specific progress range within a category
+  const handleProgressRangeChange = (catIdx, rangeIdx, field, val) => {
+    setProgressCategories(prev => prev.map((cat, i) =>
+      i === catIdx
+        ? {
+            ...cat,
+            progressRanges: cat.progressRanges.map((range, j) =>
+              j === rangeIdx ? { ...range, [field]: val } : range
+            )
+          }
+        : cat
+    ));
+  };
+
+  // Handler to add a new progress range in a specific category
+  const handleAddProgressRange = (catIdx) => {
+    setProgressCategories(prev => prev.map((cat, i) =>
+      i === catIdx
+        ? {
+            ...cat,
+            progressRanges: [...cat.progressRanges, initialProgressRange()]
+          }
+        : cat
+    ));
+  };
+
+  // Handler to remove a progress range in a specific category
+  const handleRemoveProgressRange = (catIdx, rangeIdx) => {
+    setProgressCategories(prev => prev.map((cat, i) =>
+      i === catIdx
+        ? {
+            ...cat,
+            progressRanges: cat.progressRanges.filter((_, j) => j !== rangeIdx)
+          }
+        : cat
+    ));
+  };
+
+  // Handler to add a new progress category
+  const handleAddProgressCategory = () => {
+    setProgressCategories(prev => [...prev, initialProgressCategory()]);
+  };
+
+  // Handler to remove a progress category
+  const handleRemoveProgressCategory = (idx) => {
+    setProgressCategories(prev => prev.filter((_, i) => i !== idx));
+  };
+
+    // Handler to clone (add) a new grade category
   const handleAddGradeCategory = () => {
     setGradeCategories(prev => [...prev, initialGradeCategory()]);
   };
@@ -256,78 +328,132 @@ const Grading = () => {
                         Add Grade Category
                       </button>
                     </div>
+
                     <div className="col-md-6">
-                      <label className="form-label">Progress Category *</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="e.g., 'Above Expected'"
-                      />
-                      <div className="mt-3 d-flex align-items-end">
-                        <div className="mr-2">
-                          <label className="form-label">
-                            Minimum Progress (%)
-                          </label>
+                      {progressCategories.map((cat, catIdx) => (
+                        <div key={catIdx} className="mb-4 p-3 border rounded position-relative">
+                          <label className="form-label">Progress Category *</label>
                           <input
-                            type="number"
-                            className="form-control mr-2"
-                            placeholder="Min Progress (%)"
+                            type="text"
+                            className="form-control"
+                            placeholder="e.g., 'Above Expected'"
+                            value={cat.progressCategory}
+                            onChange={e => handleProgressCategoryChange(catIdx, 'progressCategory', e.target.value)}
                           />
-                        </div>
-                        <div className="mr-2">
-                          <label className="form-label">
-                            Maximum Progress (%)
-                          </label>
-                          <input
-                            type="number"
-                            className="form-control mr-2"
-                            placeholder="Max Progress (%)"
-                          />
-                        </div>
-                        <div className="ml-2">
-                          <label className="form-label">Color</label>
-                          <div className="d-flex align-items-center">
-                            <input
-                              type="color"
-                              className="color-picker form-control p-0"
-                              style={{ width: 40, height: 40, border: 'none', background: 'none' }}
-                              value={progressColor}
-                              onChange={e => setProgressColor(e.target.value)}
-                            />
+                          {/* Progress Ranges */}
+                          {cat.progressRanges.map((range, rangeIdx) => (
+                           <div>
+                             <div key={rangeIdx} className="mt-3 d-flex align-items-end pb-3 ">
+                              <div className="mr-2">
+                                <label className="form-label">Minimum Progress (%)</label>
+                                <input
+                                  type="number"
+                                  className="form-control mr-2"
+                                  placeholder="Min Progress (%)"
+                                  value={range.min}
+                                  onChange={e => handleProgressRangeChange(catIdx, rangeIdx, 'min', e.target.value)}
+                                />
+                              </div>
+                              <div className="mr-2">
+                                <label className="form-label">Maximum Progress (%)</label>
+                                <input
+                                  type="number"
+                                  className="form-control mr-2"
+                                  placeholder="Max Progress (%)"
+                                  value={range.max}
+                                  onChange={e => handleProgressRangeChange(catIdx, rangeIdx, 'max', e.target.value)}
+                                />
+                              </div>
+                              <div className="ml-2">
+                                <label className="form-label">Color</label>
+                                <div className="d-flex align-items-center">
+                                  <input
+                                    type="color"
+                                    className="color-picker form-control p-0"
+                                    style={{ width: 40, height: 40, border: 'none', background: 'none' }}
+                                    value={range.color}
+                                    onChange={e => handleProgressRangeChange(catIdx, rangeIdx, 'color', e.target.value)}
+                                  />
+                                  <input
+                                    type="text"
+                                    className="form-control ml-2"
+                                    style={{ width: 90 }}
+                                    value={range.color}
+                                    onChange={e => handleProgressRangeChange(catIdx, rangeIdx, 'color', e.target.value)}
+                                    maxLength={7}
+                                    placeholder="#FFFFFF"
+                                  />
+                                  <div
+                                    style={{
+                                      width: 32,
+                                      height: 32,
+                                      backgroundColor: range.color,
+                                      border: '1px solid #ccc',
+                                      borderRadius: 4,
+                                      marginLeft: 8
+                                    }}
+                                    title={range.color}
+                                  />
+                                </div>
+                              </div>
+                            
+                              {cat.progressRanges.length > 1 && (
+                                <button
+                                  type="button"
+                                  className="btn btn-danger btn-sm ml-2 mb-2"
+                                  onClick={() => handleRemoveProgressRange(catIdx, rangeIdx)}
+                                  title="Remove Progress Range"
+                                >
+                                  &times;
+                                </button>
+                              )}
+                            </div>
+                             <div className="mb-3">
+                                <label className="form-label">Description</label>
+                                <input
+                                  type="text"
+                                  className="form-control mt-3"
+                                  placeholder="e.g., Excellent, Needs Improvement"
+                                />
+                              </div>
+                           </div>
+                          ))}
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary w-20 mt-2 mb-3 p-3 br10"
+                            onClick={() => handleAddProgressRange(catIdx)}
+                          >
+                            Add Progress Range
+                          </button>
+                          <div className="mb-3">
+                            <label className="form-label">Grade Description</label>
                             <input
                               type="text"
-                              className="form-control ml-2"
-                              style={{ width: 90 }}
-                              value={progressColor}
-                              onChange={e => setProgressColor(e.target.value)}
-                              maxLength={7}
-                              placeholder="#FFFFFF"
+                              className="form-control mt-2"
+                              placeholder="Grade Description"
+                              value={cat.gradeDescription}
+                              onChange={e => handleProgressCategoryChange(catIdx, 'gradeDescription', e.target.value)}
                             />
                           </div>
+                          {progressCategories.length > 1 && (
+                            <button
+                              type="button"
+                              className="btn btn-danger btn-sm position-absolute"
+                              style={{ top: 10, right: 10 }}
+                              onClick={() => handleRemoveProgressCategory(catIdx)}
+                              title="Remove Progress Category"
+                            >
+                              Remove
+                            </button>
+                          )}
                         </div>
-                      </div>
-                    
-                      <div className="mt-3">
-                        <label className="form-label">Description</label>
-                        <input
-                          type="text"
-                          className="form-control mt-3"
-                          placeholder="Description"
-                        />
-                      </div>
-                      <div className="mt-3">
-                        <label className="form-label">Grade Description</label>
-                        <input
-                          type="text"
-                          className="form-control mt-2"
-                          placeholder="Grade Description"
-                        />
-                      </div>
-                        <button
+                      ))}
+                      <button
                         type="button"
                         className="btn btn-outline-primary w-100 mt-3 mb-3 p-3 br10"
+                        onClick={handleAddProgressCategory}
                       >
-                        Add Grade Value
+                        Add Progress Category
                       </button>
                     </div>
                     
