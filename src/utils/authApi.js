@@ -1,3 +1,19 @@
+// -------------Teachers -----------------------
+export const getAllTeachers = async () => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.get(`${API_URL}/user/teacher/get-teachers?limit=1000&page=1`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching teachers:", error);
+    throw error;
+  }
+};
 import axios from "axios";
 
 const API_URL = "https://server-php-8-3.technorizen.com/gradesphere/api";
