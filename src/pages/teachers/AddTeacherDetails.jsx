@@ -6,13 +6,7 @@ import Sidebar from "../../components/Sidebar";
 const API_URL = "https://server-php-8-3.technorizen.com/gradesphere/api";
 
 const AddTeacherDetails = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-  } = useForm({ mode: "onBlur" });
+  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({ mode: "onBlur" });
   const [departments, setDepartments] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [roles, setRoles] = useState([]);
@@ -28,9 +22,7 @@ const AddTeacherDetails = () => {
         const [depRes, roleRes, classRes] = await Promise.all([
           axios.get(`${API_URL}/user/department/get-departments`),
           axios.get(`${API_URL}/user/teacher-role/get-teacher-roles`),
-          axios.get(
-            `${API_URL}/user/classes/get-class-hierarchy?school_curriculum_id=5`
-          ),
+          axios.get(`${API_URL}/user/classes/get-class-hierarchy?school_curriculum_id=5`)
         ]);
         setDepartments(depRes.data.data || []);
         setRoles(roleRes.data.data || []);
@@ -41,7 +33,7 @@ const AddTeacherDetails = () => {
           if (item.curriculum_division) {
             allYearGroups.push({
               id: item.curriculum_division.id,
-              name: item.curriculum_division.name,
+              name: item.curriculum_division.name
             });
             (item.curriculum_division.classes || []).forEach((cls) => {
               (cls.school_classes || []).forEach((sc) => {
@@ -80,8 +72,7 @@ const AddTeacherDetails = () => {
       formData.append("email", data.email);
       formData.append("department_id", data.department_id);
       formData.append("teacher_role_id", data.teacher_role_id);
-      if (data.year_group_id)
-        formData.append("year_group_id", data.year_group_id);
+      if (data.year_group_id) formData.append("year_group_id", data.year_group_id);
       (data.assigned_classes || []).forEach((clsId, idx) => {
         formData.append(`assigned_classes[${idx}]`, clsId);
       });
@@ -92,16 +83,12 @@ const AddTeacherDetails = () => {
         formData.append("profile_image", data.profile_image[0]);
       }
       const token = localStorage.getItem("userTokenStudent");
-      const res = await axios.post(
-        `${API_URL}/user/teacher/add-teacher`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await axios.post(`${API_URL}/user/teacher/add-teacher`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
       if (res.data.status) {
         setSuccess("Teacher added successfully!");
         reset();
@@ -128,171 +115,71 @@ const AddTeacherDetails = () => {
             <div className="card-body">
               {success && <div className="alert alert-success">{success}</div>}
               {error && <div className="alert alert-danger">{error}</div>}
-              <form
-                className="new-added-form"
-                onSubmit={handleSubmit(onSubmit)}
-              >
+              <form className="new-added-form" onSubmit={handleSubmit(onSubmit)}>
                 <div className="row">
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>First Name *</label>
-                    <input
-                      type="text"
-                      placeholder="Enter First Name"
-                      className="form-control"
-                      {...register("first_name", {
-                        required: "First name is required",
-                      })}
-                    />
-                    {errors.first_name && (
-                      <p className="text-danger">{errors.first_name.message}</p>
-                    )}
+                    <input type="text" placeholder="Enter First Name" className="form-control"
+                      {...register("first_name", { required: "First name is required" })} />
+                    {errors.first_name && <p className="text-danger">{errors.first_name.message}</p>}
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Last Name *</label>
-                    <input
-                      type="text"
-                      placeholder="Enter Last Name"
-                      className="form-control"
-                      {...register("last_name", {
-                        required: "Last name is required",
-                      })}
-                    />
-                    {errors.last_name && (
-                      <p className="text-danger">{errors.last_name.message}</p>
-                    )}
+                    <input type="text" placeholder="Enter Last Name" className="form-control"
+                      {...register("last_name", { required: "Last name is required" })} />
+                    {errors.last_name && <p className="text-danger">{errors.last_name.message}</p>}
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Email *</label>
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      className="form-control"
-                      {...register("email", { required: "Email is required" })}
-                    />
-                    {errors.email && (
-                      <p className="text-danger">{errors.email.message}</p>
-                    )}
+                    <input type="email" placeholder="Email" className="form-control"
+                      {...register("email", { required: "Email is required" })} />
+                    {errors.email && <p className="text-danger">{errors.email.message}</p>}
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Year Group *</label>
-                    <select
-                      className="form-control"
-                      {...register("year_group_id", {
-                        required: "Year Group is required",
-                      })}
-                    >
+                    <select className="form-control" {...register("year_group_id", { required: "Year Group is required" })}>
                       <option value="">Select Year Group</option>
-                      {yearGroups.map((yg) => (
-                        <option key={yg.id} value={yg.id}>
-                          {yg.name}
-                        </option>
-                      ))}
+                      {yearGroups.map(yg => <option key={yg.id} value={yg.id}>{yg.name}</option>)}
                     </select>
-                    {errors.year_group_id && (
-                      <p className="text-danger">
-                        {errors.year_group_id.message}
-                      </p>
-                    )}
+                    {errors.year_group_id && <p className="text-danger">{errors.year_group_id.message}</p>}
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Department *</label>
-                    <select
-                      className="form-control"
-                      {...register("department_id", {
-                        required: "Department is required",
-                      })}
-                    >
+                    <select className="form-control" {...register("department_id", { required: "Department is required" })}>
                       <option value="">Select Department</option>
-                      {departments.map((dep) => (
-                        <option key={dep.id} value={dep.id}>
-                          {dep.name}
-                        </option>
-                      ))}
+                      {departments.map(dep => <option key={dep.id} value={dep.id}>{dep.name}</option>)}
                     </select>
-                    {errors.department_id && (
-                      <p className="text-danger">
-                        {errors.department_id.message}
-                      </p>
-                    )}
+                    {errors.department_id && <p className="text-danger">{errors.department_id.message}</p>}
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Role *</label>
-                    <select
-                      className="form-control"
-                      {...register("teacher_role_id", {
-                        required: "Role is required",
-                      })}
-                    >
+                    <select className="form-control" {...register("teacher_role_id", { required: "Role is required" })}>
                       <option value="">Select Role</option>
-                      {roles.map((role) => (
-                        <option key={role.id} value={role.id}>
-                          {role.name}
-                        </option>
-                      ))}
+                      {roles.map(role => <option key={role.id} value={role.id}>{role.name}</option>)}
                     </select>
-                    {errors.teacher_role_id && (
-                      <p className="text-danger">
-                        {errors.teacher_role_id.message}
-                      </p>
-                    )}
+                    {errors.teacher_role_id && <p className="text-danger">{errors.teacher_role_id.message}</p>}
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Assigned Classes *</label>
-                    <select
-                      className="form-control"
-                      multiple
-                      {...register("assigned_classes", {
-                        required: "At least one class is required",
-                      })}
-                    >
-                      {classes.map((cls) => (
-                        <option key={cls.id} value={cls.id}>
-                          {cls.name}
-                        </option>
-                      ))}
+                    <select className="form-control" multiple {...register("assigned_classes", { required: "At least one class is required" })}>
+                      {classes.map(cls => <option key={cls.id} value={cls.id}>{cls.name}</option>)}
                     </select>
-                    {errors.assigned_classes && (
-                      <p className="text-danger">
-                        {errors.assigned_classes.message}
-                      </p>
-                    )}
+                    {errors.assigned_classes && <p className="text-danger">{errors.assigned_classes.message}</p>}
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Assigned Subjects *</label>
-                    <select
-                      className="form-control"
-                      multiple
-                      {...register("assigned_subjects", {
-                        required: "At least one subject is required",
-                      })}
-                    >
-                      {subjects.map((sub) => (
-                        <option key={sub.id} value={sub.id}>
-                          {sub.name}
-                        </option>
-                      ))}
+                    <select className="form-control" multiple {...register("assigned_subjects", { required: "At least one subject is required" })}>
+                      {subjects.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
                     </select>
-                    {errors.assigned_subjects && (
-                      <p className="text-danger">
-                        {errors.assigned_subjects.message}
-                      </p>
-                    )}
+                    {errors.assigned_subjects && <p className="text-danger">{errors.assigned_subjects.message}</p>}
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Profile Image</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="form-control-file"
-                      {...register("profile_image")}
-                    />
+                    <input type="file" accept="image/*" className="form-control-file"
+                      {...register("profile_image")} />
                   </div>
                   <div className="col-12 form-group mg-t-8">
-                    <button
-                      type="submit"
-                      className="btn-fill-lg btn-gradient-blue1 btn-hover-bluedark"
-                      disabled={loading}
-                    >
+                    <button type="submit" className="btn-fill-lg btn-gradient-blue1 btn-hover-bluedark" disabled={loading}>
                       {loading ? "Adding..." : "Add Teacher"}
                     </button>
                   </div>
