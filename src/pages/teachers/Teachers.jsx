@@ -15,7 +15,7 @@ import studentClass from "../../assets/assets/icon/class.png";
 import studentProg from "../../assets/assets/icon/tabler_progress.png";
 import studentStat from "../../assets/assets/icon/lets-icons_status.png";
 import studentEdit from "../../assets/assets/icon/tabler_edit.png";
-import { getAllTeachers } from "../../utils/authApi";
+import { deleteTeacherById, getAllTeachers} from "../../utils/authApi";
 
 
 const Teachers = () => {
@@ -95,9 +95,21 @@ const Teachers = () => {
     navigate("/add-teacher")
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this teacher?")) {
-      setTeachers(teachers.filter(t => t.id !== id));
+      try {
+        const res = await deleteTeacherById(id);
+        if (res.status) {
+          // Refresh teacher list
+          const data = await getAllTeachers();
+          setTeachers(data?.data || []);
+          alert("Teacher deleted successfully!");
+        } else {
+          alert(res.message || "Failed to delete teacher");
+        }
+      } catch (err) {
+        alert("Error deleting teacher");
+      }
     }
   };
 

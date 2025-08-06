@@ -14,6 +14,22 @@ export const getAllTeachers = async () => {
     throw error;
   }
 };
+// Delete teacher by ID
+export const deleteTeacherById = async (id) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.get(`${API_URL}/user/teacher/delete-teacher?teacher_id=${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error deleting teacher:", error);
+    throw error;
+  }
+};
 import axios from "axios";
 
 const API_URL = "https://server-php-8-3.technorizen.com/gradesphere/api";
