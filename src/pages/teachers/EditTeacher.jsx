@@ -131,28 +131,27 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
         {success && <div className="alert alert-success">{success}</div>}
         {error && <div className="alert alert-danger">{error}</div>}
         {/* First Name */}
-        <div className="col-xl-4 col-lg-6 col-12 form-group">
+        <div className="col-xl-6 col-lg-6 col-12 form-group">
           <label>First Name *</label>
           <input type="text" placeholder="Enter First Name" className="form-control"
             {...register("first_name", { required: "First name is required" })} />
           {errors.first_name && <p className="text-danger">{errors.first_name.message}</p>}
         </div>
-        {/* Last Name */}
-        <div className="col-xl-4 col-lg-6 col-12 form-group">
+        <div className="col-xl-6 col-lg-6 col-12 form-group">
           <label>Last Name *</label>
           <input type="text" placeholder="Enter Last Name" className="form-control"
             {...register("last_name", { required: "Last name is required" })} />
           {errors.last_name && <p className="text-danger">{errors.last_name.message}</p>}
         </div>
         {/* Email */}
-        <div className="col-xl-4 col-lg-6 col-12 form-group">
+          <div className="col-xl-6 col-lg-6 col-12 form-group">
           <label>Email *</label>
           <input type="email" placeholder="Email" className="form-control"
             {...register("email", { required: "Email is required" })} />
           {errors.email && <p className="text-danger">{errors.email.message}</p>}
         </div>
         {/* Year Group */}
-        <div className="col-xl-4 col-lg-6 col-12 form-group">
+          <div className="col-xl-6 col-lg-6 col-12 form-group">
           <label>Year Group *</label>
           <select
             className="form-control"
@@ -167,7 +166,7 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
           {errors.year_group_id && <p className="text-danger">{errors.year_group_id.message}</p>}
         </div>
         {/* Department */}
-        <div className="col-xl-4 col-lg-6 col-12 form-group">
+          <div className="col-xl-6 col-lg-6 col-12 form-group">
           <label>Department *</label>
           <select className="form-control" {...register("department_id", { required: "Department is required" })}>
             <option value="">Select Department</option>
@@ -176,7 +175,7 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
           {errors.department_id && <p className="text-danger">{errors.department_id.message}</p>}
         </div>
         {/* Role */}
-        <div className="col-xl-4 col-lg-6 col-12 form-group">
+         <div className="col-xl-6 col-lg-6 col-12 form-group">
           <label>Role *</label>
           <select className="form-control" {...register("teacher_role_id", { required: "Role is required" })}>
             <option value="">Select Role</option>
@@ -185,7 +184,7 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
           {errors.teacher_role_id && <p className="text-danger">{errors.teacher_role_id.message}</p>}
         </div>
         {/* Assigned Classes */}
-        <div className="col-xl-4 col-lg-6 col-12 form-group">
+       <div className="col-xl-6 col-lg-6 col-12 form-group">
           <label>Assigned Classes *</label>
           <select
             className="form-control"
@@ -200,7 +199,7 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
           {errors.assigned_classes && <p className="text-danger">{errors.assigned_classes.message}</p>}
         </div>
         {/* Assigned Subjects */}
-        <div className="col-xl-4 col-lg-6 col-12 form-group">
+          <div className="col-xl-6 col-lg-6 col-12 form-group">
           <label>Assigned Subjects *</label>
           <select
             className="form-control"
@@ -234,4 +233,4 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
   );
 };
 
-export default EditTeacher; 
+export default EditTeacher;
