@@ -188,7 +188,7 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
           <label>Assigned Classes *</label>
           <select
             className="form-control"
-            multiple
+          
             {...register("assigned_classes", { required: "At least one class is required" })}
             defaultValue={watch("assigned_classes")}
           >
@@ -203,7 +203,6 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
           <label>Assigned Subjects *</label>
           <select
             className="form-control"
-            multiple
             {...register("assigned_subjects", { required: "At least one subject is required" })}
             defaultValue={watch("assigned_subjects")}
           >

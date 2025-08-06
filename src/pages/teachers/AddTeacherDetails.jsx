@@ -161,14 +161,17 @@ const AddTeacherDetails = () => {
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Assigned Classes *</label>
-                    <select className="form-control" multiple {...register("assigned_classes", { required: "At least one class is required" })}>
+                    
+                    <select className="form-control"  {...register("assigned_classes", { required: "At least one class is required" })}>
+                       <option value="">Select Assigned </option>
                       {classes.map(cls => <option key={cls.id} value={cls.id}>{cls.name}</option>)}
                     </select>
                     {errors.assigned_classes && <p className="text-danger">{errors.assigned_classes.message}</p>}
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Assigned Subjects *</label>
-                    <select className="form-control" multiple {...register("assigned_subjects", { required: "At least one subject is required" })}>
+                    <select className="form-control" {...register("assigned_subjects", { required: "At least one subject is required" })}>
+                        <option value="">Select Subject </option>
                       {subjects.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
                     </select>
                     {errors.assigned_subjects && <p className="text-danger">{errors.assigned_subjects.message}</p>}
