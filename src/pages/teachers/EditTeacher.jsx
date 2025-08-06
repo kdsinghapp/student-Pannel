@@ -6,7 +6,7 @@ import Select from "react-select";
 const API_URL = "https://server-php-8-3.technorizen.com/gradesphere/api";
 
 const EditTeacher = ({ teacher, handleUpdate }) => {
-  const { register, handleSubmit, reset, formState: { errors }, watch, setValue } = useForm({ mode: "onBlur" });
+  const { register, handleSubmit, reset, formState: { errors, isSubmitted }, watch, setValue } = useForm({ mode: "onBlur" });
   const [selectedClasses, setSelectedClasses] = useState([]);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -17,6 +17,7 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [selectError, setSelectError] = useState({ classes: false, subjects: false });
 
   useEffect(() => {
     if (teacher) {
@@ -92,6 +93,14 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
     setLoading(true);
     setError(null);
     setSuccess(null);
+    setSelectError({
+      classes: selectedClasses.length === 0,
+      subjects: selectedSubjects.length === 0
+    });
+    if (selectedClasses.length === 0 || selectedSubjects.length === 0) {
+      setLoading(false);
+      return;
+    }
     try {
       const formData = new FormData();
       formData.append("first_name", data.first_name);
@@ -101,7 +110,6 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
       formData.append("teacher_role_id", data.teacher_role_id);
       formData.append("year_group_id", data.year_group_id);
       formData.append("teacher_id", data.teacher_id);
-      // Use selectedClasses and selectedSubjects from react-select
       selectedClasses.forEach((cls, idx) => {
         formData.append(`assigned_classes[${idx}]`, cls.value);
       });
@@ -200,7 +208,7 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
             classNamePrefix="react-select"
             placeholder="Select Classes"
           />
-          {selectedClasses.length === 0 && <p className="text-danger">At least one class is required</p>}
+          {selectError.classes && isSubmitted && <p className="text-danger">At least one class is required</p>}
         </div>
         {/* Assigned Subjects */}
           <div className="col-xl-6 col-lg-6 col-12 form-group">
@@ -213,7 +221,7 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
             classNamePrefix="react-select"
             placeholder="Select Subjects"
           />
-          {selectedSubjects.length === 0 && <p className="text-danger">At least one subject is required</p>}
+          {selectError.subjects && isSubmitted && <p className="text-danger">At least one subject is required</p>}
         </div>
         {/* Profile Image */}
         <div className="col-xl-4 col-lg-6 col-12 form-group">

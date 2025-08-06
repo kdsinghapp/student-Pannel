@@ -3,10 +3,12 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import Headers from "../../components/Headers";
 import Sidebar from "../../components/Sidebar";
+import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 const API_URL = "https://server-php-8-3.technorizen.com/gradesphere/api";
 
 const AddTeacherDetails = () => {
+  const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm({ mode: "onBlur" });
   const [selectedClasses, setSelectedClasses] = useState([]);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
@@ -100,6 +102,7 @@ const AddTeacherDetails = () => {
         reset();
         setSelectedClasses([]);
         setSelectedSubjects([]);
+        navigate("/teachers");
       } else {
         setError(res.data.message || "Failed to add teacher");
       }

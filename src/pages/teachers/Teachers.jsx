@@ -321,6 +321,10 @@ const Teachers = () => {
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
+              {/* Show success message after update */}
+              {editModalOpen && !selectedTeacher && (
+                <div className="alert alert-success text-center">Teacher updated successfully!</div>
+              )}
               {selectedTeacher && <EditTeacher teacher={selectedTeacher} handleUpdate={handleUpdate} />}
             </div>
           </div>
