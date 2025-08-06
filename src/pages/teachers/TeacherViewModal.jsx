@@ -12,14 +12,35 @@ function TeacherViewModal({ teacher }) {
         </div>
         <div className="d-flex mb-2 justify-center" style={{ margin: "auto" }}>
           <div className="m-auto justify-center">
-            {teacher?.photo_url && (
-              <img src={teacher.photo_url} style={{ width: "10em", height: "10em", borderRadius: "50%" }} alt="Teacher" />
+            {teacher?.profile_image && (
+              <img src={teacher.profile_image} style={{ width: "10em", height: "10em", borderRadius: "50%" }} alt="Teacher" />
             )}
           </div>
         </div>
         <div className="modal-body">
-         
-          <p>hellow</p>
+          <div className="row">
+            <div className="col-12 mb-2">
+              <strong>Name:</strong> {teacher?.first_name} {teacher?.last_name}
+            </div>
+            <div className="col-12 mb-2">
+              <strong>Email:</strong> {teacher?.email}
+            </div>
+            <div className="col-12 mb-2">
+              <strong>Status:</strong> {teacher?.status}
+            </div>
+            <div className="col-12 mb-2">
+              <strong>Department:</strong> {teacher?.department?.name}
+            </div>
+            <div className="col-12 mb-2">
+              <strong>Role:</strong> {teacher?.teachersrole?.name || teacher?.role?.name}
+            </div>
+            <div className="col-12 mb-2">
+              <strong>Assigned Classes:</strong> {teacher?.assigned_classes?.filter(cls => cls.name).map(cls => cls.name).join(", ") || "-"}
+            </div>
+            <div className="col-12 mb-2">
+              <strong>Assigned Subjects:</strong> {teacher?.assigned_subjects?.map(sub => sub.name).join(", ") || "-"}
+            </div>
+          </div>
         </div>
         <div className="modal-footer">
           <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" style={{ fontSize: "12px" }}>
