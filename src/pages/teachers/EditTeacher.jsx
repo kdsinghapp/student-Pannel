@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import Select from "react-select";
 
 const API_URL = "https://server-php-8-3.technorizen.com/gradesphere/api";
 
 const EditTeacher = ({ teacher, handleUpdate }) => {
-  const { register, handleSubmit, reset, formState: { errors }, watch } = useForm({ mode: "onBlur" });
+  const { register, handleSubmit, reset, formState: { errors }, watch, setValue } = useForm({ mode: "onBlur" });
+  const [selectedClasses, setSelectedClasses] = useState([]);
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [roles, setRoles] = useState([]);
@@ -24,11 +27,11 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
         department_id: teacher.department?.id,
         teacher_role_id: teacher.teachersrole?.id || teacher.role?.id,
         year_group_id: teacher.year_group_id,
-        assigned_classes: teacher.assigned_classes?.map(cls => cls.id) || [],
-        assigned_subjects: teacher.assigned_subjects?.map(sub => sub.id) || [],
         profile_image: undefined,
         teacher_id: teacher.id,
       });
+      setSelectedClasses((teacher.assigned_classes || []).map(cls => ({ value: cls.id, label: cls.name })));
+      setSelectedSubjects((teacher.assigned_subjects || []).map(sub => ({ value: sub.id, label: sub.name })));
     }
   }, [teacher, reset]);
 
@@ -78,8 +81,10 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
     if (depId) {
       const dep = departments.find((d) => d.id === parseInt(depId));
       setSubjects(dep?.subjects || []);
+      setSelectedSubjects([]); // Reset subjects selection when department changes
     } else {
       setSubjects([]);
+      setSelectedSubjects([]);
     }
   }, [watch("department_id"), departments]);
 
@@ -96,11 +101,12 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
       formData.append("teacher_role_id", data.teacher_role_id);
       formData.append("year_group_id", data.year_group_id);
       formData.append("teacher_id", data.teacher_id);
-      (data.assigned_classes || []).forEach((clsId, idx) => {
-        formData.append(`assigned_classes[${idx}]`, clsId);
+      // Use selectedClasses and selectedSubjects from react-select
+      selectedClasses.forEach((cls, idx) => {
+        formData.append(`assigned_classes[${idx}]`, cls.value);
       });
-      (data.assigned_subjects || []).forEach((subId, idx) => {
-        formData.append(`assigned_subjects[${idx}]`, subId);
+      selectedSubjects.forEach((sub, idx) => {
+        formData.append(`assigned_subjects[${idx}]`, sub.value);
       });
       if (data.profile_image && data.profile_image[0]) {
         formData.append("profile_image", data.profile_image[0]);
@@ -186,31 +192,28 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
         {/* Assigned Classes */}
        <div className="col-xl-6 col-lg-6 col-12 form-group">
           <label>Assigned Classes *</label>
-          <select
-            className="form-control"
-          
-            {...register("assigned_classes", { required: "At least one class is required" })}
-            defaultValue={watch("assigned_classes")}
-          >
-            {classes.map(cls => (
-              <option key={cls.id} value={cls.id}>{cls.name}</option>
-            ))}
-          </select>
-          {errors.assigned_classes && <p className="text-danger">{errors.assigned_classes.message}</p>}
+          <Select
+            isMulti
+            options={classes.map(cls => ({ value: cls.id, label: cls.name }))}
+            value={selectedClasses}
+            onChange={selected => setSelectedClasses(selected || [])}
+            classNamePrefix="react-select"
+            placeholder="Select Classes"
+          />
+          {selectedClasses.length === 0 && <p className="text-danger">At least one class is required</p>}
         </div>
         {/* Assigned Subjects */}
           <div className="col-xl-6 col-lg-6 col-12 form-group">
           <label>Assigned Subjects *</label>
-          <select
-            className="form-control"
-            {...register("assigned_subjects", { required: "At least one subject is required" })}
-            defaultValue={watch("assigned_subjects")}
-          >
-            {subjects.map(sub => (
-              <option key={sub.id} value={sub.id}>{sub.name}</option>
-            ))}
-          </select>
-          {errors.assigned_subjects && <p className="text-danger">{errors.assigned_subjects.message}</p>}
+          <Select
+            isMulti
+            options={subjects.map(sub => ({ value: sub.id, label: sub.name }))}
+            value={selectedSubjects}
+            onChange={selected => setSelectedSubjects(selected || [])}
+            classNamePrefix="react-select"
+            placeholder="Select Subjects"
+          />
+          {selectedSubjects.length === 0 && <p className="text-danger">At least one subject is required</p>}
         </div>
         {/* Profile Image */}
         <div className="col-xl-4 col-lg-6 col-12 form-group">

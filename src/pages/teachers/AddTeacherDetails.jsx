@@ -3,10 +3,13 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import Headers from "../../components/Headers";
 import Sidebar from "../../components/Sidebar";
+import Select from "react-select";
 const API_URL = "https://server-php-8-3.technorizen.com/gradesphere/api";
 
 const AddTeacherDetails = () => {
-  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({ mode: "onBlur" });
+  const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm({ mode: "onBlur" });
+  const [selectedClasses, setSelectedClasses] = useState([]);
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [roles, setRoles] = useState([]);
@@ -56,8 +59,10 @@ const AddTeacherDetails = () => {
     if (depId) {
       const dep = departments.find((d) => d.id === parseInt(depId));
       setSubjects(dep?.subjects || []);
+      setSelectedSubjects([]); // Reset subjects selection when department changes
     } else {
       setSubjects([]);
+      setSelectedSubjects([]);
     }
   }, [watch("department_id"), departments]);
 
@@ -73,11 +78,12 @@ const AddTeacherDetails = () => {
       formData.append("department_id", data.department_id);
       formData.append("teacher_role_id", data.teacher_role_id);
       if (data.year_group_id) formData.append("year_group_id", data.year_group_id);
-      (data.assigned_classes || []).forEach((clsId, idx) => {
-        formData.append(`assigned_classes[${idx}]`, clsId);
+      // Use selectedClasses and selectedSubjects from react-select
+      selectedClasses.forEach((cls, idx) => {
+        formData.append(`assigned_classes[${idx}]`, cls.value);
       });
-      (data.assigned_subjects || []).forEach((subId, idx) => {
-        formData.append(`assigned_subjects[${idx}]`, subId);
+      selectedSubjects.forEach((sub, idx) => {
+        formData.append(`assigned_subjects[${idx}]`, sub.value);
       });
       if (data.profile_image && data.profile_image[0]) {
         formData.append("profile_image", data.profile_image[0]);
@@ -92,6 +98,8 @@ const AddTeacherDetails = () => {
       if (res.data.status) {
         setSuccess("Teacher added successfully!");
         reset();
+        setSelectedClasses([]);
+        setSelectedSubjects([]);
       } else {
         setError(res.data.message || "Failed to add teacher");
       }
@@ -161,20 +169,27 @@ const AddTeacherDetails = () => {
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Assigned Classes *</label>
-                    
-                    <select className="form-control"  {...register("assigned_classes", { required: "At least one class is required" })}>
-                       <option value="">Select Assigned </option>
-                      {classes.map(cls => <option key={cls.id} value={cls.id}>{cls.name}</option>)}
-                    </select>
-                    {errors.assigned_classes && <p className="text-danger">{errors.assigned_classes.message}</p>}
+                    <Select
+                      isMulti
+                      options={classes.map(cls => ({ value: cls.id, label: cls.name }))}
+                      value={selectedClasses}
+                      onChange={selected => setSelectedClasses(selected || [])}
+                      classNamePrefix="react-select"
+                      placeholder="Select Classes"
+                    />
+                    {selectedClasses.length === 0 && <p className="text-danger">At least one class is required</p>}
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Assigned Subjects *</label>
-                    <select className="form-control" {...register("assigned_subjects", { required: "At least one subject is required" })}>
-                        <option value="">Select Subject </option>
-                      {subjects.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
-                    </select>
-                    {errors.assigned_subjects && <p className="text-danger">{errors.assigned_subjects.message}</p>}
+                    <Select
+                      isMulti
+                      options={subjects.map(sub => ({ value: sub.id, label: sub.name }))}
+                      value={selectedSubjects}
+                      onChange={selected => setSelectedSubjects(selected || [])}
+                      classNamePrefix="react-select"
+                      placeholder="Select Subjects"
+                    />
+                    {selectedSubjects.length === 0 && <p className="text-danger">At least one subject is required</p>}
                   </div>
                   <div className="col-xl-4 col-lg-6 col-12 form-group">
                     <label>Profile Image</label>
