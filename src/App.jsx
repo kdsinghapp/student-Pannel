@@ -4,7 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import SignUp from "./pages/SignUp";
 import Classes from "./pages/Classes";
 import Students from "./pages/student/Students";
-import Grading from "./pages/Grading";
+import Grading from "./pages/grading/Grading";
 import Teachers from "./pages/teachers/Teachers";
 import CurriculamSetup from "./pages/CurriculumSetup";
 import InternalAssesment from "./pages/InternalAssesment";

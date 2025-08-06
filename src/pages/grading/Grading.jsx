@@ -1,12 +1,11 @@
-
 import React, { useState } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import * as bootstrap from "bootstrap";
 import { Link } from "react-router-dom";
-import logo from "../assets/img/logo.png";
-import Headers from "../components/Headers";
-import Sidebar from "../components/Sidebar";
-import DownloadTemplate from "../components/DownloadTemplate";
+import logo from "../../assets/img/logo.png";
+import Headers from "../../components/Headers";
+import Sidebar from "../../components/Sidebar";
+import DownloadTemplate from "../../components/DownloadTemplate";
 
 
 
