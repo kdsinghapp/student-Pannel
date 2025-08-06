@@ -18,13 +18,8 @@ function TeacherViewModal({ teacher }) {
           </div>
         </div>
         <div className="modal-body">
-          <p style={{ fontSize: "14px" }}>Name: {teacher?.forename} {teacher?.surname}</p>
-          <p style={{ fontSize: "14px" }}>Email: {teacher?.email}</p>
-          <p style={{ fontSize: "14px" }}>Department: {teacher?.department}</p>
-          <p style={{ fontSize: "14px" }}>Subject: {teacher?.subject}</p>
-          <p style={{ fontSize: "14px" }}>Year Group: {teacher?.year_group}</p>
-          <p style={{ fontSize: "14px" }}>Class: {teacher?.class}</p>
-          <p style={{ fontSize: "14px" }}>Role: {teacher?.role}</p>
+         
+          <p>hellow</p>
         </div>
         <div className="modal-footer">
           <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" style={{ fontSize: "12px" }}>

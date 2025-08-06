@@ -328,7 +328,7 @@ const Teachers = () => {
       </div>
       {/* View Modal */}
       <div className="modal fade" id="viewModal" tabIndex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
-        {selectedTeacher && <TeacherViewModal teacher={selectedTeacher} />}
+         <TeacherViewModal teacher={selectedTeacher} />
       </div>
     </>
   );
