@@ -1,4 +1,3 @@
-
 import axios from "axios";
 
 const API_URL = "https://server-php-8-3.technorizen.com/gradesphere/api";
@@ -300,6 +299,26 @@ export const deleteTeacherById = async (id) => {
       return res.data;
     } catch (error) {
       console.error("Error fetching grading schemas:", error);
+      throw error;
+    }
+  };
+
+  export const addGradingSchema = async (formData) => {
+    const token = localStorage.getItem("userTokenStudent");
+    try {
+      const res = await axios.post(
+        `${API_URL}/user/grading/add-grading-schema`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error adding grading schema:", error);
       throw error;
     }
   };

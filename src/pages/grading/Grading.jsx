@@ -127,31 +127,45 @@ const Grading = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {gradingSchemas.length === 0 ? (
-                      <tr><td colSpan="5" className="text-center">No grading schemas found.</td></tr>
-                    ) : (
-                      gradingSchemas.map((schema) => (
-                        <tr key={schema.id} style={{ lineHeight: "35px", fontSize: "15px" }}>
-                          <td>{schema.gradeCategory || schema.category || "-"}</td>
-                          <td>
-                            {Array.isArray(schema.gradeValues)
-                              ? schema.gradeValues.map((v, idx) => (
-                                  <span key={idx} style={{ marginRight: 8, background: v.color, padding: '2px 8px', borderRadius: 4 }}>
-                                    {v.value} ({v.min}-{v.max})
-                                  </span>
+                      {gradingSchemas.length === 0 ? (
+                        <tr><td colSpan="5" className="text-center">No grading schemas found.</td></tr>
+                      ) : (
+                        gradingSchemas.map((schema) => (
+                          <tr key={schema.id} style={{ lineHeight: "35px", fontSize: "15px" }}>
+                            <td>{schema.category || "-"}</td>
+                            <td>
+                              {Array.isArray(schema.grades) && schema.grades.length > 0 ? (
+                                schema.grades.map((grade, idx) => (
+                                  <div key={idx} style={{ marginBottom: 4 }}>
+                                    <span style={{ background: grade.color, color: '#fff', padding: '2px 8px', borderRadius: 4, marginRight: 8 }}>
+                                      {grade.label} ({grade.min}-{grade.max})
+                                    </span>
+                                    <span style={{ fontStyle: 'italic', color: '#555' }}>{grade.description}</span>
+                                  </div>
                                 ))
-                              : "-"}
-                          </td>
-                          <td>{schema.weightage || "-"}</td>
-                          <td>{schema.gradeDescription || schema.description || "-"}</td>
-                          <td className="action-icons">
-                            <a href="#" title="Edit"><i className="fas fa-edit" /></a>
-                            <a href="#" title="View"><i className="fas fa-eye" /></a>
-                            <a href="#" title="Delete"><i className="fas fa-trash" /></a>
-                          </td>
-                        </tr>
-                      ))
-                    )}
+                              ) : "-"}
+                            </td>
+                            <td>
+                              {Array.isArray(schema.progress) && schema.progress.length > 0 ? (
+                                schema.progress.map((prog, idx) => (
+                                  <div key={idx} style={{ marginBottom: 4 }}>
+                                    <span style={{ background: prog.color, color: '#fff', padding: '2px 8px', borderRadius: 4, marginRight: 8 }}>
+                                      {prog.label} ({prog.min}-{prog.max})
+                                    </span>
+                                    <span style={{ fontStyle: 'italic', color: '#555' }}>{prog.description}</span>
+                                  </div>
+                                ))
+                              ) : "-"}
+                            </td>
+                            <td>{schema.weightage || "-"}</td>
+                            <td className="action-icons">
+                              <a href="#" title="Edit"><i className="fas fa-edit" /></a>
+                              <a href="#" title="View"><i className="fas fa-eye" /></a>
+                              <a href="#" title="Delete"><i className="fas fa-trash" /></a>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                   </tbody>
                 </table>
               </div>
