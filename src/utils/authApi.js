@@ -8,12 +8,22 @@ export const signInAdmin = async (data) => {
     const res = await axios.post(`${API_URL}/user/login`, data);
     const responseData = res.data;
 
-   if (responseData?.user) {
+    if (responseData?.user) {
       localStorage.setItem("userStudentData", JSON.stringify(responseData));
-            console.log("userStudentData stored");
+      console.log("userStudentData stored");
 
       const fullName = `${responseData.user.first_name} ${responseData.user.last_name}`;
       localStorage.setItem("userName", fullName);
+
+      // Save school_id from first school_details item
+      if (
+        Array.isArray(responseData.user.school_details) &&
+        responseData.user.school_details.length > 0 &&
+        responseData.user.school_details[0].id
+      ) {
+        localStorage.setItem("school_id", responseData.user.id);
+        console.log("school_id stored:", responseData.user.id);
+      }
     }
 
     return responseData;
