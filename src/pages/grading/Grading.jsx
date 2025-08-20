@@ -4,7 +4,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min";
 import Headers from "../../components/Headers";
 import Sidebar from "../../components/Sidebar";
 import * as bootstrap from "bootstrap";
-import { getGradingSchemas } from "../../utils/authApi";
+import { getGradingSchemas, deleteGradingSchemaById } from "../../utils/authApi";
 import DownloadTemplate from "../../components/DownloadTemplate";
 import { useNavigate } from "react-router-dom";
 import studentId from "../../assets/assets/icon/fi_list.png";
@@ -25,22 +25,61 @@ const Grading = () => {
   const [gradingSchemas, setGradingSchemas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  // State for view modal
+  const [viewSchema, setViewSchema] = useState(null);
+  // Handler to open view modal
+  const handleView = (schema) => {
+    setViewSchema(schema);
+    setTimeout(() => {
+      const modalElement = document.getElementById("viewGradingModal");
+      if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+      }
+    }, 100);
+  };
+
+  // Handler to close view modal
+  const handleCloseView = () => {
+    setViewSchema(null);
+    const modalElement = document.getElementById("viewGradingModal");
+    if (modalElement) {
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) modal.hide();
+    }
+  };
+
+  const fetchGradingSchemas = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getGradingSchemas();
+      setGradingSchemas(data?.data || []);
+    } catch (err) {
+      setError("Failed to fetch grading schemas");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchGradingSchemas = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getGradingSchemas();
-        setGradingSchemas(data?.data || []);
-      } catch (err) {
-        setError("Failed to fetch grading schemas");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchGradingSchemas();
   }, []);
+
+  // Delete grading schema handler
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this grading schema?")) return;
+    setDeletingId(id);
+    try {
+      await deleteGradingSchemaById(id);
+      await fetchGradingSchemas();
+    } catch (err) {
+      setError("Failed to delete grading schema");
+    } finally {
+      setDeletingId(null);
+    }
+  };
   return (
     <div id="wrapper" className="wrapper bg-ash">
       <Headers />
@@ -160,8 +199,72 @@ const Grading = () => {
                             <td>{schema.weightage || "-"}</td>
                             <td className="action-icons">
                               <a href="#" title="Edit"><i className="fas fa-edit" /></a>
-                              <a href="#" title="View"><i className="fas fa-eye" /></a>
-                              <a href="#" title="Delete"><i className="fas fa-trash" /></a>
+                              <a href="#" title="View" onClick={() => handleView(schema)}><i className="fas fa-eye" /></a>
+      {/* View Grading Modal */}
+      <div className="modal fade" id="viewGradingModal" tabIndex="-1" aria-labelledby="viewGradingModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-lg">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="viewGradingModalLabel">Grading Schema Details</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleCloseView}></button>
+            </div>
+            <div className="modal-body">
+              {viewSchema ? (
+                <div>
+                  <p><strong>Category:</strong> {viewSchema.category || '-'}</p>
+                  <p><strong>Weightage:</strong> {viewSchema.weightage || '-'}</p>
+                  <div>
+                    <strong>Grades:</strong>
+                    {Array.isArray(viewSchema.grades) && viewSchema.grades.length > 0 ? (
+                      <ul>
+                        {viewSchema.grades.map((grade, idx) => (
+                          <li key={idx}>
+                            <span style={{ background: grade.color, color: '#fff', padding: '2px 8px', borderRadius: 4, marginRight: 8 }}>
+                              {grade.label} ({grade.min}-{grade.max})
+                            </span>
+                            <span style={{ fontStyle: 'italic', color: '#555' }}>{grade.description}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : <span> - </span>}
+                  </div>
+                  <div>
+                    <strong>Progress:</strong>
+                    {Array.isArray(viewSchema.progress) && viewSchema.progress.length > 0 ? (
+                      <ul>
+                        {viewSchema.progress.map((prog, idx) => (
+                          <li key={idx}>
+                            <span style={{ background: prog.color, color: '#fff', padding: '2px 8px', borderRadius: 4, marginRight: 8 }}>
+                              {prog.label} ({prog.min}-{prog.max})
+                            </span>
+                            <span style={{ fontStyle: 'italic', color: '#555' }}>{prog.description}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : <span> - </span>}
+                  </div>
+                </div>
+              ) : <div>No data to display.</div>}
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleCloseView}>Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+                              <button
+                                className="btn btn-link p-0"
+                                title="Delete"
+                                style={{ color: '#dc3545', outline: 'none', border: 'none', background: 'none' }}
+                                onClick={() => handleDelete(schema.id)}
+                                disabled={deletingId === schema.id}
+                              >
+                                {deletingId === schema.id ? (
+                                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                ) : (
+                                  <i className="fas fa-trash" />
+                                )}
+                              </button>
                             </td>
                           </tr>
                         ))

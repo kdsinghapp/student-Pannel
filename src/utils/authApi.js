@@ -332,3 +332,20 @@ export const deleteTeacherById = async (id) => {
       throw error;
     }
   };
+
+// Delete grading schema by ID
+export const deleteGradingSchemaById = async (id) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.delete(`${API_URL}/user/grading/grading-schema/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error deleting grading schema:", error);
+    throw error;
+  }
+};
