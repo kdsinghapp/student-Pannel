@@ -4,7 +4,10 @@ import "bootstrap/dist/js/bootstrap.bundle.min";
 import Headers from "../../components/Headers";
 import Sidebar from "../../components/Sidebar";
 import * as bootstrap from "bootstrap";
-import { getGradingSchemas, deleteGradingSchemaById } from "../../utils/authApi";
+import {
+  getGradingSchemas,
+  deleteGradingSchemaById,
+} from "../../utils/authApi";
 import DownloadTemplate from "../../components/DownloadTemplate";
 import { useNavigate } from "react-router-dom";
 import studentId from "../../assets/assets/icon/fi_list.png";
@@ -69,7 +72,8 @@ const Grading = () => {
 
   // Delete grading schema handler
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this grading schema?")) return;
+    if (!window.confirm("Are you sure you want to delete this grading schema?"))
+      return;
     setDeletingId(id);
     try {
       await deleteGradingSchemaById(id);
@@ -80,6 +84,28 @@ const Grading = () => {
       setDeletingId(null);
     }
   };
+
+  // State and handler for edit modal
+  const [editSchema, setEditSchema] = useState(null);
+  const handleEdit = (schema) => {
+    setEditSchema(schema);
+    setTimeout(() => {
+      const modalElement = document.getElementById("editGradingModal");
+      if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+      }
+    }, 100);
+  };
+  const handleCloseEdit = () => {
+    setEditSchema(null);
+    const modalElement = document.getElementById("editGradingModal");
+    if (modalElement) {
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) modal.hide();
+    }
+  };
+
   return (
     <div id="wrapper" className="wrapper bg-ash">
       <Headers />
@@ -148,13 +174,27 @@ const Grading = () => {
           <div className="card height-auto mt-4">
             <div className="card-body p-0">
               {loading && (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
-                  <div className="spinner-border text-primary" role="status" style={{ width: '4rem', height: '4rem' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "300px",
+                  }}
+                >
+                  <div
+                    className="spinner-border text-primary"
+                    role="status"
+                    style={{ width: "4rem", height: "4rem" }}
+                  >
                     <span className="visually-hidden">Loading...</span>
                   </div>
                 </div>
               )}
-              <div className="table-responsive" style={{ display: loading ? 'none' : 'block' }}>
+              <div
+                className="table-responsive"
+                style={{ display: loading ? "none" : "block" }}
+              >
                 <table className="table display data-table">
                   <thead style={{ lineHeight: "35px", fontSize: "15px" }}>
                     <tr>
@@ -166,113 +206,307 @@ const Grading = () => {
                     </tr>
                   </thead>
                   <tbody>
-                      {gradingSchemas.length === 0 ? (
-                        <tr><td colSpan="5" className="text-center">No grading schemas found.</td></tr>
-                      ) : (
-                        gradingSchemas.map((schema) => (
-                          <tr key={schema.id} style={{ lineHeight: "35px", fontSize: "15px" }}>
-                            <td>{schema.category || "-"}</td>
-                            <td>
-                              {Array.isArray(schema.grades) && schema.grades.length > 0 ? (
-                                schema.grades.map((grade, idx) => (
+                    {gradingSchemas.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" className="text-center">
+                          No grading schemas found.
+                        </td>
+                      </tr>
+                    ) : (
+                      gradingSchemas.map((schema) => (
+                        <tr
+                          key={schema.id}
+                          style={{ lineHeight: "35px", fontSize: "15px" }}
+                        >
+                          <td>{schema.category || "-"}</td>
+                          <td>
+                            {Array.isArray(schema.grades) &&
+                            schema.grades.length > 0
+                              ? schema.grades.map((grade, idx) => (
                                   <div key={idx} style={{ marginBottom: 4 }}>
-                                    <span style={{ background: grade.color, color: '#fff', padding: '2px 8px', borderRadius: 4, marginRight: 8 }}>
+                                    <span
+                                      style={{
+                                        background: grade.color,
+                                        color: "#fff",
+                                        padding: "2px 8px",
+                                        borderRadius: 4,
+                                        marginRight: 8,
+                                      }}
+                                    >
                                       {grade.label} ({grade.min}-{grade.max})
                                     </span>
-                                    <span style={{ fontStyle: 'italic', color: '#555' }}>{grade.description}</span>
+                                    <span
+                                      style={{
+                                        fontStyle: "italic",
+                                        color: "#555",
+                                      }}
+                                    >
+                                      {grade.description}
+                                    </span>
                                   </div>
                                 ))
-                              ) : "-"}
-                            </td>
-                            <td>
-                              {Array.isArray(schema.progress) && schema.progress.length > 0 ? (
-                                schema.progress.map((prog, idx) => (
+                              : "-"}
+                          </td>
+                          <td>
+                            {Array.isArray(schema.progress) &&
+                            schema.progress.length > 0
+                              ? schema.progress.map((prog, idx) => (
                                   <div key={idx} style={{ marginBottom: 4 }}>
-                                    <span style={{ background: prog.color, color: '#fff', padding: '2px 8px', borderRadius: 4, marginRight: 8 }}>
+                                    <span
+                                      style={{
+                                        background: prog.color,
+                                        color: "#fff",
+                                        padding: "2px 8px",
+                                        borderRadius: 4,
+                                        marginRight: 8,
+                                      }}
+                                    >
                                       {prog.label} ({prog.min}-{prog.max})
                                     </span>
-                                    <span style={{ fontStyle: 'italic', color: '#555' }}>{prog.description}</span>
+                                    <span
+                                      style={{
+                                        fontStyle: "italic",
+                                        color: "#555",
+                                      }}
+                                    >
+                                      {prog.description}
+                                    </span>
                                   </div>
                                 ))
-                              ) : "-"}
-                            </td>
-                            <td>{schema.weightage || "-"}</td>
-                            <td className="action-icons">
-                              <a href="#" title="Edit"><i className="fas fa-edit" /></a>
-                              <a href="#" title="View" onClick={() => handleView(schema)}><i className="fas fa-eye" /></a>
-      {/* View Grading Modal */}
-      <div className="modal fade" id="viewGradingModal" tabIndex="-1" aria-labelledby="viewGradingModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="viewGradingModalLabel">Grading Schema Details</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleCloseView}></button>
-            </div>
-            <div className="modal-body">
-              {viewSchema ? (
-                <div>
-                  <p><strong>Category:</strong> {viewSchema.category || '-'}</p>
-                  <p><strong>Weightage:</strong> {viewSchema.weightage || '-'}</p>
-                  <div>
-                    <strong>Grades:</strong>
-                    {Array.isArray(viewSchema.grades) && viewSchema.grades.length > 0 ? (
-                      <ul>
-                        {viewSchema.grades.map((grade, idx) => (
-                          <li key={idx}>
-                            <span style={{ background: grade.color, color: '#fff', padding: '2px 8px', borderRadius: 4, marginRight: 8 }}>
-                              {grade.label} ({grade.min}-{grade.max})
-                            </span>
-                            <span style={{ fontStyle: 'italic', color: '#555' }}>{grade.description}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : <span> - </span>}
-                  </div>
-                  <div>
-                    <strong>Progress:</strong>
-                    {Array.isArray(viewSchema.progress) && viewSchema.progress.length > 0 ? (
-                      <ul>
-                        {viewSchema.progress.map((prog, idx) => (
-                          <li key={idx}>
-                            <span style={{ background: prog.color, color: '#fff', padding: '2px 8px', borderRadius: 4, marginRight: 8 }}>
-                              {prog.label} ({prog.min}-{prog.max})
-                            </span>
-                            <span style={{ fontStyle: 'italic', color: '#555' }}>{prog.description}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : <span> - </span>}
-                  </div>
-                </div>
-              ) : <div>No data to display.</div>}
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleCloseView}>Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-                              <button
-                                className="btn btn-link p-0"
-                                title="Delete"
-                                style={{ color: '#dc3545', outline: 'none', border: 'none', background: 'none' }}
-                                onClick={() => handleDelete(schema.id)}
-                                disabled={deletingId === schema.id}
-                              >
-                                {deletingId === schema.id ? (
-                                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                ) : (
-                                  <i className="fas fa-trash" />
-                                )}
-                              </button>
-                            </td>
-                          </tr>
-                        ))
-                      )}
+                              : "-"}
+                          </td>
+                          <td>{schema.weightage || "-"}</td>
+                          <td className="action-icons">
+                            <a
+                              href="#"
+                              title="Edit"
+                              onClick={e => {
+                                e.preventDefault();
+                                handleEdit(schema);
+                              }}
+                            >
+                              <i className="fas fa-edit" />
+                            </a>
+                            {/* Edit Grading Modal */}
+                            <div
+                              className="modal fade"
+                              id="editGradingModal"
+                              tabIndex="-1"
+                              aria-labelledby="editGradingModalLabel"
+                              aria-hidden="true"
+                            >
+                              <div className="modal-dialog modal-lg">
+                                <div className="modal-content">
+                                  <div className="modal-header">
+                                    <h5 className="modal-title" id="editGradingModalLabel">
+                                      Edit Grading Schema
+                                    </h5>
+                                    <button
+                                      type="button"
+                                      className="btn-close"
+                                      data-bs-dismiss="modal"
+                                      aria-label="Close"
+                                      onClick={handleCloseEdit}
+                                    ></button>
+                                  </div>
+                                  <div className="modal-body">
+                                    {editSchema ? (
+                                      <div>
+                                        {/* Replace below with your edit form fields as needed */}
+                                        <p>
+                                          <strong>Category:</strong> {editSchema.category || "-"}
+                                        </p>
+                                        <p>
+                                          <strong>Weightage:</strong> {editSchema.weightage || "-"}
+                                        </p>
+                                        {/* Add more fields for editing as needed */}
+                                        <div className="alert alert-info">
+                                          Edit form UI goes here.
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div>No data to edit.</div>
+                                    )}
+                                  </div>
+                                  <div className="modal-footer">
+                                    <button
+                                      type="button"
+                                      className="btn btn-secondary"
+                                      data-bs-dismiss="modal"
+                                      onClick={handleCloseEdit}
+                                    >
+                                      Close
+                                    </button>
+                                    {/* Add Save button and logic here */}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <a
+                              href="#"
+                              title="View"
+                              onClick={() => handleView(schema)}
+                            >
+                              <i className="fas fa-eye" />
+                            </a>
+                            {/* View Grading Modal */}
+                            <div
+                              className="modal fade"
+                              id="viewGradingModal"
+                              tabIndex="-1"
+                              aria-labelledby="viewGradingModalLabel"
+                              aria-hidden="true"
+                            >
+                              <div className="modal-dialog modal-lg">
+                                <div className="modal-content">
+                                  <div className="modal-header">
+                                    <h5
+                                      className="modal-title"
+                                      id="viewGradingModalLabel"
+                                    >
+                                      Grading Schema Details
+                                    </h5>
+                                    <button
+                                      type="button"
+                                      className="btn-close"
+                                      data-bs-dismiss="modal"
+                                      aria-label="Close"
+                                      onClick={handleCloseView}
+                                    ></button>
+                                  </div>
+                                  <div className="modal-body">
+                                    {viewSchema ? (
+                                      <div>
+                                        <p>
+                                          <strong>Category:</strong>{" "}
+                                          {viewSchema.category || "-"}
+                                        </p>
+                                        <p>
+                                          <strong>Weightage:</strong>{" "}
+                                          {viewSchema.weightage || "-"}
+                                        </p>
+                                        <div>
+                                          <strong>Grades:</strong>
+                                          {Array.isArray(viewSchema.grades) &&
+                                          viewSchema.grades.length > 0 ? (
+                                            <ul>
+                                              {viewSchema.grades.map(
+                                                (grade, idx) => (
+                                                  <li key={idx}>
+                                                    <span
+                                                      style={{
+                                                        background: grade.color,
+                                                        color: "#fff",
+                                                        padding: "2px 8px",
+                                                        borderRadius: 4,
+                                                        marginRight: 8,
+                                                      }}
+                                                    >
+                                                      {grade.label} ({grade.min}
+                                                      -{grade.max})
+                                                    </span>
+                                                    <span
+                                                      style={{
+                                                        fontStyle: "italic",
+                                                        color: "#555",
+                                                      }}
+                                                    >
+                                                      {grade.description}
+                                                    </span>
+                                                  </li>
+                                                )
+                                              )}
+                                            </ul>
+                                          ) : (
+                                            <span> - </span>
+                                          )}
+                                        </div>
+                                        <div>
+                                          <strong>Progress:</strong>
+                                          {Array.isArray(viewSchema.progress) &&
+                                          viewSchema.progress.length > 0 ? (
+                                            <ul>
+                                              {viewSchema.progress.map(
+                                                (prog, idx) => (
+                                                  <li key={idx}>
+                                                    <span
+                                                      style={{
+                                                        background: prog.color,
+                                                        color: "#fff",
+                                                        padding: "2px 8px",
+                                                        borderRadius: 4,
+                                                        marginRight: 8,
+                                                      }}
+                                                    >
+                                                      {prog.label} ({prog.min}-
+                                                      {prog.max})
+                                                    </span>
+                                                    <span
+                                                      style={{
+                                                        fontStyle: "italic",
+                                                        color: "#555",
+                                                      }}
+                                                    >
+                                                      {prog.description}
+                                                    </span>
+                                                  </li>
+                                                )
+                                              )}
+                                            </ul>
+                                          ) : (
+                                            <span> - </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div>No data to display.</div>
+                                    )}
+                                  </div>
+                                  <div className="modal-footer">
+                                    <button
+                                      type="button"
+                                      className="btn btn-secondary"
+                                      data-bs-dismiss="modal"
+                                      onClick={handleCloseView}
+                                    >
+                                      Close
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              className="btn btn-link p-0"
+                              title="Delete"
+                              style={{
+                                color: "#dc3545",
+                                outline: "none",
+                                border: "none",
+                                background: "none",
+                              }}
+                              onClick={() => handleDelete(schema.id)}
+                              disabled={deletingId === schema.id}
+                            >
+                              {deletingId === schema.id ? (
+                                <span
+                                  className="spinner-border spinner-border-sm"
+                                  role="status"
+                                  aria-hidden="true"
+                                ></span>
+                              ) : (
+                                <i className="fas fa-trash" />
+                              )}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
-              {error && <div className="alert alert-danger text-center">{error}</div>}
+              {error && (
+                <div className="alert alert-danger text-center">{error}</div>
+              )}
             </div>
           </div>
         </div>
