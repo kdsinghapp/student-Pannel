@@ -23,6 +23,13 @@ export const signInAdmin = async (data) => {
       ) {
         localStorage.setItem("school_id", responseData.user.id);
         console.log("school_id stored:", responseData.user.id);
+
+        // Save first curriculum id as school_curriculum_id
+        const curriculums = responseData.user.school_details[0].curriculums;
+        if (Array.isArray(curriculums) && curriculums.length > 0 && curriculums[0].id) {
+          localStorage.setItem("school_curriculum_id", curriculums[0].id);
+          console.log("school_curriculum_id stored:", curriculums[0].id);
+        }
       }
     }
 
@@ -36,8 +43,9 @@ export const signInAdmin = async (data) => {
 
 export const getAllClasses = async () => {
   const token = localStorage.getItem("userTokenStudent");
+  const schoolCurriculumId = localStorage.getItem("school_curriculum_id");
   try {
-    const res = await axios.get(`${API_URL}/user/classes?school_curriculum_id=5`, {
+    const res = await axios.get(`${API_URL}/user/classes?school_curriculum_id=${schoolCurriculumId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",

@@ -27,7 +27,7 @@ const AddTeacherDetails = () => {
         const [depRes, roleRes, classRes] = await Promise.all([
           axios.get(`${API_URL}/user/department/get-departments`),
           axios.get(`${API_URL}/user/teacher-role/get-teacher-roles`),
-          axios.get(`${API_URL}/user/classes/get-class-hierarchy?school_curriculum_id=5`)
+          axios.get(`${API_URL}/user/classes/get-class-hierarchy?school_curriculum_id=${localStorage.getItem("school_curriculum_id")}`)
         ]);
         setDepartments(depRes.data.data || []);
         setRoles(roleRes.data.data || []);

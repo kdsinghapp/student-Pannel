@@ -44,7 +44,7 @@ const EditTeacher = ({ teacher, handleUpdate }) => {
         const [depRes, roleRes, classRes] = await Promise.all([
           axios.get(`${API_URL}/user/department/get-departments`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`${API_URL}/user/teacher-role/get-teacher-roles`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API_URL}/user/classes/get-class-hierarchy?school_curriculum_id=5`, { headers: { Authorization: `Bearer ${token}` } })
+          axios.get(`${API_URL}/user/classes/get-class-hierarchy?school_curriculum_id=${localStorage.getItem("school_curriculum_id")}`, { headers: { Authorization: `Bearer ${token}` } })
         ]);
         setDepartments(depRes.data.data || []);
         setRoles(roleRes.data.data || []);
