@@ -133,13 +133,16 @@ export const addClasses = async (formData) => {
 // -------------Student -----------------------
 export const getAllStudents = async () => {
   const token = localStorage.getItem("userTokenStudent");
+  const schoolCurriculumId = localStorage.getItem("school_curriculum_id");
   try {
-    const res = await axios.get(`${API_URL}/user/student/get-students?limit=1000&page=1&school_curriculum_id[0]=5&school_curriculum_id[1]=6`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const res = await axios.get(`${API_URL}/user/student/get-students?limit=1000&page=1&school_curriculum_id[0]=${schoolCurriculumId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     return res.data;
   } catch (error) {
