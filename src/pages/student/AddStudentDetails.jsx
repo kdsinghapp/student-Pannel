@@ -10,6 +10,7 @@ import {
   getReligionsList,
   getAllClasses,
   updateStudentById,
+  getClassHierarchy,
 } from "../../utils/authApi";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -33,12 +34,15 @@ const AddStudentsUI = () => {
   const [editMode, setEditMode] = useState(false);
   const [editStudentData, setEditStudentData] = useState(null);
 
-  // Get user/school info
+  // Get school_curriculum_id from localStorage
+  // userDataString contains the JSON string for user data
   const userDataString = localStorage.getItem("userData");
   let schoolCurriculumId = null;
   if (userDataString) {
     const userData = JSON.parse(userDataString);
+    // schoolCurriculumId is fetched from the nested structure
     schoolCurriculumId = userData?.user?.school_details?.[0]?.curriculums?.[0]?.id;
+    console.log('schoolCurriculumId from localStorage:', schoolCurriculumId);
   }
 
   // Fetch dropdown data and class hierarchy
@@ -53,13 +57,10 @@ const AddStudentsUI = () => {
         if (countryRes.status) setCountries(countryRes.data);
         if (religionRes.status) setReligions(religionRes.data);
         if (classRes.status) setClassData(classRes.data);
-        // Fetch class hierarchy
+        // Fetch class hierarchy using utility
         if (schoolCurriculumId) {
-          const res = await fetch(
-            `https://server-php-8-3.technorizen.com/gradesphere/api/user/classes/get-class-hierarchy?school_curriculum_id=${schoolCurriculumId}`
-          );
-          const result = await res.json();
-          if (result.status && result.data) setClassHierarchy(result.data);
+          const res = await getClassHierarchy(schoolCurriculumId);
+          if (res.status && res.data) setClassHierarchy(res.data);
         }
       } catch (error) {
         alert("Error loading dropdown data");

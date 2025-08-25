@@ -14,6 +14,7 @@ import {
   getAllClasses,
   updateClassById,
   addClasses,
+  getClassHierarchy,
 } from "../utils/authApi";
 import Swal from "sweetalert2";
 import img1 from "../assets/assets/icon/circle-round.png";
@@ -134,12 +135,13 @@ const Classes = () => {
   useEffect(() => {
     const fetchYearGroups = async () => {
       try {
-        const res = await fetch(
-          `https://server-php-8-3.technorizen.com/gradesphere/api/user/classes/get-class-hierarchy?school_curriculum_id=${school}`
-        );
-        const result = await res.json();
-        if (result.status && result.data && result.data.length > 0) {
-          setYearGroupHierarchy(result.data); // Store full hierarchy
+        // Get curriculum IDs from userData (support multiple)
+        const userData = JSON.parse(localStorage.getItem("userData"));
+        const curriculumIds =
+          userData?.user?.school_details?.[0]?.curriculums?.map(c => c.id) || [];
+        const res = await getClassHierarchy(curriculumIds);
+        if (res.status && res.data && res.data.length > 0) {
+          setYearGroupHierarchy(res.data); // Store full hierarchy
         }
       } catch (err) {
         // handle error

@@ -1,3 +1,29 @@
+// Fetch class hierarchy for one or more school curriculum IDs
+export const getClassHierarchy = async (schoolCurriculumIds) => {
+  const token = localStorage.getItem("userTokenStudent");
+  // Accepts a single ID or an array of IDs
+  let query = "";
+  if (Array.isArray(schoolCurriculumIds)) {
+    query = schoolCurriculumIds.map(id => `school_curriculum_id[]=${id}`).join("&");
+  } else if (schoolCurriculumIds) {
+    query = `school_curriculum_id[]=${schoolCurriculumIds}`;
+  }
+  try {
+    const res = await axios.get(
+      `${API_URL}/user/classes/get-class-hierarchy?${query}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching class hierarchy:", error);
+    throw error;
+  }
+};
 import axios from "axios";
 
 const API_URL = "https://server-php-8-3.technorizen.com/gradesphere/api";
@@ -29,6 +55,11 @@ export const signInAdmin = async (data) => {
         if (Array.isArray(curriculums) && curriculums.length > 0 && curriculums[0].id) {
           localStorage.setItem("school_curriculum_id", curriculums[0].id);
           console.log("school_curriculum_id stored:", curriculums[0].id);
+
+          // Save all curriculum ids as an array
+          const curriculumIds = curriculums.map(c => c.id);
+          localStorage.setItem("school_curriculum_ids", JSON.stringify(curriculumIds));
+          console.log("school_curriculum_ids stored:", curriculumIds);
         }
       }
     }
