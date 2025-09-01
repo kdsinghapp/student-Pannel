@@ -24,25 +24,25 @@ const AddStudentsUI = () => {
   const [religions, setReligions] = useState([]);
   const [classData, setClassData] = useState([]);
 
-  // Class hierarchy states
+  // Class hierarchy states (Division > Year Group > Class)
   const [classHierarchy, setClassHierarchy] = useState([]);
   const [selectedDivisionId, setSelectedDivisionId] = useState("");
+  const [yearGroups, setYearGroups] = useState([]); // Year groups for selected division
   const [selectedYearGroupId, setSelectedYearGroupId] = useState("");
+  const [classes, setClasses] = useState([]); // Classes for selected year group
   const [selectedClassId, setSelectedClassId] = useState("");
 
   // Edit mode state
   const [editMode, setEditMode] = useState(false);
   const [editStudentData, setEditStudentData] = useState(null);
 
-  // Get school_curriculum_id from localStorage
-  // userDataString contains the JSON string for user data
+  // Get all school curriculum IDs from localStorage (array)
   const userDataString = localStorage.getItem("userData");
-  let schoolCurriculumId = null;
+  let schoolCurriculumIds = [];
   if (userDataString) {
     const userData = JSON.parse(userDataString);
-    // schoolCurriculumId is fetched from the nested structure
-    schoolCurriculumId = userData?.user?.school_details?.[0]?.curriculums?.[0]?.id;
-    console.log('schoolCurriculumId from localStorage:', schoolCurriculumId);
+    schoolCurriculumIds = userData?.user?.school_details?.[0]?.curriculums?.map(c => c.id) || [];
+    console.log('schoolCurriculumIds from localStorage:', schoolCurriculumIds);
   }
 
   // Fetch dropdown data and class hierarchy
@@ -57,27 +57,56 @@ const AddStudentsUI = () => {
         if (countryRes.status) setCountries(countryRes.data);
         if (religionRes.status) setReligions(religionRes.data);
         if (classRes.status) setClassData(classRes.data);
-        // Fetch class hierarchy using utility
-        if (schoolCurriculumId) {
-          const res = await getClassHierarchy(schoolCurriculumId);
+        // Fetch class hierarchy using all curriculum IDs
+        if (schoolCurriculumIds.length > 0) {
+          const res = await getClassHierarchy(schoolCurriculumIds);
           if (res.status && res.data) setClassHierarchy(res.data);
         }
       } catch (error) {
         alert("Error loading dropdown data");
       }
     })();
-  }, [schoolCurriculumId]);
+  }, [userDataString]);
 
-  // Reset year group and class when division changes
+  // When division changes, update year groups and reset lower selections
   useEffect(() => {
+    if (!selectedDivisionId) {
+      setYearGroups([]);
+      setSelectedYearGroupId("");
+      setClasses([]);
+      setSelectedClassId("");
+      return;
+    }
+    const divisionObj = classHierarchy.find(
+      (item) => String(item.curriculum_division?.id) === String(selectedDivisionId)
+    );
+    if (divisionObj && divisionObj.curriculum_division?.classes) {
+      setYearGroups(divisionObj.curriculum_division.classes);
+    } else {
+      setYearGroups([]);
+    }
     setSelectedYearGroupId("");
+    setClasses([]);
     setSelectedClassId("");
-  }, [selectedDivisionId]);
+  }, [selectedDivisionId, classHierarchy]);
 
-  // Reset class when year group changes
+  // When year group changes, update classes and reset class selection
   useEffect(() => {
+    if (!selectedYearGroupId) {
+      setClasses([]);
+      setSelectedClassId("");
+      return;
+    }
+    const yearGroupObj = yearGroups.find(
+      (cls) => String(cls.id) === String(selectedYearGroupId)
+    );
+    if (yearGroupObj && yearGroupObj.school_classes) {
+      setClasses(yearGroupObj.school_classes);
+    } else {
+      setClasses([]);
+    }
     setSelectedClassId("");
-  }, [selectedYearGroupId]);
+  }, [selectedYearGroupId, yearGroups]);
 
   // Form handling
   const {
@@ -183,23 +212,7 @@ const AddStudentsUI = () => {
     }
   };
 
-  // Helper: get year groups for selected division
-  const yearGroups = React.useMemo(() => {
-    if (!selectedDivisionId) return [];
-    const div = classHierarchy.find(
-      (item) => String(item.curriculum_division?.id) === String(selectedDivisionId)
-    );
-    return div?.curriculum_division?.classes || [];
-  }, [selectedDivisionId, classHierarchy]);
-
-  // Helper: get classes for selected year group
-  const classes = React.useMemo(() => {
-    if (!selectedYearGroupId) return [];
-    const yearGroup = yearGroups.find(
-      (cls) => String(cls.id) === String(selectedYearGroupId)
-    );
-    return yearGroup?.school_classes || [];
-  }, [selectedYearGroupId, yearGroups]);
+  // Remove old memoized helpers (now handled by useEffect above)
 
   // For demonstration: simulate edit with dummy data
   const handleEditButtonClick = () => {
@@ -529,7 +542,6 @@ const AddStudentsUI = () => {
                               value={selectedDivisionId}
                               onChange={e => setSelectedDivisionId(e.target.value)}
                               required
-                              defaultValue={editStudentData?.school_division_id}
                             >
                               <option value="">Select Division</option>
                               {classHierarchy.map((item) => (
