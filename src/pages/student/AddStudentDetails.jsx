@@ -360,7 +360,7 @@ const AddStudentsUI = () => {
                               {countries &&
                                 countries.map((contry) => (
                                   <option key={contry.id} value={contry.id}>
-                                    {contry.name}
+                                    {contry.nationality}
                                   </option>
                                 ))}
                             </select>
