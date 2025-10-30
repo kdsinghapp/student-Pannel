@@ -185,16 +185,17 @@ export const getAllStudents = async () => {
 export const getStudentById = async (id) => {
   const token = localStorage.getItem("userTokenStudent");
   try {
-    const res = await axios.get(`${API_URL}/admin{{baseUrl}}admin/student/get-student?student_id=${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
+    const res = await axios.get(`${API_URL}/user/student/get-student?student_id=${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return res.data;
   } catch (error) {
-    console.error("Error fetching classes:", error);
+    console.error("Error fetching student:", error);
     throw error;
   }
 };
