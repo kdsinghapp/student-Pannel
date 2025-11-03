@@ -392,3 +392,201 @@ export const deleteGradingSchemaById = async (id) => {
     throw error;
   }
 };
+
+// ---------------------- DEPARTMENTS ----------------------
+export const getDepartments = async (school_id = null) => {
+  const token = localStorage.getItem("userTokenStudent");
+  let url = `${API_URL}/user/departments`;
+  if (school_id) url += `?school_id=${school_id}`;
+
+  try {
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data; // { status, message, data }
+  } catch (error) {
+    console.error("Error fetching departments:", error);
+    return { status: false, message: "Failed to fetch departments", data: [] };
+  }
+};
+
+
+
+// ---------------------- DEPARTMENTS ----------------------
+
+
+// ✅ Get all departments (optionally filter by school_id)
+export const getAllDepartments = async (school_id = null) => {
+  const token = localStorage.getItem("userTokenStudent");
+  let url = `${API_URL}/user/departments`;
+  if (school_id) url += `?school_id=${school_id}`;
+
+  try {
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data; // { status, message, data }
+  } catch (error) {
+    console.error("Error fetching departments:", error);
+    return { status: false, message: "Failed to fetch departments", data: [] };
+  }
+};
+
+// ✅ Get department by ID
+export const getDepartmentById = async (id) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.get(`${API_URL}/user/departments/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data; // { status, message, data }
+  } catch (error) {
+    console.error("Error fetching department:", error);
+    return { status: false, message: "Failed to fetch department", data: null };
+  }
+};
+
+// ✅ Add new department
+export const addDepartment = async (data) => {
+  const token = localStorage.getItem("userTokenStudent");
+  const schoolId = localStorage.getItem("school_id"); // auto attach school_id
+  const payload = { ...data, school_id: schoolId };
+
+  try {
+    const res = await axios.post(`${API_URL}/user/departments`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data; // { status, message }
+  } catch (error) {
+    console.error("Error adding department:", error);
+    return { status: false, message: "Failed to add department" };
+  }
+};
+
+// ✅ Update department by ID
+export const updateDepartmentById = async (id, data) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.put(`${API_URL}/user/departments/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data; // { status, message }
+  } catch (error) {
+    console.error("Error updating department:", error);
+    return { status: false, message: "Failed to update department" };
+  }
+};
+
+// ✅ Delete department by ID
+export const deleteDepartmentById = async (id) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.delete(`${API_URL}/user/departments/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data; // { status, message }
+  } catch (error) {
+    console.error("Error deleting department:", error);
+    return { status: false, message: "Failed to delete department" };
+  }
+};
+
+
+// ---------------------- SUBJECTS ----------------------
+export const getAllSubjects = async (department_id = null) => {
+  const token = localStorage.getItem("userTokenStudent");
+  let url = `${API_URL}/user/subjects`;
+  if (department_id) url += `?department_id=${department_id}`;
+
+  try {
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching subjects:", error);
+    return { status: false, message: "Failed to fetch subjects", data: [] };
+  }
+};
+
+export const addSubject = async (payload) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.post(`${API_URL}/user/subjects`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error adding subject:", error);
+    return { status: false, message: "Failed to add subject", data: [] };
+  }
+};
+
+export const updateSubjectById = async (id, payload) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.put(`${API_URL}/user/subjects/${id}`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error updating subject:", error);
+    return { status: false, message: "Failed to update subject", data: [] };
+  }
+};
+
+export const deleteSubjectById = async (id) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.delete(`${API_URL}/user/subjects/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error deleting subject:", error);
+    return { status: false, message: "Failed to delete subject", data: [] };
+  }
+};
+
+export const getSubjectById = async (id) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.get(`${API_URL}/user/subjects/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;  // ✅ Return full object (status, message, data)
+  } catch (error) {
+    console.error("Error fetching subject by ID:", error);
+    return { status: false, message: "Failed to fetch subject", data: null };
+  }
+};

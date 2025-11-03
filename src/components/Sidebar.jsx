@@ -45,6 +45,26 @@ const Sidebar = () => {
                 <span>Classes</span>
               </Link>
             </li>
+             <li
+              className={`nav-item ${
+                location.pathname === "/departments" ? "active" : ""
+              }`}
+            >
+              <Link to="/departments" className="nav-link">
+                <i className="flaticon-classmates" />
+                <span>Departments</span>
+              </Link>
+            </li>
+             <li
+              className={`nav-item ${
+                location.pathname === "/subjects" ? "active" : ""
+              }`}
+            >
+              <Link to="/subjects" className="nav-link">
+                <i className="flaticon-classmates" />
+                <span>Subjects</span>
+              </Link>
+            </li>
             <li
               className={`nav-item ${
                 location.pathname === "/students" ? "active" : ""
