@@ -5,13 +5,12 @@ import Headers from "../Headers";
 import { Link } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import DownloadTemplate from '../DownloadTemplate';
-import { getAllSubjects } from "../../utils/authApi";
+import { getAllSubjects, getAllDepartments } from "../../utils/authApi";
 
 // Import images
 import add from "../../assets/assets/icon/add.png";
 
 const Curriculum = () => {
-  // State for form fields
   const [department, setDepartment] = useState("");
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
@@ -21,8 +20,8 @@ const Curriculum = () => {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [departments, setDepartments] = useState([]); 
 
-  // Fetch subjects when component mounts
   useEffect(() => {
     const fetchSubjects = async () => {
       setLoading(true);
@@ -43,15 +42,26 @@ const Curriculum = () => {
 
     fetchSubjects();
   }, []);
+
+  
+useEffect(() => {
+  const fetchDepartments = async () => {
+    const response = await getAllDepartments();
+    if (response.status) {
+      setDepartments(response.data);
+    } else {
+      setError(response.message);
+    }
+  };
+  fetchDepartments();
+}, []);
   const [searchTeacher, setSearchTeacher] = useState("");
   const [selectedTeachers, setSelectedTeachers] = useState([]);
 
-  // Grade mapping / assessments state
   const [assessments, setAssessments] = useState([
     { id: Date.now(), name: "", type: "", scheme: "", weight: "" }
   ]);
 
-  // Helper to add/remove assessments
   const addAssessment = () => {
     setAssessments(prev => [...prev, { id: Date.now() + Math.random(), name: "", type: "", scheme: "", weight: "" }]);
   };
@@ -65,7 +75,6 @@ const Curriculum = () => {
     setAssessments(prev => prev.map(a => a.id === id ? { ...a, [field]: value } : a));
   };
 
-  // Add subject/department/year handlers
   const handleSelectDepartment = (e) => {
     const val = e.target.value;
     if (val && !selectedDepartments.includes(val)) {
@@ -90,20 +99,17 @@ const Curriculum = () => {
     e.target.value = "";
   };
 
-  // Add new subject from form
   const handleAddNewSubject = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
     if (!selectedSubjects.includes(trimmed)) {
       setSelectedSubjects(prev => [...prev, trimmed]);
     }
-    // reset form fields
     setDepartment("");
     setCode("");
     setName("");
   };
 
-  // Teacher add on Enter
   const handleTeacherKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -116,9 +122,7 @@ const Curriculum = () => {
     }
   };
 
-  // Handler for showing download template modal
 
-  // Handler for showing download template modal
   const handleShowDownloadModal = () => {
     const modalElement = document.getElementById("download");
     if (modalElement) {
@@ -127,7 +131,6 @@ const Curriculum = () => {
     }
   };
 
-  // Handler for removing selected items (departments, subjects, years)
   const handleRemoveItem = (item, type) => {
     switch(type) {
       case 'department':
@@ -152,7 +155,6 @@ const Curriculum = () => {
         <div className="dashboard-page-one">
           <Sidebar />
           <div className="dashboard-content-one">
-            {/* Breadcrumbs Area */}
             <div className="breadcrumbs-area d-flex justify-content-between">
               <h3>Add Curriculum Mapping</h3>
               <div>
@@ -168,13 +170,10 @@ const Curriculum = () => {
               </div>
             </div>
 
-            {/* Main Content Area */}
             <div className="card height-auto">
               <div className="card-body">
                 <div className="row main-mapping-container justify-content-between">
-                  {/* New Subject Form */}
 
-                  {/* New Subject Form */}
                   <div className="col-lg-4 col-md-12 new-subject-container-row px-4">
                     <p className="subject-title">Subjects</p>
                     <div className="col-lg-12 px-0">
@@ -213,18 +212,23 @@ const Curriculum = () => {
                     </div>
                   </div>
 
-                  {/* Curriculum Mapping Section */}
                   <div className="col-lg-12 section curriculum-mapping-new mt-4">
-                    {/* Department, Subject, and Year Selection */}
                     <div className="row mb-4">
                       <div className="col-lg-4 col-md-6 col-sm-12 mb-3">
                         <label className="form-label">Department/Subject Group</label>
                         <select className="form-select form-control" onChange={handleSelectDepartment}>
                           <option value="">Type or select department...</option>
-                          <option value="Science">Science</option>
-                          <option value="Mathematics">Mathematics</option>
-                          <option value="English">English</option>
-                          <option value="Arts">Arts</option>
+                          {loading ? (
+                            <option disabled>Loading departments...</option>
+                          ) : error ? (
+                            <option disabled>Error loading departments</option>
+                          ) : (
+                            departments.map((dept) => (
+                              <option key={dept.id} value={dept.name}>
+                                {dept.name}
+                              </option>
+                            ))
+                          )}
                         </select>
                         <div className="selected-pills mt-2">
                           {selectedDepartments.map((dept, index) => (
@@ -281,8 +285,6 @@ const Curriculum = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* Teacher Search Section */}
                     <div className="row mb-4">
                       <div className="col-lg-12">
                         <div className="search-container">
@@ -308,7 +310,6 @@ const Curriculum = () => {
                       </div>
                     </div>
 
-                    {/* Grade Mapping Section */}
                     <div className="row">
                       <div className="col-lg-12">
                         <h6>Grade Mapping</h6>
@@ -356,7 +357,6 @@ const Curriculum = () => {
         </div>
       </div>
 
-      {/* Download Template Component */}
       <DownloadTemplate />
 
       {/* Upload Modal */}
