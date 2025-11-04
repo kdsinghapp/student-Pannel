@@ -1,23 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import * as bootstrap from "bootstrap";
 import Headers from "../Headers";
 import { Link } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import DownloadTemplate from '../DownloadTemplate';
+import { getAllSubjects } from "../../utils/authApi";
 
 // Import images
-import calci from "../../assets/assets/icon/calculator.png";
-import books from "../../assets/assets/icon/book.png";
-import lab from "../../assets/assets/icon/lab.png";
-import chip from "../../assets/assets/icon/chip.png";
-import home from "../../assets/assets/icon/home.png";
-import web from "../../assets/assets/icon/web.png";
-import art from "../../assets/assets/icon/art.png";
-import music from "../../assets/assets/icon/music.png";
-import imgPerson from "../../assets/assets/icon/peron.png";
-import laptop from "../../assets/assets/icon/laptop.png";
-import language from "../../assets/assets/icon/language.png";
 import add from "../../assets/assets/icon/add.png";
 
 const Curriculum = () => {
@@ -28,6 +18,31 @@ const Curriculum = () => {
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [selectedYears, setSelectedYears] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Fetch subjects when component mounts
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      setLoading(true);
+      try {
+        const response = await getAllSubjects();
+        if (response.status) {
+          setSubjects(response.data);
+        } else {
+          setError(response.message);
+        }
+      } catch (err) {
+        setError("Failed to fetch subjects");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
   const [searchTeacher, setSearchTeacher] = useState("");
   const [selectedTeachers, setSelectedTeachers] = useState([]);
 
@@ -101,20 +116,7 @@ const Curriculum = () => {
     }
   };
 
-  // Default subjects data
-  const compulsorySubjects = [
-    { icon: calci, name: "Mathematics" },
-    { icon: books, name: "English" },
-    { icon: lab, name: "Science" },
-    { icon: chip, name: "Technology" },
-    { icon: home, name: "History" },
-    { icon: web, name: "Geography" },
-    { icon: art, name: "Art & Design" },
-    { icon: music, name: "Music" },
-    { icon: imgPerson, name: "Physical Education" },
-    { icon: laptop, name: "Computing" },
-    { icon: language, name: "Languages" }
-  ];
+  // Handler for showing download template modal
 
   // Handler for showing download template modal
   const handleShowDownloadModal = () => {
@@ -170,22 +172,7 @@ const Curriculum = () => {
             <div className="card height-auto">
               <div className="card-body">
                 <div className="row main-mapping-container justify-content-between">
-                  {/* Compulsory Subjects Section */}
-                  <div className="col-lg-8 col-md-12 subject-container-row">
-                    <p className="subject-title">Compulsory Subjects</p>
-                    <div className="row">
-                      {compulsorySubjects.map((subject, index) => (
-                        <div key={index} className="col-lg-4 col-md-4 col-sm-6 subject-container mb-2">
-                          <img src={subject.icon} alt="subject-icon" width="12px" height="16px" />
-                          <p className="mb-0">{subject.name}</p>
-                        </div>
-                      ))}
-                      <div className="col-lg-4 col-md-4 col-sm-6 subject-container mb-2">
-                        <img src={add} alt="subject-icon" width="15px" height="15px" />
-                        <a href="#" className="mb-0 add-more-subject" onClick={(e) => { e.preventDefault(); const el = document.querySelector('.new-subject-container-row input'); if (el) el.focus(); }}>Add More</a>
-                      </div>
-                    </div>
-                  </div>
+                  {/* New Subject Form */}
 
                   {/* New Subject Form */}
                   <div className="col-lg-4 col-md-12 new-subject-container-row px-4">
@@ -253,9 +240,17 @@ const Curriculum = () => {
                         <label>Subject</label>
                         <select className="form-select form-control" onChange={handleSelectSubject}>
                           <option value="">Select subject...</option>
-                          {compulsorySubjects.map((s, idx) => (
-                            <option key={idx} value={s.name}>{s.name}</option>
-                          ))}
+                          {loading ? (
+                            <option disabled>Loading subjects...</option>
+                          ) : error ? (
+                            <option disabled>Error loading subjects</option>
+                          ) : (
+                            subjects.map((subject) => (
+                              <option key={subject.id} value={subject.name}>
+                                {subject.name} 
+                              </option>
+                            ))
+                          )}
                         </select>
                         <div className="selected-pills mt-2">
                           {selectedSubjects.map((subject, index) => (
