@@ -321,9 +321,9 @@ const Students = () => {
                           <img src={studentId} /> Student Id{" "}
                           <i className={getSortIcon("id")} />
                         </th>
-                        <th onClick={() => sortData("name")}>
+                        <th onClick={() => sortData("first_name")}>
                           <img src={studentPh} /> Student Name{" "}
-                          <i className={getSortIcon("name")} />
+                          <i className={getSortIcon("first_name")} />
                         </th>
                         <th onClick={() => sortData("category")}>
                           <img src={studentCat} /> Category{" "}
