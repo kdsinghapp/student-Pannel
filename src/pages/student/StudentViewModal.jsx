@@ -28,9 +28,14 @@ function StudentViewModal({ student }) {
 
         </div>
         <div className="modal-body">
-          <p style={{ fontSize: "14px" }}>Item ID: {student?.id}</p>
+          <p style={{ fontSize: "14px" }}>Student ID: {student?.student_id}</p>
           <p style={{ fontSize: "14px" }}>Name: {student?.first_name} {student?.last_name}</p>
+         < p style={{ fontSize: "14px" }}>Gender: {student?.gender}</p>
+          <p style={{ fontSize: "14px" }}>Category: {student?.category}</p>
+          <p style={{ fontSize: "14px" }}>Class: {student?.academic_info.class_name}</p>
+          <p style={{ fontSize: "14px" }}>Date of Birth: {student?.date_of_birth}</p>
         </div>
+        
         <div className="modal-footer">
           <button
             type="button"
