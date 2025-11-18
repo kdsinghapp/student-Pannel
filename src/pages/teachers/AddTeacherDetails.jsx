@@ -24,13 +24,15 @@ const AddTeacherDetails = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [depRes, roleRes, classRes] = await Promise.all([
-          axios.get(`${API_URL}/user/department/get-departments`),
+        const [depRes, roleRes, classRes, subRes] = await Promise.all([
+          axios.get(`${API_URL}/user/departments`),
           axios.get(`${API_URL}/user/teacher-role/get-teacher-roles`),
-          axios.get(`${API_URL}/user/classes/get-class-hierarchy?school_curriculum_id=${localStorage.getItem("school_curriculum_id")}`)
+          axios.get(`${API_URL}/user/classes/get-class-hierarchy?school_curriculum_id[]=${localStorage.getItem("school_curriculum_id")}`),
+          axios.get(`${API_URL}/user/subjects`)
         ]);
         setDepartments(depRes.data.data || []);
         setRoles(roleRes.data.data || []);
+        setSubjects(subRes.data.data || []);
         // Flatten all school_classes from all divisions/classes
         const allSchoolClasses = [];
         const allYearGroups = [];
@@ -59,14 +61,14 @@ const AddTeacherDetails = () => {
   useEffect(() => {
     const depId = watch("department_id");
     if (depId) {
-      const dep = departments.find((d) => d.id === parseInt(depId));
-      setSubjects(dep?.subjects || []);
+      // Filter subjects by department_id
+      const filteredSubjects = subjects.filter(sub => sub.department_id === parseInt(depId));
+      // No need to set subjects here, as they're already in the state
       setSelectedSubjects([]); // Reset subjects selection when department changes
     } else {
-      setSubjects([]);
       setSelectedSubjects([]);
     }
-  }, [watch("department_id"), departments]);
+  }, [watch("department_id"), subjects]);
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -77,6 +79,7 @@ const AddTeacherDetails = () => {
       formData.append("first_name", data.first_name);
       formData.append("last_name", data.last_name);
       formData.append("email", data.email);
+      formData.append("school_id", localStorage.getItem("school_id"));
       formData.append("department_id", data.department_id);
       formData.append("teacher_role_id", data.teacher_role_id);
       if (data.year_group_id) formData.append("year_group_id", data.year_group_id);
@@ -186,7 +189,9 @@ const AddTeacherDetails = () => {
                     <label>Assigned Subjects *</label>
                     <Select
                       isMulti
-                      options={subjects.map(sub => ({ value: sub.id, label: sub.name }))}
+                      options={subjects
+                        .filter(sub => sub.department_id === parseInt(watch("department_id")) || !watch("department_id"))
+                        .map(sub => ({ value: sub.id, label: sub.name }))}
                       value={selectedSubjects}
                       onChange={selected => setSelectedSubjects(selected || [])}
                       classNamePrefix="react-select"
