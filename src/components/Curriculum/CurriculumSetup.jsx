@@ -161,7 +161,7 @@ useEffect(() => {
                 <button className="btn btn-purple modal-trigger" onClick={handleShowDownloadModal}>
                   <i className="fas fa-download" /> Template
                 </button>
-                <button className="btn btn-purple modal-trigger mb-0" data-bs-toggle="modal" data-bs-target="#upload">
+                <button className="btn btn-purple modal-trigger" data-bs-toggle="modal" data-bs-target="#upload">
                   <i className="fas fa-upload" /> Upload
                 </button>
                 <button className="btn btn-purple text-white">

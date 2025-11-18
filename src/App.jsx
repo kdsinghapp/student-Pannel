@@ -26,6 +26,7 @@ import EditDepartment from "./pages/departments/EditDepartment";
 import Subjects from "./pages/subjects/Subjects";
 import AddSubject from "./pages/subjects/AddSubject";
 import EditSubject from "./pages/subjects/EditSubject";
+import GradeBook from "./pages/gradeBook/GradeBook";
 
 function ProtectedRoute({ children }) {
   const location = useLocation();
@@ -77,7 +78,7 @@ function App() {
                   <Route path="/subjects" element={<Subjects />} />
                   <Route path="/add-subject" element={<AddSubject />} />
                   <Route path="/edit-subject/:id" element={<EditSubject />} />
-
+                  <Route path="/grade-book" element={<GradeBook />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </ProtectedRoute>

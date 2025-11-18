@@ -107,10 +107,10 @@ const Sidebar = () => {
             </li>
             <li
               className={`nav-item ${
-                location.pathname === "/grade" ? "active" : ""
+                location.pathname === "/grade-book" ? "active" : ""
               }`}
             >
-              <Link to="/grade" className="nav-link">
+              <Link to="/grade-book" className="nav-link">
                 <i className="flaticon-shopping-list" />
                 <span>Grade Book</span>
               </Link>
