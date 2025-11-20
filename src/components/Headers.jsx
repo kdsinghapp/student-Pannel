@@ -7,17 +7,13 @@ const Headers = ({ selectedYear }) => {
   // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { toggleSidebar } = useSidebarContext();
+  const { isSidebarOpen, toggleSidebar } = useSidebarContext();
   const dropdownRef = useRef(null);
   const [userName, setUserName] = useState("");
 
-  // const toggleSidebar = () => {
-  //   setIsSidebarOpen(!isSidebarOpen);
-  // };
-
-  // const toggleMobileNav = () => {
-  //   setIsMobileNavOpen(!isMobileNavOpen);
-  // };
+  const toggleMobileNav = () => {
+    setIsMobileNavOpen(!isMobileNavOpen);
+  };
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -37,10 +33,10 @@ const Headers = ({ selectedYear }) => {
 
   const navigate = useNavigate();
 
-const handleLogout = () => {
-  localStorage.clear(); 
-  navigate("/signin");
-};
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/signin");
+  };
 
   useEffect(() => {
     const name = localStorage.getItem("userName");
@@ -70,7 +66,7 @@ const handleLogout = () => {
         <button
           className="navbar-toggler pulse-animation"
           type="button"
-        // onClick={toggleMobileNav}
+          onClick={toggleMobileNav}
         >
           <i className="far fa-arrow-alt-circle-down" />
         </button>
@@ -83,8 +79,9 @@ const handleLogout = () => {
         </button>
       </div>
       <div
-        className={`header-main-menu collapse navbar-collapse ${isMobileNavOpen ? "show" : ""
-          }`}
+        className={`header-main-menu collapse navbar-collapse ${
+          isMobileNavOpen ? "show" : ""
+        }`}
         id="mobile-navbar"
       >
         <ul className="navbar-nav">
@@ -103,9 +100,9 @@ const handleLogout = () => {
             </div>
           </li>
         </ul>
-          <div className="breadcrumbs-area  ">
-                <h3>{selectedYear}</h3>
-              </div>
+        <div className="breadcrumbs-area  ">
+          <h3>{selectedYear}</h3>
+        </div>
         <ul className="navbar-nav">
           <li className="navbar-item dropdown header-admin">
             <a
