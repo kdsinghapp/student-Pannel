@@ -256,7 +256,7 @@ const AddGrading = () => {
       
       // Reset form
       setTimeout(() => {
-        navigate("/grading");
+        navigate("/grading-setup");
       }, 1500);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save grading schema");
