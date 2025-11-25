@@ -1,41 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import * as bootstrap from "bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/img/logo.png";
 import Headers from "../../components/Headers";
 import Sidebar from "../../components/Sidebar";
 import DownloadTemplate from "../../components/DownloadTemplate";
-import Grading from "./Grading";
+import { getSchoolCurriculums, addGradingSchemaWithDetails } from "../../utils/authApi";
 
 
 const initialGradeCategory = () => ({
-  gradeCategory: '',
+  category_name: '',
+  description: '',
   gradeValues: [
-    { value: '', min: '', max: '', color: '#ffffff' }
+    { grade_value: '', min_percentage: '', max_percentage: '', color: '#ffffff', description: '' }
   ],
   weightage: ''
 });
 
 
 const initialProgressRange = () => ({
-  min: '',
-  max: '',
+  min_progress: '',
+  max_progress: '',
   color: '#ffffff',
-  description: ''
+  description: '',
+  grade_description: ''
 });
 
 const initialProgressCategory = () => ({
-  progressCategory: '',
-  progressRanges: [initialProgressRange()],
-  gradeDescription: ''
+  category_name: '',
+  description: '',
+  progressRanges: [initialProgressRange()]
 });
 
 const AddGrading = () => {
+  const navigate = useNavigate();
+  
+  // State for schema description
+  const [schemaDescription, setSchemaDescription] = useState('');
+  // State for school curriculum selection
+  const [selectedCurriculumId, setSelectedCurriculumId] = useState('');
+  const [curriculums, setCurriculums] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+  
   // State for multiple grade categories
   const [gradeCategories, setGradeCategories] = useState([initialGradeCategory()]);
   // State for multiple progress categories (each with multiple progress ranges)
   const [progressCategories, setProgressCategories] = useState([initialProgressCategory()]);
+
+  // Fetch school curriculums on component mount
+  useEffect(() => {
+    fetchCurriculums();
+  }, []);
+
+  const fetchCurriculums = async () => {
+    try {
+      const schoolId = localStorage.getItem("school_id");
+      if (!schoolId) {
+        setError("School ID not found");
+        return;
+      }
+      const data = await getSchoolCurriculums(schoolId);
+      setCurriculums(data?.data || []);
+      // Auto-select first curriculum if available
+      if (data?.data && data.data.length > 0) {
+        setSelectedCurriculumId(data.data[0].id.toString());
+      }
+    } catch (err) {
+      setError("Failed to fetch curriculums");
+      console.error(err);
+    }
+  };
 
   // Handler to update a grade value in a specific category
   const handleGradeValueChange = (catIdx, idx, field, val) => {
@@ -57,7 +94,7 @@ const AddGrading = () => {
       i === catIdx
         ? {
             ...cat,
-            gradeValues: [...cat.gradeValues, { value: '', min: '', max: '', color: '#ffffff' }]
+            gradeValues: [...cat.gradeValues, { grade_value: '', min_percentage: '', max_percentage: '', color: '#ffffff', description: '' }]
           }
         : cat
     ));
@@ -81,8 +118,6 @@ const AddGrading = () => {
       i === catIdx ? { ...cat, [field]: val } : cat
     ));
   };
-
-
 
   // Handler to update a field in a specific progress category (for category-level fields)
   const handleProgressCategoryChange = (idx, field, val) => {
@@ -139,10 +174,99 @@ const AddGrading = () => {
     setProgressCategories(prev => prev.filter((_, i) => i !== idx));
   };
 
-    // Handler to clone (add) a new grade category
+  // Handler to clone (add) a new grade category
   const handleAddGradeCategory = () => {
     setGradeCategories(prev => [...prev, initialGradeCategory()]);
   };
+
+  // Handler to submit the form
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSuccessMessage('');
+    
+    if (!selectedCurriculumId) {
+      setError("Please select a curriculum");
+      return;
+    }
+
+    if (!schemaDescription.trim()) {
+      setError("Please enter a description for the grading schema");
+      return;
+    }
+
+    // Validate grade categories
+    for (let cat of gradeCategories) {
+      if (!cat.category_name.trim()) {
+        setError("Please fill in all grade category names");
+        return;
+      }
+      if (cat.gradeValues.some(g => !g.grade_value || g.min_percentage === '' || g.max_percentage === '' || !g.description.trim())) {
+        setError("Please fill in all grade value fields");
+        return;
+      }
+    }
+
+    // Validate progress categories
+    for (let cat of progressCategories) {
+      if (!cat.category_name.trim()) {
+        setError("Please fill in all progress category names");
+        return;
+      }
+      if (cat.progressRanges.some(r => r.min_progress === '' || r.max_progress === '' || !r.description.trim() || !r.grade_description.trim())) {
+        setError("Please fill in all progress range fields");
+        return;
+      }
+    }
+
+    try {
+      setLoading(true);
+
+      // Transform data to match API expectations
+      const formData = {
+        description: schemaDescription,
+        school_curriculum_id: parseInt(selectedCurriculumId),
+        grading_categories: gradeCategories.map(cat => ({
+          category_name: cat.category_name,
+          description: cat.description,
+          weightage: cat.weightage || 0,
+          values: cat.gradeValues.map(val => ({
+            grade_value: val.grade_value,
+            min_percentage: parseInt(val.min_percentage),
+            max_percentage: parseInt(val.max_percentage),
+            color: val.color,
+            description: val.description
+          }))
+        })),
+        progress_categories: progressCategories.map(cat => ({
+          category_name: cat.category_name,
+          description: cat.description,
+          values: cat.progressRanges.map(range => ({
+            min_progress: parseInt(range.min_progress),
+            max_progress: parseInt(range.max_progress),
+            color: range.color,
+            description: range.description,
+            grade_description: range.grade_description
+          }))
+        }))
+      };
+
+      await addGradingSchemaWithDetails(formData);
+      setSuccessMessage("Grading schema created successfully!");
+      
+      // Reset form
+      setTimeout(() => {
+        navigate("/grading");
+      }, 1500);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to save grading schema");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   return (
     <>
@@ -161,7 +285,55 @@ const AddGrading = () => {
             {/* Class Table Area Start Here */}
             <div className="card height-auto">
               <div className="card-body">
-                <form>
+                {error && (
+                  <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                    {error}
+                    <button type="button" className="btn-close" onClick={() => setError(null)}></button>
+                  </div>
+                )}
+                {successMessage && (
+                  <div className="alert alert-success alert-dismissible fade show" role="alert">
+                    {successMessage}
+                    <button type="button" className="btn-close" onClick={() => setSuccessMessage(null)}></button>
+                  </div>
+                )}
+                <form onSubmit={handleSubmit}>
+                  {/* Top section for schema description and curriculum selection */}
+                  <div className="row mb-4">
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label className="form-label">Schema Description *</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="e.g., Final Term Grading Schema"
+                          value={schemaDescription}
+                          onChange={e => setSchemaDescription(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label className="form-label">Select Curriculum *</label>
+                        <select
+                          className="form-control"
+                          value={selectedCurriculumId}
+                          onChange={e => setSelectedCurriculumId(e.target.value)}
+                          required
+                        >
+                          <option value="">-- Select a Curriculum --</option>
+                          {curriculums.map(curr => (
+                            <option key={curr.id} value={curr.id}>
+                              {curr.curriculum_division?.name || `Curriculum ${curr.id}`}
+                              {curr.assigned_schema && " (Schema Already Assigned)"}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="row">
                     <div className="col-md-6">
                       {gradeCategories.map((cat, catIdx) => (
@@ -171,9 +343,19 @@ const AddGrading = () => {
                             <input
                               type="text"
                               className="form-control"
-                              placeholder="Input Grading"
-                              value={cat.gradeCategory}
-                              onChange={e => handleCategoryFieldChange(catIdx, 'gradeCategory', e.target.value)}
+                              placeholder="e.g., Assignments, Exams"
+                              value={cat.category_name}
+                              onChange={e => handleCategoryFieldChange(catIdx, 'category_name', e.target.value)}
+                            />
+                          </div>
+                          <div className="mb-3">
+                            <label className="form-label">Category Description</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="e.g., Short assignments"
+                              value={cat.description}
+                              onChange={e => handleCategoryFieldChange(catIdx, 'description', e.target.value)}
                             />
                           </div>
                           {/* Dynamic Grade Value Inputs */}
@@ -185,27 +367,27 @@ const AddGrading = () => {
                                   <input
                                     type="text"
                                     className="form-control mr-2"
-                                    placeholder="Value"
-                                    value={grade.value}
-                                    onChange={e => handleGradeValueChange(catIdx, idx, 'value', e.target.value)}
+                                    placeholder="e.g., A, B, C"
+                                    value={grade.grade_value}
+                                    onChange={e => handleGradeValueChange(catIdx, idx, 'grade_value', e.target.value)}
                                   />
                                 </div>
                                 <div>
-                                  <label className="form-label">Main(%)</label>
+                                  <label className="form-label">Range (%)</label>
                                   <div className="d-flex">
                                     <input
                                       type="number"
                                       className="form-control mr-2"
                                       placeholder="Min (%)"
-                                      value={grade.min}
-                                      onChange={e => handleGradeValueChange(catIdx, idx, 'min', e.target.value)}
+                                      value={grade.min_percentage}
+                                      onChange={e => handleGradeValueChange(catIdx, idx, 'min_percentage', e.target.value)}
                                     />
                                     <input
                                       type="number"
                                       className="form-control mr-2"
                                       placeholder="Max (%)"
-                                      value={grade.max}
-                                      onChange={e => handleGradeValueChange(catIdx, idx, 'max', e.target.value)}
+                                      value={grade.max_percentage}
+                                      onChange={e => handleGradeValueChange(catIdx, idx, 'max_percentage', e.target.value)}
                                     />
                                   </div>
                                 </div>
@@ -254,11 +436,13 @@ const AddGrading = () => {
                                 )}
                               </div>
                               <div className="mb-3">
-                                <label className="form-label">Description</label>
+                                <label className="form-label">Description *</label>
                                 <input
                                   type="text"
-                                  className="form-control mt-3"
-                                  placeholder="e.g., Excellent, Needs Improvement"
+                                  className="form-control"
+                                  placeholder="e.g., Excellent, Good, Needs Improvement"
+                                  value={grade.description}
+                                  onChange={e => handleGradeValueChange(catIdx, idx, 'description', e.target.value)}
                                 />
                               </div>
                             </div>
@@ -312,10 +496,20 @@ const AddGrading = () => {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="e.g., 'Above Expected'"
-                            value={cat.progressCategory}
-                            onChange={e => handleProgressCategoryChange(catIdx, 'progressCategory', e.target.value)}
+                            placeholder="e.g., Behaviour, Participation"
+                            value={cat.category_name}
+                            onChange={e => handleProgressCategoryChange(catIdx, 'category_name', e.target.value)}
                           />
+                          <div className="mb-3">
+                            <label className="form-label">Category Description</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="e.g., Behaviour progress"
+                              value={cat.description}
+                              onChange={e => handleProgressCategoryChange(catIdx, 'description', e.target.value)}
+                            />
+                          </div>
                           {/* Progress Ranges */}
                           {cat.progressRanges.map((range, rangeIdx) => (
                            <div>
@@ -326,8 +520,8 @@ const AddGrading = () => {
                                   type="number"
                                   className="form-control mr-2"
                                   placeholder="Min Progress (%)"
-                                  value={range.min}
-                                  onChange={e => handleProgressRangeChange(catIdx, rangeIdx, 'min', e.target.value)}
+                                  value={range.min_progress}
+                                  onChange={e => handleProgressRangeChange(catIdx, rangeIdx, 'min_progress', e.target.value)}
                                 />
                               </div>
                               <div className="mr-2">
@@ -336,8 +530,8 @@ const AddGrading = () => {
                                   type="number"
                                   className="form-control mr-2"
                                   placeholder="Max Progress (%)"
-                                  value={range.max}
-                                  onChange={e => handleProgressRangeChange(catIdx, rangeIdx, 'max', e.target.value)}
+                                  value={range.max_progress}
+                                  onChange={e => handleProgressRangeChange(catIdx, rangeIdx, 'max_progress', e.target.value)}
                                 />
                               </div>
                               <div className="ml-2">
@@ -385,11 +579,23 @@ const AddGrading = () => {
                               )}
                             </div>
                              <div className="mb-3">
-                                <label className="form-label">Description</label>
+                                <label className="form-label">Progress Description *</label>
                                 <input
                                   type="text"
-                                  className="form-control mt-3"
+                                  className="form-control"
                                   placeholder="e.g., Excellent, Needs Improvement"
+                                  value={range.description}
+                                  onChange={e => handleProgressRangeChange(catIdx, rangeIdx, 'description', e.target.value)}
+                                />
+                              </div>
+                              <div className="mb-3">
+                                <label className="form-label">Grade Description *</label>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="e.g., Very Low, High"
+                                  value={range.grade_description}
+                                  onChange={e => handleProgressRangeChange(catIdx, rangeIdx, 'grade_description', e.target.value)}
                                 />
                               </div>
                            </div>
@@ -402,13 +608,12 @@ const AddGrading = () => {
                             Add Progress Range
                           </button>
                           <div className="mb-3">
-                            <label className="form-label">Grade Description</label>
+                            <label className="form-label">Progress Category Description (Optional)</label>
                             <input
                               type="text"
-                              className="form-control mt-2"
-                              placeholder="Grade Description"
-                              value={cat.gradeDescription}
-                              onChange={e => handleProgressCategoryChange(catIdx, 'gradeDescription', e.target.value)}
+                              className="form-control"
+                              placeholder="Additional description"
+                              disabled
                             />
                           </div>
                           {progressCategories.length > 1 && (
@@ -438,8 +643,16 @@ const AddGrading = () => {
                     <button
                       type="submit"
                       className="btn-fill-lg btn-gradient-blue1 btn-hover-bluedark"
+                      disabled={loading}
                     >
-                      Save Grading Scheme
+                      {loading ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Saving...
+                        </>
+                      ) : (
+                        'Save Grading Scheme'
+                      )}
                     </button>
                   </div>
                   

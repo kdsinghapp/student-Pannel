@@ -410,6 +410,86 @@ export const getGradingSchemasBySchoolId = async (schoolId) => {
   }
 };
 
+// Get school curriculums by school ID
+export const getSchoolCurriculums = async (schoolId) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.get(`${API_URL}/user/grading/school-curriculums?school_id=${schoolId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching school curriculums:", error);
+    throw error;
+  }
+};
+
+// Add grading schema with categories and progress categories
+export const addGradingSchemaWithDetails = async (formData) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    // Convert form data to FormData object for proper encoding
+    const encodedData = new FormData();
+    
+    // Add simple fields
+    encodedData.append("description", formData.description);
+    encodedData.append("school_curriculum_id", formData.school_curriculum_id);
+    
+    // Add grading categories
+    if (Array.isArray(formData.grading_categories)) {
+      formData.grading_categories.forEach((category, catIdx) => {
+        encodedData.append(`grading_categories[${catIdx}][category_name]`, category.category_name);
+        encodedData.append(`grading_categories[${catIdx}][description]`, category.description);
+        encodedData.append(`grading_categories[${catIdx}][weightage]`, category.weightage);
+        
+        // Add values for each category
+        if (Array.isArray(category.values)) {
+          category.values.forEach((value, valIdx) => {
+            encodedData.append(`grading_categories[${catIdx}][values][${valIdx}][grade_value]`, value.grade_value);
+            encodedData.append(`grading_categories[${catIdx}][values][${valIdx}][min_percentage]`, value.min_percentage);
+            encodedData.append(`grading_categories[${catIdx}][values][${valIdx}][max_percentage]`, value.max_percentage);
+            encodedData.append(`grading_categories[${catIdx}][values][${valIdx}][color]`, value.color);
+            encodedData.append(`grading_categories[${catIdx}][values][${valIdx}][description]`, value.description);
+          });
+        }
+      });
+    }
+    
+    // Add progress categories
+    if (Array.isArray(formData.progress_categories)) {
+      formData.progress_categories.forEach((progCat, progIdx) => {
+        encodedData.append(`progress_categories[${progIdx}][category_name]`, progCat.category_name);
+        encodedData.append(`progress_categories[${progIdx}][description]`, progCat.description);
+        
+        // Add values for each progress category
+        if (Array.isArray(progCat.values)) {
+          progCat.values.forEach((value, valIdx) => {
+            encodedData.append(`progress_categories[${progIdx}][values][${valIdx}][min_progress]`, value.min_progress);
+            encodedData.append(`progress_categories[${progIdx}][values][${valIdx}][max_progress]`, value.max_progress);
+            encodedData.append(`progress_categories[${progIdx}][values][${valIdx}][color]`, value.color);
+            encodedData.append(`progress_categories[${progIdx}][values][${valIdx}][description]`, value.description);
+            encodedData.append(`progress_categories[${progIdx}][values][${valIdx}][grade_description]`, value.grade_description);
+          });
+        }
+      });
+    }
+    
+    const res = await axios.post(`${API_URL}/user/grading/add-grading-schema`, encodedData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error adding grading schema:", error);
+    throw error;
+  }
+};
+
 // ---------------------- DEPARTMENTS ----------------------
 export const getDepartments = async (school_id = null) => {
   const token = localStorage.getItem("userTokenStudent");
