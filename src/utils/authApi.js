@@ -393,6 +393,23 @@ export const deleteGradingSchemaById = async (id) => {
   }
 };
 
+// Get grading schemas by school ID
+export const getGradingSchemasBySchoolId = async (schoolId) => {
+  const token = localStorage.getItem("userTokenStudent");
+  try {
+    const res = await axios.get(`${API_URL}/user/grading/grading-schema?school_id=${schoolId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching grading schemas by school ID:", error);
+    throw error;
+  }
+};
+
 // ---------------------- DEPARTMENTS ----------------------
 export const getDepartments = async (school_id = null) => {
   const token = localStorage.getItem("userTokenStudent");
