@@ -6,6 +6,7 @@ import Classes from "./pages/Classes";
 import Students from "./pages/student/Students";
 import Grading from "./pages/grading/Grading";
 import AddGrading from "./pages/grading/AddGrading";
+import EditGrading from "./pages/grading/EditGrading";
 import Teachers from "./pages/teachers/Teachers";
 import CurriculamSetup from "./pages/CurriculumSetup";
 import InternalAssesment from "./pages/InternalAssesment";
@@ -58,6 +59,7 @@ function App() {
                   <Route path="/students" element={<Students />} />
                   <Route path="/grading-setup" element={<Grading />} />
                   <Route path="/add-grading" element={<AddGrading />} />
+                  <Route path="/edit-grading/:id" element={<EditGrading />} />
                   <Route path="/teachers" element={<Teachers />} />
                   <Route path="/add-teacher" element={<AddTeacherDetails />} />
                   <Route path="/curriculam-setup" element={<CurriculamSetup />} />

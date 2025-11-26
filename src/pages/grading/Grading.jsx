@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min";
-
 import Headers from "../../components/Headers";
 import Sidebar from "../../components/Sidebar";
 import * as bootstrap from "bootstrap";
@@ -8,15 +7,7 @@ import {
   getGradingSchemasBySchoolId,
   deleteGradingSchemaById,
 } from "../../utils/authApi";
-import DownloadTemplate from "../../components/DownloadTemplate";
 import { useNavigate } from "react-router-dom";
-import studentId from "../../assets/assets/icon/fi_list.png";
-import studentPh from "../../assets/assets/icon/ph_student.png";
-import studentCat from "../../assets/assets/icon/category.png";
-import studentClass from "../../assets/assets/icon/class.png";
-import studentProg from "../../assets/assets/icon/tabler_progress.png";
-import studentStat from "../../assets/assets/icon/lets-icons_status.png";
-import studentEdit from "../../assets/assets/icon/tabler_edit.png";
 
 const Grading = () => {
   const navigate = useNavigate();
@@ -24,15 +15,12 @@ const Grading = () => {
     navigate("/add-grading");
   };
 
-  // State for grading schemas
   const [gradingSchemas, setGradingSchemas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
-  // State for view modal
   const [viewSchema, setViewSchema] = useState(null);
 
-  // Handler to open view modal
   const handleView = (schema) => {
     setViewSchema(schema);
     setTimeout(() => {
@@ -44,7 +32,6 @@ const Grading = () => {
     }, 100);
   };
 
-  // Handler to close view modal
   const handleCloseView = () => {
     setViewSchema(null);
     const modalElement = document.getElementById("viewGradingModal");
@@ -77,7 +64,6 @@ const Grading = () => {
     fetchGradingSchemas();
   }, []);
 
-  // Delete grading schema handler
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this grading schema?"))
       return;
@@ -92,25 +78,9 @@ const Grading = () => {
     }
   };
 
-  // State and handler for edit modal
   const [editSchema, setEditSchema] = useState(null);
   const handleEdit = (schema) => {
-    setEditSchema(schema);
-    setTimeout(() => {
-      const modalElement = document.getElementById("editGradingModal");
-      if (modalElement) {
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
-      }
-    }, 100);
-  };
-  const handleCloseEdit = () => {
-    setEditSchema(null);
-    const modalElement = document.getElementById("editGradingModal");
-    if (modalElement) {
-      const modal = bootstrap.Modal.getInstance(modalElement);
-      if (modal) modal.hide();
-    }
+    navigate(`/edit-grading/${schema.id}`);
   };
 
   return (
@@ -222,7 +192,8 @@ const Grading = () => {
                     ) : (
                       gradingSchemas.map((schema) => (
                         <React.Fragment key={schema.id}>
-                          {Array.isArray(schema.categories) && schema.categories.length > 0 ? (
+                          {Array.isArray(schema.categories) &&
+                          schema.categories.length > 0 ? (
                             schema.categories.map((category, catIdx) => (
                               <tr
                                 key={`${schema.id}-cat-${category.id}`}
@@ -230,9 +201,13 @@ const Grading = () => {
                               >
                                 <td>{category.category_name || "-"}</td>
                                 <td>
-                                  {Array.isArray(category.values) && category.values.length > 0
+                                  {Array.isArray(category.values) &&
+                                  category.values.length > 0
                                     ? category.values.map((value, idx) => (
-                                        <div key={idx} style={{ marginBottom: 4 }}>
+                                        <div
+                                          key={idx}
+                                          style={{ marginBottom: 4 }}
+                                        >
                                           <span
                                             style={{
                                               background: value.color,
@@ -242,7 +217,8 @@ const Grading = () => {
                                               marginRight: 8,
                                             }}
                                           >
-                                            {value.grade_value} ({value.min_percentage}-
+                                            {value.grade_value} (
+                                            {value.min_percentage}-
                                             {value.max_percentage}%)
                                           </span>
                                           <span
@@ -329,70 +305,6 @@ const Grading = () => {
             </div>
           </div>
 
-          {/* Edit Grading Modal */}
-          <div
-            className="modal fade"
-            id="editGradingModal"
-            tabIndex="-1"
-            aria-labelledby="editGradingModalLabel"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog modal-lg">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title" id="editGradingModalLabel">
-                    Edit Grading Schema
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                    onClick={handleCloseEdit}
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  {editSchema ? (
-                    <div>
-                      <p>
-                        <strong>Description:</strong> {editSchema.description || "-"}
-                      </p>
-                      <div className="alert alert-info">
-                        Edit form UI goes here. You can add form fields for editing categories and values.
-                      </div>
-                      {Array.isArray(editSchema.categories) &&
-                      editSchema.categories.length > 0 ? (
-                        <div>
-                          <strong>Categories:</strong>
-                          <ul>
-                            {editSchema.categories.map((cat) => (
-                              <li key={cat.id}>
-                                {cat.category_name} (Weightage: {cat.weightage}%)
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ) : null}
-                    </div>
-                  ) : (
-                    <div>No data to edit.</div>
-                  )}
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                    onClick={handleCloseEdit}
-                  >
-                    Close
-                  </button>
-                  {/* Add Save button and logic here */}
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* View Grading Modal */}
           <div
             className="modal fade"
@@ -419,7 +331,8 @@ const Grading = () => {
                   {viewSchema ? (
                     <div>
                       <p>
-                        <strong>Description:</strong> {viewSchema.description || "-"}
+                        <strong>Description:</strong>{" "}
+                        {viewSchema.description || "-"}
                       </p>
                       <div>
                         <strong>Categories:</strong>
@@ -439,11 +352,23 @@ const Grading = () => {
                                 <h6 style={{ marginBottom: "8px" }}>
                                   {category.category_name}
                                 </h6>
-                                <p style={{ fontSize: "14px", marginBottom: "4px" }}>
-                                  <strong>Description:</strong> {category.description}
+                                <p
+                                  style={{
+                                    fontSize: "14px",
+                                    marginBottom: "4px",
+                                  }}
+                                >
+                                  <strong>Description:</strong>{" "}
+                                  {category.description}
                                 </p>
-                                <p style={{ fontSize: "14px", marginBottom: "8px" }}>
-                                  <strong>Weightage:</strong> {category.weightage}%
+                                <p
+                                  style={{
+                                    fontSize: "14px",
+                                    marginBottom: "8px",
+                                  }}
+                                >
+                                  <strong>Weightage:</strong>{" "}
+                                  {category.weightage}%
                                 </p>
                                 <div>
                                   <strong>Grade Values:</strong>
@@ -461,10 +386,16 @@ const Grading = () => {
                                               marginRight: 8,
                                             }}
                                           >
-                                            {value.grade_value} ({value.min_percentage}-
+                                            {value.grade_value} (
+                                            {value.min_percentage}-
                                             {value.max_percentage}%)
                                           </span>
-                                          <span style={{ fontSize: "13px", color: "#555" }}>
+                                          <span
+                                            style={{
+                                              fontSize: "13px",
+                                              color: "#555",
+                                            }}
+                                          >
                                             - {value.description}
                                           </span>
                                         </li>
@@ -500,8 +431,14 @@ const Grading = () => {
                                 <h6 style={{ marginBottom: "8px" }}>
                                   {progCat.category_name}
                                 </h6>
-                                <p style={{ fontSize: "14px", marginBottom: "8px" }}>
-                                  <strong>Description:</strong> {progCat.description}
+                                <p
+                                  style={{
+                                    fontSize: "14px",
+                                    marginBottom: "8px",
+                                  }}
+                                >
+                                  <strong>Description:</strong>{" "}
+                                  {progCat.description}
                                 </p>
                                 <div>
                                   <strong>Progress Values:</strong>
@@ -519,10 +456,17 @@ const Grading = () => {
                                               marginRight: 8,
                                             }}
                                           >
-                                            {value.min_progress}-{value.max_progress}
+                                            {value.min_progress}-
+                                            {value.max_progress}
                                           </span>
-                                          <span style={{ fontSize: "13px", color: "#555" }}>
-                                            {value.description} ({value.grade_description})
+                                          <span
+                                            style={{
+                                              fontSize: "13px",
+                                              color: "#555",
+                                            }}
+                                          >
+                                            {value.description} (
+                                            {value.grade_description})
                                           </span>
                                         </li>
                                       ))}
