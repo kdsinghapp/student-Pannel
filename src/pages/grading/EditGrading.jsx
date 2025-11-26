@@ -76,59 +76,65 @@ const EditGrading = () => {
         setCurriculums(curriculumRes.data?.data || []);
 
         if (id) {
-          // Use helper which calls the correct GET endpoint
           const schemaRes = await getGradingSchemaById(id);
 
           const schema = schemaRes?.data;
           if (schema) {
             setSchemaDescription(schema.description || "");
-            setSelectedCurriculumId(
-              schema.school_curriculum_id?.toString() || ""
-            );
-
-            if (
-              schema.grading_categories &&
-              schema.grading_categories.length > 0
+            let curriculumId = "";
+            if (schema.school_curriculum_id) {
+              curriculumId = schema.school_curriculum_id.toString();
+            } else if (
+              Array.isArray(schema.divisions) &&
+              schema.divisions.length > 0
             ) {
-              const transformedGradeCategories = schema.grading_categories.map(
-                (cat) => ({
-                  id: cat.id,
-                  category_name: cat.category_name,
-                  description: cat.description || "",
-                  weightage: cat.weightage || "",
-                  gradeValues:
-                    cat.values?.map((val) => ({
-                      id: val.id,
-                      grade_value: val.grade_value,
-                      min_percentage: val.min_percentage?.toString() || "",
-                      max_percentage: val.max_percentage?.toString() || "",
-                      color: val.color,
-                      description: val.description,
-                    })) || [],
-                })
-              );
+              curriculumId = (
+                schema.divisions[0].school_curriculum_id ||
+                schema.divisions[0].school_curriculum?.id ||
+                ""
+              ).toString();
+            }
+            setSelectedCurriculumId(curriculumId || "");
+
+            // Categories: API may return `categories` or `grading_categories`.
+            const categories =
+              schema.categories || schema.grading_categories || [];
+            if (Array.isArray(categories) && categories.length > 0) {
+              const transformedGradeCategories = categories.map((cat) => ({
+                id: cat.id,
+                category_name: cat.category_name,
+                description: cat.description || "",
+                weightage: cat.weightage || "",
+                gradeValues:
+                  cat.values?.map((val) => ({
+                    id: val.id,
+                    grade_value: val.grade_value,
+                    min_percentage: val.min_percentage?.toString() || "",
+                    max_percentage: val.max_percentage?.toString() || "",
+                    color: val.color || "#ffffff",
+                    description: val.description || "",
+                  })) || [],
+              }));
               setGradeCategories(transformedGradeCategories);
             }
 
-            if (
-              schema.progress_categories &&
-              schema.progress_categories.length > 0
-            ) {
-              const transformedProgressCategories =
-                schema.progress_categories.map((cat) => ({
-                  id: cat.id,
-                  category_name: cat.category_name,
-                  description: cat.description || "",
-                  progressRanges:
-                    cat.values?.map((range) => ({
-                      id: range.id,
-                      min_progress: range.min_progress?.toString() || "",
-                      max_progress: range.max_progress?.toString() || "",
-                      color: range.color,
-                      description: range.description,
-                      grade_description: range.grade_description,
-                    })) || [],
-                }));
+            const progCats =
+              schema.progress_categories || schema.progressCategories || [];
+            if (Array.isArray(progCats) && progCats.length > 0) {
+              const transformedProgressCategories = progCats.map((cat) => ({
+                id: cat.id,
+                category_name: cat.category_name,
+                description: cat.description || "",
+                progressRanges:
+                  cat.values?.map((range) => ({
+                    id: range.id,
+                    min_progress: range.min_progress?.toString() || "",
+                    max_progress: range.max_progress?.toString() || "",
+                    color: range.color || "#ffffff",
+                    description: range.description || "",
+                    grade_description: range.grade_description || "",
+                  })) || [],
+              }));
               setProgressCategories(transformedProgressCategories);
             }
           }
@@ -525,7 +531,6 @@ const EditGrading = () => {
                               }
                             />
                           </div>
-                          {/* Dynamic Grade Value Inputs */}
                           {cat.gradeValues.map((grade, idx) => (
                             <div key={idx}>
                               <div className="mb-3 d-flex align-items-end">
@@ -760,7 +765,6 @@ const EditGrading = () => {
                               }
                             />
                           </div>
-                          {/* Progress Ranges */}
                           {cat.progressRanges.map((range, rangeIdx) => (
                             <div key={rangeIdx}>
                               <div className="mt-3 d-flex align-items-end pb-3 ">
