@@ -510,19 +510,28 @@ export const updateGradingSchemaById = async (id, formData) => {
 // Get grading schema by ID
 export const getGradingSchemaById = async (id) => {
   const token = localStorage.getItem("userTokenStudent");
+
   try {
-    const res = await axios.get(`${API_URL}/user/grading/grading-schema/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const res = await axios.get(
+      `${API_URL}/user/grading/get-grading-schema-by-id`,
+      {
+        params: {
+          schema_id: id,  
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
     return res.data;
   } catch (error) {
     console.error("Error fetching grading schema by ID:", error);
     throw error;
   }
 };
+
 
 // ---------------------- DEPARTMENTS ----------------------
 export const getDepartments = async (school_id = null) => {

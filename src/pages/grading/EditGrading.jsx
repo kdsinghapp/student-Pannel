@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Headers from "../../components/Headers";
 import Sidebar from "../../components/Sidebar";
 import axios from "axios";
+import { getGradingSchemaById } from "../../utils/authApi";
 
 const API_URL = "https://server-php-8-3.technorizen.com/gradesphere/api";
 
@@ -75,17 +76,10 @@ const EditGrading = () => {
         setCurriculums(curriculumRes.data?.data || []);
 
         if (id) {
-          const schemaRes = await axios.get(
-            `${API_URL}/user/grading/grading-schema/${id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          // Use helper which calls the correct GET endpoint
+          const schemaRes = await getGradingSchemaById(id);
 
-          const schema = schemaRes.data?.data;
+          const schema = schemaRes?.data;
           if (schema) {
             setSchemaDescription(schema.description || "");
             setSelectedCurriculumId(
