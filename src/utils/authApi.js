@@ -730,3 +730,31 @@ export const getSubjectById = async (id) => {
     return { status: false, message: "Failed to fetch subject", data: null };
   }
 };
+
+
+export const getUserProfile = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/user/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    throw error;
+  }
+};
+
+// ✅ Update user profile (optional helper)
+export const updateUserProfile = async (formData) => {
+  try {
+    const response = await axios.post(`${API_URL}/user/profile/update`, formData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    throw error;
+  }
+};
