@@ -9,9 +9,7 @@ import createdDate from "../../assets/assets/icon/class.png";
 import Sidebar from "../../components/Sidebar";
 import * as bootstrap from "bootstrap";
 import DownloadTemplate from "../../components/DownloadTemplate";
-import {
-  getAllSubjects, deleteSubjectById
-} from "../../utils/authApi";
+import { getAllSubjects, deleteSubjectById } from "../../utils/authApi";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -27,7 +25,7 @@ const Subjects = () => {
     setLoading(true);
     try {
       const res = await getAllSubjects();
-      console.log("subject-list", res)
+      console.log("subject-list", res);
       if (res.status) {
         setSubjects(res.data);
       }
@@ -61,8 +59,12 @@ const Subjects = () => {
     }
 
     const sortedData = [...subjects].sort((a, b) => {
-      if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
-      if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
+      // Safely handle nested or null/undefined values
+      const aVal = (key === "department" ? (a.department?.name ?? a.department_id) : (a[key] ?? "")).toString();
+      const bVal = (key === "department" ? (b.department?.name ?? b.department_id) : (b[key] ?? "")).toString();
+
+      if (aVal < bVal) return direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return direction === "asc" ? 1 : -1;
       return 0;
     });
 
@@ -80,38 +82,44 @@ const Subjects = () => {
   };
 
   const navigateToAddSubject = () => {
-    navigate("/add-subject")
+    navigate("/add-subject");
   };
 
-const handleDelete = async (id) => {
-  Swal.fire({
-    title: "Are you sure?",
-    text: "You won't be able to revert this!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, delete it!",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        await deleteSubjectById(id);
-        Swal.fire("Deleted!", "The subject has been deleted.", "success").then(() => {
-          // Reload the page after delete
-          window.location.reload();
-        });
-      } catch (error) {
-        Swal.fire("Error!", "Failed to delete the subject.", "error");
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteSubjectById(id);
+          Swal.fire(
+            "Deleted!",
+            "The subject has been deleted.",
+            "success"
+          ).then(() => {
+            // Reload the page after delete
+            window.location.reload();
+          });
+        } catch (error) {
+          Swal.fire("Error!", "Failed to delete the subject.", "error");
+        }
       }
-    }
-  });
-};
-
+    });
+  };
 
   // Calculate paginated subjects
   const indexOfLastSubject = currentPage * itemsPerPage;
   const indexOfFirstSubject = indexOfLastSubject - itemsPerPage;
-  const currentSubjects = subjects.slice(indexOfFirstSubject, indexOfLastSubject);
+  const currentSubjects = subjects.slice(
+    indexOfFirstSubject,
+    indexOfLastSubject
+  );
   const totalPages = Math.ceil(subjects.length / itemsPerPage);
 
   const handlePageChange = (pageNumber) => {
@@ -188,22 +196,25 @@ const handleDelete = async (id) => {
                 {loading && (
                   <div
                     style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      minHeight: '300px',
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      minHeight: "300px",
                     }}
                   >
                     <div
                       className="spinner-border text-primary"
                       role="status"
-                      style={{ width: '4rem', height: '4rem' }}
+                      style={{ width: "4rem", height: "4rem" }}
                     >
                       <span className="visually-hidden">Loading...</span>
                     </div>
                   </div>
                 )}
-                <div className="table-responsive" style={{ display: loading ? 'none' : 'block' }}>
+                <div
+                  className="table-responsive"
+                  style={{ display: loading ? "none" : "block" }}
+                >
                   <table className="table display data-table">
                     <thead style={{ lineHeight: "35px", fontSize: "15px" }}>
                       <tr>
@@ -216,7 +227,8 @@ const handleDelete = async (id) => {
                           <i className={getSortIcon("name")} />
                         </th>
                         <th>
-                          <img src={departmentIcon} alt="Department" /> Department
+                          <img src={departmentIcon} alt="Department" />{" "}
+                          Department
                         </th>
                         <th onClick={() => sortData("created_at")}>
                           <img src={createdDate} alt="Created" /> Created Date{" "}
@@ -228,36 +240,53 @@ const handleDelete = async (id) => {
                     <tbody>
                       {(!subjects || !subjects.length) && (
                         <tr style={{ lineHeight: "35px", fontSize: "15px" }}>
-                          <td colSpan="5" className="text-center">No Data Found</td>
+                          <td colSpan="5" className="text-center">
+                            No Data Found
+                          </td>
                         </tr>
                       )}
-                      {currentSubjects && currentSubjects.map((subject) => (
-                        <tr key={subject.id} style={{ lineHeight: "35px", fontSize: "15px" }}>
-                          <td>{subject.id}</td>
-                          <td>{subject.name}</td>
-                          <td>{subject.department.name}</td>
-                          <td>{new Date(subject.created_at).toLocaleDateString()}</td>
+                      {currentSubjects &&
+                        currentSubjects.map((subject) => (
+                          <tr
+                            key={subject.id}
+                            style={{ lineHeight: "35px", fontSize: "15px" }}
+                          >
+                            <td>{subject.id}</td>
+                            <td>{subject.name}</td>
+                            <td>{subject.department?.name || subject.department_id || "N/A"}</td>
+                            <td>
+                              {new Date(
+                                subject.created_at
+                              ).toLocaleDateString()}
+                            </td>
 
-<td className="action-icons">
-  <a
-    href="#"
-    onClick={() => navigate(`/edit-subject/${subject.id}`)}
-  >
-    <i className="fas fa-edit" title="Edit Subject" />
-  </a>
-  <a
-    href="#"
-    onClick={() => { console.log('Delete subject id:', subject.id); handleDelete(subject.id); }}
-  >
-    <i className="fas fa-trash" title="Delete Subject" />
-  </a>
-</td>
-
-
-
-
-                        </tr>
-                      ))}
+                            <td className="action-icons">
+                              <a
+                                href="#"
+                                onClick={() =>
+                                  navigate(`/edit-subject/${subject.id}`)
+                                }
+                              >
+                                <i
+                                  className="fas fa-edit"
+                                  title="Edit Subject"
+                                />
+                              </a>
+                              <a
+                                href="#"
+                                onClick={() => {
+                                  console.log("Delete subject id:", subject.id);
+                                  handleDelete(subject.id);
+                                }}
+                              >
+                                <i
+                                  className="fas fa-trash"
+                                  title="Delete Subject"
+                                />
+                              </a>
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>
@@ -268,18 +297,44 @@ const handleDelete = async (id) => {
             {subjects.length > itemsPerPage && (
               <nav aria-label="Subject table pagination" className="mt-3">
                 <ul className="pagination justify-content-center">
-                  <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
-                    <button className="page-link" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                  <li
+                    className={`page-item${
+                      currentPage === 1 ? " disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
                       Previous
                     </button>
                   </li>
                   {Array.from({ length: totalPages }, (_, i) => (
-                    <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
-                      <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
+                    <li
+                      key={i + 1}
+                      className={`page-item${
+                        currentPage === i + 1 ? " active" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
                     </li>
                   ))}
-                  <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
-                    <button className="page-link" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                  <li
+                    className={`page-item${
+                      currentPage === totalPages ? " disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
                       Next
                     </button>
                   </li>
@@ -334,10 +389,7 @@ const handleDelete = async (id) => {
                 >
                   Cancel
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-success"
-                >
+                <button type="button" className="btn btn-success">
                   Upload
                 </button>
               </div>
