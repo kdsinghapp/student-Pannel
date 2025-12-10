@@ -190,7 +190,7 @@ const Subjects = () => {
             </div>
             {/* Subject Table Area Start Here */}
 
-            {/* Add a Loader */}
+            {/* Add a Loadera */}
             <div className="card height-auto">
               <div className="card-body p-0">
                 {loading && (
